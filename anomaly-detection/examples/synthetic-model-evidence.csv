@@ -1,0 +1,4 @@
+synthetic,transaction_id,journey,scenario,subject_id,related_entity,existing_control_score,transaction_amount,amount_at_risk,saned_case_id
+true,SANED-CSV-ROUTINE,SANED,Routine synthetic history,SYN-SUBJECT-1,SYN-EMP-1,20,12000,12000,SYN-demo-00000
+true,SANED-CSV-COORDINATED,SANED,Coordinated synthetic history,SYN-SUBJECT-2,SYN-EMP-2,20,12000,12000,SYN-demo-00002
+true,SANED-CSV-INCOMPLETE,SANED,Missing synthetic evidence,SYN-SUBJECT-3,SYN-EMP-3,20,12000,12000,SYN-demo-00005

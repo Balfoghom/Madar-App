@@ -1,0 +1,16 @@
+case_id,journey,scenario,masked_subject_id,masked_related_entity_id,assessment_datetime,existing_rule_score,ai_anomaly_score,interaction_uplift,overall_risk_score,risk_level,reason_codes,recommended_action,status,confirmed_outcome,model_version
+BRI-004,Employer Registration,Rapid registration and exclusion cluster,EMP-880,SUP-308,2026-09-27 09:55:00,80,97,15,100,High,RAPID_REGISTRATION_EXCLUSION|EMPLOYER_CLUSTER|SHARED_SUPERVISOR_CONTACT|EMPLOYER_HISTORY,Fraud & Inspection Review,Awaiting review,Pending,0.4
+BRI-001,Benefit Payments,IBAN ownership mismatch,BEN-1048,IBAN-4421,2026-09-27 09:08:00,88,58,15,90,High,IBAN_OWNER_MISMATCH|SHARED_IBAN|RECENT_IBAN_CHANGE,Payment Verification & Fraud Review,Awaiting review,Pending,0.4
+BRI-013,SANED,Retroactive exclusion followed by request,CTR-2370,EMP-341,2026-09-27 13:05:00,76,83,8,87,High,REPEATED_EXCLUSION_EDIT|RETROACTIVE_EXCLUSION|RAPID_SANED_REQUEST|EMPLOYER_REQUEST_CLUSTER,Fraud & Inspection Review,Awaiting review,Pending,0.4
+BRI-007,Retirement,Re-employment detected through WPS,RET-1711,EMP-644,2026-09-27 10:58:00,75,57,8,75,Medium,WPS_REEMPLOYMENT_SIGNAL|PAYMENT_ELIGIBILITY_CONFLICT,Eligibility Verification,Awaiting review,Pending,0.4
+BRI-010,Maternity Benefit,Salary spike before benefit request,BEN-2056,EMP-933,2026-09-27 12:03:00,72,59,8,74,Medium,SALARY_SPIKE_BEFORE_BENEFIT|SHORT_EMPLOYMENT_SEQUENCE|EMPLOYMENT_RELATIONSHIP_ANOMALY,Insurance Operations Audit,Awaiting review,Pending,0.4
+BRI-005,Employer Registration,Elevated employment churn,EMP-512,SUP-196,2026-09-27 10:16:00,50,68,10,68,Medium,EMPLOYMENT_CHURN|LINKED_CONTRIBUTORS,Insurance Operations Audit,Awaiting review,Pending,0.4
+BRI-008,Retirement,Unconfirmed WPS employment signal,RET-1850,EMP-302,2026-09-27 11:19:00,50,56,0,53,Medium,WPS_EMPLOYMENT_SIGNAL|DATA_QUALITY_GAP,Eligibility Verification,Awaiting review,Pending,0.4
+BRI-011,Maternity Benefit,Relationship requires verification,BEN-2188,EMP-775,2026-09-27 12:27:00,48,35,0,42,Medium,SHARED_DEVICE|SALARY_CHANGE,Insurance Operations Audit,Awaiting review,Pending,0.4
+BRI-014,SANED,Rapid request after exclusion change,CTR-2419,EMP-455,2026-09-27 13:28:00,46,27,0,37,Medium,RAPID_SANED_REQUEST|EXCLUSION_CHANGE,Insurance Operations Audit,Awaiting review,Pending,0.4
+BRI-002,Benefit Payments,Shared contact before IBAN change,BEN-1154,MOB-7782,2026-09-27 09:22:00,45,22,0,35,Medium,SHARED_MOBILE|PROFILE_CHANGE_SEQUENCE,IBAN Ownership Verification,Awaiting review,Pending,0.4
+BRI-006,Employer Registration,Normal employer activity,EMP-220,SUP-041,2026-09-27 10:34:00,10,10,0,10,Low,NO_MATERIAL_ANOMALY,Seamless processing,Awaiting review,Pending,0.4
+BRI-012,Maternity Benefit,Stable employment relationship,BEN-2291,EMP-119,2026-09-27 12:49:00,11,0,0,6,Low,NO_MATERIAL_ANOMALY,Seamless processing,Awaiting review,Pending,0.4
+BRI-015,SANED,Standard SANED request,CTR-2504,EMP-611,2026-09-27 13:47:00,9,0,0,5,Low,NO_MATERIAL_ANOMALY,Seamless processing,Awaiting review,Pending,0.4
+BRI-003,Benefit Payments,Verified benefit payment,BEN-1231,IBAN-8012,2026-09-27 09:37:00,8,0,0,4,Low,NO_MATERIAL_ANOMALY,Seamless processing,Awaiting review,Pending,0.4
+BRI-009,Retirement,No re-employment evidence,RET-1924,,2026-09-27 11:41:00,7,0,0,4,Low,NO_MATERIAL_ANOMALY,Seamless processing,Awaiting review,Pending,0.4

@@ -1,0 +1,22 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {spawn} from 'node:child_process';
+import {mkdtemp,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {once} from 'node:events';
+import {fileURLToPath} from 'node:url';
+test('single-server hosting supplies assets and same-origin API behind optional demo access',async t=>{
+ const dir=await mkdtemp(join(tmpdir(),'madar-host-'));
+ const child=spawn(process.execPath,[fileURLToPath(new URL('../../start.mjs',import.meta.url))],{env:{...process.env,PORT:'0',HOST:'127.0.0.1',ASSESSMENT_DATA_DIR:dir,MADAR_DEMO_PASSWORD:'synthetic-test-gate'},stdio:['ignore','pipe','pipe']});
+ t.after(async()=>{if(child.exitCode===null){child.kill();await once(child,'exit');}await rm(dir,{recursive:true,force:true});});
+ const port=await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('Madar startup timeout')),10000);child.stdout.on('data',chunk=>{const match=String(chunk).match(/localhost:(\d+)/);if(match){clearTimeout(timer);resolve(match[1]);}});child.on('error',error=>{clearTimeout(timer);reject(error);});child.stderr.on('data',chunk=>{clearTimeout(timer);reject(new Error(String(chunk)));});});
+ const base=`http://127.0.0.1:${port}`;
+ assert.equal((await fetch(base)).status,401);
+ const headers={Authorization:'Basic '+Buffer.from('madar:synthetic-test-gate').toString('base64')};
+ const page=await fetch(base,{headers});assert.equal(page.status,200);const html=await page.text();assert.match(html,/Madar \| مدار/);assert.match(html,/window.MADAR_API_BASE="\/api"/);
+ assert.equal((await fetch(base+'/madar.js',{headers})).status,200);
+ const health=await(await fetch(base+'/api/health',{headers})).json();assert.equal(health.crossJourneyModelVersion,'madar-cross-journey-rf-20261017-v1');
+ assert.equal((await fetch(base+'/anomaly-detection/data/backend-assessments.json',{headers})).status,404);
+ assert.equal((await fetch(base+'/api/cross-journey/assess',{method:'POST',headers:{...headers,Origin:'https://unrelated.example'},body:'{}'})).status,403);
+});

@@ -1,0 +1,28 @@
+event_id,case_id,event_type,event_datetime,source_system,existing_rule_trigger,event_value,risk_contribution,data_quality_status
+EV-001,BRI-001,IBAN change,2026-09-21 09:08:00,Beneficiary Profile,false,Change submitted,0,Complete
+EV-002,BRI-001,IBAN ownership mismatch,2026-09-25 09:08:00,Ownership Verification,true,Different verified owner,20,Conflicting
+EV-003,BRI-001,Shared IBAN link,2026-09-27 09:08:00,Behavioral Intelligence,false,3 linked profiles,18,Complete
+EV-004,BRI-002,Shared mobile link,2026-09-26 07:22:00,Profile System,true,3 linked profiles,13,Complete
+EV-005,BRI-002,IBAN change,2026-09-27 01:22:00,Beneficiary Profile,false,Submitted after contact update,8,Complete
+EV-006,BRI-004,Registration-exclusion cluster,2026-09-24 09:55:00,Subscription System,true,12 events in 72 hours,18,Complete
+EV-007,BRI-004,Linked contributor cluster,2026-09-27 09:55:00,Behavioral Intelligence,false,18 linked contributors,18,Complete
+EV-008,BRI-004,Prior violation outcome,2026-09-20 09:55:00,Fraud Outcomes,true,Confirmed employer history,16,Complete
+EV-009,BRI-005,Employment churn,2026-09-27 10:16:00,Subscription System,true,6 rapid changes,18,Complete
+EV-010,BRI-007,WPS salary record,2026-09-17 10:58:00,WPS,false,Salary payment detected,20,Complete
+EV-011,BRI-007,Eligibility conflict,2026-09-27 10:58:00,Behavioral Intelligence,false,Retirement payment status conflict,18,Conflicting
+EV-012,BRI-008,WPS employment signal,2026-09-22 11:19:00,WPS,false,Employment signal detected,12,Unverified
+EV-013,BRI-008,Missing employment start date,2026-09-27 11:19:00,Data Quality Layer,true,Required date missing,9,Missing
+EV-014,BRI-010,Employment registration,2026-08-13 12:03:00,Subscription System,false,Relationship created,0,Complete
+EV-015,BRI-010,Salary increase,2026-09-15 12:03:00,Subscription System,true,180 percent increase,17,Complete
+EV-016,BRI-010,Maternity benefit request,2026-09-27 12:03:00,Benefits System,false,Request received,15,Complete
+EV-017,BRI-011,Shared device link,2026-09-27 12:27:00,Session Context,true,3 linked profiles,13,Complete
+EV-018,BRI-013,Retroactive exclusion,2026-09-08 13:05:00,Subscription System,true,19 retroactive days,16,Complete
+EV-019,BRI-013,Repeated exclusion edit,2026-09-26 21:05:00,Subscription System,true,Reason changed again,15,Complete
+EV-020,BRI-013,SANED request,2026-09-27 13:05:00,Benefits System,false,Request received,15,Complete
+EV-021,BRI-014,Exclusion change,2026-09-26 16:28:00,Subscription System,true,Change within 24 hours,12,Complete
+EV-022,BRI-014,SANED request,2026-09-27 13:28:00,Benefits System,false,Request received,10,Complete
+EV-023,BRI-003,Verified payment context,2026-09-27 09:37:00,Ownership Verification,false,Consistent owner and profile,0,Complete
+EV-024,BRI-006,Routine employer activity,2026-09-27 10:34:00,Subscription System,false,Within baseline,0,Complete
+EV-025,BRI-009,Periodic eligibility check,2026-09-27 11:41:00,Eligibility System,false,No conflicting evidence,0,Complete
+EV-026,BRI-012,Stable employment history,2026-09-27 12:49:00,Subscription System,false,18 month relationship,0,Complete
+EV-027,BRI-015,Standard SANED sequence,2026-09-27 13:47:00,Benefits System,false,Within baseline,0,Complete

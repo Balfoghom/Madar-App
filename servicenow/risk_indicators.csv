@@ -1,0 +1,13 @@
+indicator_code,indicator_name,category,risk_weight,threshold,status,source,ai_suggested,owner_role
+RI-01,IBAN ownership mismatch,Payment identity,20,Verified owner differs from beneficiary profile,Approved,Ownership verification,false,Fraud Supervisor
+RI-02,Shared IBAN across profiles,Linked identity,18,IBAN linked to 2 or more profiles,Approved,Cross-profile link,false,Fraud Supervisor
+RI-03,Shared mobile or device,Digital identity,13,Identifier linked to 3 or more profiles,Approved,Contact or session context,false,Fraud Supervisor
+RI-04,Rapid registration and exclusion,Employer behavior,18,Repeated events within approved window,Approved,Employment events,false,Fraud Supervisor
+RI-05,Retroactive material change,Event sequence,16,7 or more retroactive days,Approved,Historical event,false,Fraud Supervisor
+RI-06,WPS employment conflict,Cross-source conflict,20,Payroll evidence conflicts with benefit status,Approved,WPS evidence,false,Fraud Supervisor
+RI-07,Salary spike before benefit,Benefit sequence,17,Material increase inside approved window,Approved,Salary event,false,Fraud Supervisor
+RI-08,Short employment-benefit sequence,Behavioral timing,15,Sequence shorter than approved baseline,Approved,Derived signal,false,Fraud Supervisor
+RI-09,Employer violation history,Confirmed outcomes,16,Approved prior-outcome threshold,Approved,Fraud outcomes,false,Fraud Supervisor
+RI-10,Linked request cluster,Entity network,18,Linked volume exceeds approved baseline,Approved,Derived signal,false,Fraud Supervisor
+AI-01,Cross-benefit shared-identifier network,Cross-service pattern,0,To be defined through testing,Proposed,AI suggestion,true,Fraud Supervisor
+AI-02,Payroll-benefit eligibility sequence conflict,Cross-source pattern,0,To be defined through testing,Proposed,AI suggestion,true,Fraud Supervisor

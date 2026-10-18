@@ -1,0 +1,9 @@
+.git
+.madar-data
+node_modules
+**/backend-assessments.json
+**/queue-cases.json
+**/human-reviews.json
+**/risk-config.json
+**/indicator-suggestions.json
+**/scenario-proposals.json

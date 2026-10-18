@@ -1,0 +1,23 @@
+# Operating system and local development files
+.DS_Store
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.log
+.env
+.env.*
+!.env.example
+
+# Local demo sessions (created automatically by the backend)
+anomaly-detection/data/backend-assessments.json
+anomaly-detection/data/queue-cases.json
+anomaly-detection/data/human-reviews.json
+anomaly-detection/data/scenario-proposals.json
+anomaly-detection/data/indicator-suggestions.json
+anomaly-detection/data/risk-config.json
+anomaly-detection/data/*.tmp
+
+# Local Madar demo records
+.madar-data/

@@ -1,0 +1,1581 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Enterprise multi-journey prototype for explainable behavioral risk assessment, proactive routing, and governed AI-assisted fraud prevention."
+    />
+    <title>Madar | مدار — Behavioral Intelligence</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="styles.css?v=1.7.0" />
+  <link rel="icon" href="madar-mark.svg" type="image/svg+xml">
+<link rel="stylesheet" href="madar.css?v=2">
+</head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <img class="madar-mark" src="madar-mark.svg" alt="">
+          <div>
+            <strong>Madar <span lang="ar" class="brand-ar">مدار</span></strong><span>Behavioral intelligence</span>
+          </div>
+        </div>
+
+        <nav aria-label="Main navigation">
+<button class="nav-item" data-view="connected"><span>◎</span> Connected Journeys</button>
+          <button class="nav-item active" data-view="dashboard">
+            <span>◫</span> Dashboard
+          </button>
+          <button class="nav-item" data-view="executive">
+            <span>◆</span> Executive Dashboard
+          </button>
+          <button class="nav-item" data-view="queue">
+            <span>▦</span> Intelligence Queue
+          </button>
+          <button class="nav-item" data-view="business-report">
+            <span>▤</span> Monthly Business Report
+          </button>
+          <button class="nav-item" data-view="intake">
+            <span>⇧</span> Data Intake
+          </button>
+          <button class="nav-item" data-view="simulation">
+            <span>≋</span> Legacy Scoring Sandbox
+          </button>
+          <button class="nav-item" data-view="indicators">
+            <span>⌁</span> Risk Indicators
+          </button>
+          <button class="nav-item" data-view="method">
+            <span>◎</span> Model & Governance
+          </button>
+          <button class="nav-item" data-view="appendix">
+            <span>≡</span> Appendix: Scoring
+          </button>
+          <button class="nav-item" data-view="ai-demo">
+            <span>✦</span> Model Evidence
+          </button>
+        </nav>
+        <div class="sidebar-note">
+          <span class="live-dot"></span>
+          <div>
+            <strong>Synthetic demonstration</strong
+            ><small>Synthetic data · no live action</small>
+          </div>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">ADAPTIVE BEHAVIORAL INTELLIGENCE & DECISIONING</p>
+            <h1>Madar | مدار</h1>
+          </div>
+          <div class="header-actions">
+            <div class="stream-state">
+              <span class="pulse-dot"></span>
+              <div>
+                <strong id="engine-status">Checking local model service…</strong
+                ><small id="last-updated">Synthetic feed · just now</small>
+              </div>
+            </div>
+            <span class="model-pill" id="model-state-pill">Madar demo</span>
+            <div class="avatar" aria-label="Fraud specialist">FS</div>
+          </div>
+        </header>
+
+        <section id="connected-view" class="view"><div id="madar-workspace"></div></section>
+<section id="dashboard-view" class="view active-view">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">OPERATIONAL OVERVIEW</p>
+              <h2>Behavioral risk command center</h2>
+              <p>
+                Illustrative portfolio and assessed synthetic cases across benefit, contribution, employer, and payment journeys.
+              </p>
+            </div>
+            <div class="heading-actions">
+              <button class="secondary-btn" id="dashboard-upload-btn">
+                Upload assessment data</button
+              ><button class="primary-btn" id="dashboard-assessment-btn">
+                ＋ New assessment
+              </button>
+            </div>
+          </div>
+          <div
+            class="metric-grid dashboard-metrics"
+            id="dashboard-metrics"
+          ></div>
+          <div class="dashboard-grid">
+            <article class="panel risk-overview-card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">RISK DISTRIBUTION</p>
+                  <h3>Current behavioral assessments</h3>
+                </div>
+                <span class="data-badge" id="dataset-badge"
+                  >60 synthetic cases</span
+                >
+              </div>
+              <div id="risk-distribution"></div>
+              <div class="decision-note">
+                <strong>Risk is not a fraud determination.</strong> The score
+                prioritizes proportionate review; authorized specialists retain
+                the final decision.
+              </div>
+            </article>
+            <article class="panel journey-card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">JOURNEY COVERAGE</p>
+                  <h3>Cases by service journey</h3>
+                </div>
+              </div>
+              <div id="journey-chart" class="journey-chart"></div>
+            </article>
+            <article class="panel map-card">
+              <div class="card-heading map-heading">
+                <div>
+                  <p class="eyebrow">SYNTHETIC GEOGRAPHIC VIEW</p>
+                  <h3>Saudi Arabia case concentration</h3>
+                  <p>
+                    Accurate country outline; marker size reflects volume and
+                    color reflects the highest current risk band.
+                  </p>
+                </div>
+                <button class="text-btn" id="clear-region-filter" hidden>
+                  Clear region filter
+                </button>
+              </div>
+              <div class="map-layout">
+                <div
+                  class="saudi-map-wrap"
+                  id="saudi-map"
+                  aria-label="Saudi Arabia risk distribution map"
+                ></div>
+                <div class="region-ranking" id="region-ranking"></div>
+              </div>
+            </article>
+            <article class="panel outside-card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">LOCATION CONTEXT</p>
+                  <h3>Outside Saudi Arabia</h3>
+                  <p>
+                    Displayed as one privacy-minimized category. Open it to view
+                    the relevant cases.
+                  </p>
+                </div>
+                <span class="count-pill" id="outside-count">0</span>
+              </div>
+              <div id="outside-list" class="outside-list"></div>
+            </article>
+          </div>
+          <article class="panel activity-card">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">EXPLAINABLE AI ACTIVITY</p>
+                <h3>Latest assessment decisions</h3>
+              </div>
+              <button class="text-btn" data-go-view="queue">
+                Open full queue
+              </button>
+            </div>
+            <div id="latest-activity" class="latest-activity"></div>
+          </article>
+        </section>
+
+        <section id="executive-view" class="view">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">EXECUTIVE DECISION VIEW</p>
+              <h2>Proactive risk and benefit realization</h2>
+              <p>
+                A concise leadership view of portfolio exposure, intervention,
+                service flow, and matters requiring executive attention.
+              </p>
+            </div>
+            <div class="heading-actions">
+              <span class="data-badge">Synthetic / session evidence</span
+              ><button class="secondary-btn" data-go-view="business-report">
+                Open monthly report
+              </button>
+            </div>
+          </div>
+          <div class="executive-banner">
+            <div>
+              <span>ENTERPRISE OBJECTIVE</span
+              ><strong
+                >Move from retrospective search to explainable, risk-based
+                intervention during the transaction journey.</strong
+              >
+            </div>
+            <div class="executive-principles">
+              <span>Proactive</span><span>Risk-based</span
+              ><span>Explainable</span><span>Human-governed</span>
+            </div>
+          </div>
+          <div
+            id="executive-metrics"
+            class="metric-grid executive-metrics"
+          ></div>
+          <div class="executive-grid">
+            <article class="panel">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">DECISION FUNNEL</p>
+                  <h3>Proportionate treatment of assessed activity</h3>
+                </div>
+              </div>
+              <div id="executive-funnel" class="executive-funnel"></div>
+            </article>
+            <article class="panel">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">PORTFOLIO CONCENTRATION</p>
+                  <h3>Where leadership attention is concentrated</h3>
+                </div>
+              </div>
+              <div id="executive-journeys" class="executive-journeys"></div>
+            </article>
+            <article class="panel executive-attention">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">EXECUTIVE ATTENTION</p>
+                  <h3>Priority matters and control signals</h3>
+                </div>
+                <span class="count-pill" id="executive-attention-count">0</span>
+              </div>
+              <div id="executive-attention-list"></div>
+            </article>
+            <article class="panel benefit-card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">BENEFIT REALIZATION</p>
+                  <h3>Detected exposure and pre-payment intervention</h3>
+                </div>
+              </div>
+              <div id="benefit-realization"></div>
+              <div class="scope-note">
+                <strong>Measurement boundary:</strong> all figures in this
+                prototype are synthetic. In production, confirmed fraud and
+                prevented amounts require an authorized specialist outcome and
+                verified payment status.
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="business-report-view" class="view">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">MONTHLY BUSINESS OWNER REPORT</p>
+              <h2>Risks, root causes, actions, and ownership</h2>
+              <p>
+                A decision-ready report for service owners—generated from the
+                current assessed dataset and confirmed review outcomes.
+              </p>
+            </div>
+            <div class="heading-actions">
+              <button class="secondary-btn" id="print-business-report">
+                Print / Save PDF</button
+              ><button class="primary-btn" id="generate-business-report">
+                Generate report
+              </button>
+            </div>
+          </div>
+          <div class="report-controls panel">
+            <label
+              >Reporting period<input id="report-month" type="month"
+            /></label>
+            <label
+              >Business journey<select id="report-journey">
+                <option value="All">All service journeys</option>
+              </select></label
+            >
+            <label
+              >Report owner<select id="report-owner">
+                <option value="Enterprise">
+                  Enterprise Risk &amp; Fraud Management
+                </option>
+              </select></label
+            >
+            <div class="report-state">
+              <span class="live-dot"></span>
+              <div>
+                <strong>Generated from current session</strong
+                ><small id="report-generated-at">Not generated yet</small>
+              </div>
+            </div>
+          </div>
+          <div id="report-metrics" class="metric-grid report-metrics"></div>
+          <div class="report-grid">
+            <article class="panel report-summary">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">AI MANAGEMENT SUMMARY</p>
+                  <h3>What the business owner needs to know</h3>
+                </div>
+                <span class="status-chip approved">Prototype-generated</span>
+              </div>
+              <div id="monthly-ai-summary"></div>
+              <small class="report-disclaimer"
+                >This summary organizes available evidence. It does not confirm
+                fraud, quantify realized savings, or replace accountable
+                business decisions.</small
+              >
+            </article>
+            <article class="panel financial-journey-card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">FINANCIAL IMPACT BY JOURNEY</p>
+                  <h3>Detected, confirmed, and prevented outcomes</h3>
+                </div>
+                <span class="data-badge">Synthetic SAR</span>
+              </div>
+              <div class="table-wrap">
+                <table class="financial-journey-table">
+                  <thead>
+                    <tr>
+                      <th>Journey</th>
+                      <th>Assessed</th>
+                      <th>Detected</th>
+                      <th>Amount at risk</th>
+                      <th>Suspected</th>
+                      <th>Confirmed</th>
+                      <th>Prevented</th>
+                      <th>Amount prevented</th>
+                    </tr>
+                  </thead>
+                  <tbody id="report-financial-journeys"></tbody>
+                </table>
+              </div>
+            </article>
+            <article class="panel">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">RISK &amp; OUTCOME PROFILE</p>
+                  <h3>Assessment and feedback distribution</h3>
+                </div>
+              </div>
+              <div id="report-distributions"></div>
+            </article>
+            <article class="panel">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">RECURRING SIGNALS</p>
+                  <h3>Top indicators and process weaknesses</h3>
+                </div>
+              </div>
+              <div id="report-signals" class="report-signals"></div>
+            </article>
+            <article class="panel action-tracker-card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">MANAGEMENT ACTION TRACKER</p>
+                  <h3>Finding → action → accountable owner</h3>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="action-table">
+                  <thead>
+                    <tr>
+                      <th>Finding</th>
+                      <th>Recommended action</th>
+                      <th>Owner</th>
+                      <th>Priority</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="report-actions"></tbody>
+                </table>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section id="queue-view" class="view">
+          <div class="page-heading compact-heading">
+            <div>
+              <p class="eyebrow">SPECIALIST WORKSPACE</p>
+              <h2>Unified behavioral risk queue</h2>
+              <p>
+                Existing controls + behavioral indicators + AI anomaly signals →
+                explained assessment → proportionate action.
+              </p>
+            </div>
+            <button class="primary-btn" id="new-assessment-btn">
+              ＋ New assessment
+            </button>
+          </div>
+          <div class="routing-strip" aria-label="Risk routing logic">
+            <div class="routing-intro">
+              <span class="eyebrow">PROACTIVE ROUTING</span
+              ><strong>Assess before payment or service completion</strong>
+            </div>
+            <div class="route-step low-route">
+              <span>Low</span><strong>Accelerate processing</strong
+              ><small>Less friction for normal behavior</small>
+            </div>
+            <div class="route-step medium-route">
+              <span>Medium</span><strong>Targeted verification</strong
+              ><small>Operations review before proceeding</small>
+            </div>
+            <div class="route-step high-route">
+              <span>High</span><strong>Specialist escalation</strong
+              ><small>Fraud prevention, inspection, or investigation</small>
+            </div>
+          </div>
+          <div class="workspace">
+            <section class="panel queue-panel">
+              <div class="panel-header queue-header">
+                <div>
+                  <h3>Assessment queue</h3>
+                  <p id="queue-summary">Showing all current cases</p>
+                </div>
+                <div class="filter-stack">
+                  <input
+                    id="case-search"
+                    class="search-input"
+                    type="search"
+                    placeholder="Search case, subject, entity…"
+                    aria-label="Search cases"
+                  />
+                  <select id="journey-filter" aria-label="Filter by journey">
+                    <option value="All">All journeys</option>
+                  </select>
+                  <select id="region-filter" aria-label="Filter by region">
+                    <option value="All">All locations</option>
+                  </select>
+                  <div
+                    class="filters"
+                    role="group"
+                    aria-label="Filter cases by risk"
+                  >
+                    <button class="filter active" data-filter="All">All</button
+                    ><button class="filter" data-filter="High">High</button
+                    ><button class="filter" data-filter="Medium">Medium</button
+                    ><button class="filter" data-filter="Low">Low</button><button class="filter" data-filter="Incomplete">Incomplete</button>
+                  </div>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Transaction</th>
+                      <th>Journey</th>
+                      <th>Subject / Entity</th>
+                      <th>Location</th>
+                      <th>Assessment</th>
+                      <th>Confidence</th>
+                      <th>Main reason</th>
+                      <th>Recommended route</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="case-table"></tbody>
+                </table>
+              </div>
+            </section>
+            <aside
+              class="panel case-panel"
+              id="case-panel"
+              aria-live="polite"
+            ></aside>
+          </div>
+        </section>
+
+      <section id="intake-view" class="view">
+        <div class="page-heading">
+          <div><p class="eyebrow">LIVE PROTOTYPE INPUT</p><h2>Load a new assessment dataset</h2><p>Use explicitly synthetic CSV evidence. The local backend runs the saved model and retains its original fields; missing evidence is not classified as low risk.</p></div>
+          <div class="page-actions"><button class="secondary-btn" id="download-template-btn">Download CSV template</button><button class="secondary-btn danger-outline" id="demo-reset-btn" type="button">Demo Reset</button></div>
+        </div>
+        <p class="session-note">SANED CSV: use a bundled <code>saned_case_id</code>, or provide <code>workforce</code>, <code>as_of</code>, and <code>events_json</code>. Other journeys require <code>journey_features_json</code>. Missing evidence is saved as incomplete. The <code>synthetic</code> flag is a declaration, not a data-provenance check.</p>
+        <div class="intake-grid">
+          <article class="panel upload-card">
+            <div class="card-heading"><div><p class="eyebrow">OPTION 1</p><h3>Upload a CSV file</h3></div></div>
+            <label class="drop-zone" id="drop-zone" for="csv-file-input">
+              <input id="csv-file-input" type="file" accept=".csv,text/csv" />
+              <span class="upload-icon">⇧</span><strong>Choose a CSV file or drop it here</strong><small>Fully synthetic or approved sandbox data only</small>
+            </label>
+            <div class="import-mode-row">
+              <label>Import mode<select id="file-import-mode"><option value="append">Append to current data</option><option value="replace">Replace CSV-imported cases</option></select></label>
+              <button class="primary-btn" id="import-file-btn" disabled>Validate & assess file</button>
+            </div>
+            <div id="selected-file" class="selected-file empty">No file selected</div>
+          </article>
+          <article class="panel paste-card">
+            <div class="card-heading"><div><p class="eyebrow">OPTION 2</p><h3>Paste CSV data</h3></div></div>
+            <textarea id="csv-paste" rows="9" placeholder="synthetic,transaction_id,journey,scenario,subject_id,existing_control_score,saned_case_id,events_json,journey_features_json,..."></textarea>
+            <div class="paste-actions">
+              <label>Import mode<select id="paste-import-mode"><option value="append">Append to current data</option><option value="replace">Replace CSV-imported cases</option></select></label>
+              <button class="primary-btn" id="import-paste-btn">Validate & assess pasted data</button>
+            </div>
+          </article>
+          <article class="panel import-result-card">
+            <div class="card-heading"><div><p class="eyebrow">IMPORT EVIDENCE</p><h3>Last data run</h3></div><span class="status-chip neutral" id="import-status">Waiting for data</span></div>
+            <div id="import-result" class="import-result empty-state"><strong>No import has been run in this session.</strong><p>After an import, accepted rows, rejected rows, processing time, and the resulting risk distribution will appear here.</p></div>
+          </article>
+          <article class="panel realtime-card">
+            <div class="card-heading"><div><p class="eyebrow">TARGET OPERATING MODEL</p><h3>From sandbox input to real-time intelligence</h3></div></div>
+            <div class="pipeline">
+              <div><span>1</span><strong>Source events</strong><small>Rules, requests, profile and employment activity</small></div><i>→</i>
+              <div><span>2</span><strong>Behavioral assessment</strong><small>Indicators, anomaly detection, confidence and reasons</small></div><i>→</i>
+              <div><span>3</span><strong>Proportionate action</strong><small>Accelerate, verify, or escalate with human oversight</small></div>
+            </div>
+            <div class="scope-note"><strong>Prototype today:</strong> browser-based file and manual input using synthetic data. <strong>Future target:</strong> approved APIs or event streams for real-time assessment. No live GOSI system is connected in this PoV.</div>
+          </article>
+        </div>
+      </section>
+
+        <section id="simulation-view" class="view">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">CONTROLLED SANDBOX</p>
+              <h2>Legacy Scoring Sandbox</h2>
+              <p>
+                Test weights and thresholds, see how cases move between risk
+                bands, and submit a configuration for governed review.
+              </p>
+            </div>
+            <span class="status-chip neutral" id="simulation-status"
+              >Draft simulation</span
+            >
+          </div>
+          <div class="simulation-alert">
+            <strong>Simulation only.</strong
+            ><span
+              >This page does not change source-system rules or activate a
+              production model. Any configuration requires specialist review,
+              Data &amp; AI validation, and GM approval.</span
+            >
+          </div>
+          <div class="simulation-grid">
+            <article class="panel simulation-controls-card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">MODEL MIX</p>
+                  <h3>Assessment weights and thresholds</h3>
+                  <p>
+                    These weights apply only to the legacy statistical simulation. Trained model outputs and existing operational controls are displayed separately, without blending.
+                  </p>
+                </div>
+              </div>
+              <div class="slider-stack">
+                <label class="model-slider"
+                  ><span
+                    ><strong>Existing control weight</strong
+                    ><output id="control-weight-value">55%</output></span
+                  ><input
+                    id="control-weight"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="55"
+                /></label>
+                <label class="model-slider"
+                  ><span
+                    ><strong>AI anomaly weight</strong
+                    ><output id="anomaly-weight-value">45%</output></span
+                  ><input
+                    id="anomaly-weight"
+                    type="range"
+                    min="0"
+                    max="100"
+                    value="45"
+                /></label>
+                <label class="model-slider"
+                  ><span
+                    ><strong>Combined-pattern adjustment</strong
+                    ><output id="interaction-weight-value">100%</output></span
+                  ><input
+                    id="interaction-weight"
+                    type="range"
+                    min="0"
+                    max="150"
+                    step="5"
+                    value="100"
+                /></label>
+                <label class="model-slider"
+                  ><span
+                    ><strong>Low-risk upper threshold</strong
+                    ><output id="low-threshold-value">34</output></span
+                  ><input
+                    id="low-threshold"
+                    type="range"
+                    min="10"
+                    max="60"
+                    value="34"
+                /></label>
+                <label class="model-slider"
+                  ><span
+                    ><strong>High-risk lower threshold</strong
+                    ><output id="high-threshold-value">75</output></span
+                  ><input
+                    id="high-threshold"
+                    type="range"
+                    min="40"
+                    max="95"
+                    value="75"
+                /></label>
+              </div>
+              <div class="simulation-formula" id="simulation-formula"></div>
+            </article>
+            <article class="panel simulation-results-card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">IMPACT PREVIEW</p>
+                  <h3>How the portfolio would change</h3>
+                  <p>
+                    Calculated instantly against the current synthetic/session
+                    dataset.
+                  </p>
+                </div>
+              </div>
+              <div id="simulation-results" class="simulation-results"></div>
+              <div class="simulation-actions">
+                <button class="secondary-btn" id="reset-model-btn">
+                  Reset defaults</button
+                ><button class="primary-btn" id="apply-simulation-btn">
+                  Apply to sandbox
+                </button>
+              </div>
+            </article>
+          </div>
+          <article class="panel feature-weight-card">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">BEHAVIORAL INDICATORS</p>
+                <h3>Indicator contribution simulation</h3>
+                <p>
+                  Adjust approved indicator contributions for testing. The
+                  original operational rules are not edited.
+                </p>
+              </div>
+            </div>
+            <div
+              id="feature-weight-controls"
+              class="feature-weight-controls"
+            ></div>
+          </article>
+          <article class="panel approval-card">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">MODEL CHANGE GOVERNANCE</p>
+                <h3>Approval required before activation</h3>
+                <p>
+                  A sandbox result is evidence for review—not permission to
+                  deploy.
+                </p>
+              </div>
+              <button class="primary-btn" id="submit-model-review-btn">
+                Submit configuration for review
+              </button>
+            </div>
+            <div class="approval-flow" id="approval-flow"></div>
+            <p class="approval-note">
+              Material or cross-domain changes may require escalation beyond the
+              GM in accordance with the applicable delegation of authority.
+            </p>
+          </article>
+        </section>
+
+        <section id="indicators-view" class="view">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">GOVERNED CONFIGURATION</p>
+              <h2>Behavioral risk indicator library</h2>
+              <p>
+                Source-system rules remain unchanged. Proposed indicators and
+                weight changes must pass review, testing, and approval before
+                activation.
+              </p>
+            </div>
+            <div class="page-actions"><span class="model-pill" id="indicator-summary">—</span><button class="secondary-btn" id="generate-indicator-suggestions" type="button">Analyze confirmed synthetic cases</button></div>
+            <p class="session-note" id="indicator-suggestion-status">Suggestions remain Proposed until reviewed; they never change active scoring.</p>
+          </div>
+          <div class="panel indicator-panel">
+            <div id="indicator-table"></div>
+          </div>
+        </section>
+
+        <section id="method-view" class="view">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">EXPLAINABLE & GOVERNED AI</p>
+              <h2>Model method and decision boundaries</h2>
+              <p>
+                The objective is not to automate fraud determination. The
+                capability strengthens preventive decision-making and routes
+                higher-risk activity for proportionate review.
+              </p>
+            </div>
+          </div>
+          <div class="method-flow">
+            <article class="method-card">
+              <span>1</span>
+              <h3>Receive existing controls</h3>
+              <p>
+                Consume approved rule results and events without changing the
+                original operational systems.
+              </p>
+            </article>
+            <article class="method-card">
+              <span>2</span>
+              <h3>Build behavioral context</h3>
+              <p>
+                Compare event frequency, sequence, relationships, and changes
+                with historical patterns.
+              </p>
+            </article>
+            <article class="method-card">
+              <span>3</span>
+              <h3>Detect anomalies</h3>
+              <p>
+                AI identifies unusual combinations that predefined rules may not
+                capture. An anomaly is a risk signal, not proof of fraud.
+              </p>
+            </article>
+            <article class="method-card">
+              <span>4</span>
+              <h3>Explain & recommend</h3>
+              <p>
+                Generate a behavioral risk score, confidence, reason codes, and
+                a recommended route for specialist approval.
+              </p>
+            </article>
+          </div>
+          <section class="panel journey-model-registry">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">SYNTHETIC MODEL REGISTRY</p>
+                <h3>Models for every service journey</h3>
+                <p>Saved synthetic model artifacts are loaded for inference only. Training for the other journeys is owned by the team; this integration does not train or modify them.</p>
+              </div>
+              <div class="model-registry-actions">
+                <span class="status-chip neutral" id="journey-model-registry-status">Loading models</span>
+                <button class="secondary-btn" id="refresh-journey-model-registry" type="button">Refresh</button>
+              </div>
+            </div>
+            <div id="journey-model-registry-list" class="journey-model-registry-grid" aria-live="polite">
+              <div class="empty-state">Loading model details from the local backend…</div>
+            </div>
+            <p class="session-note journey-model-registry-note">Training and holdout figures use generated synthetic cases only. These measurements are not proof of real-world performance, and the model does not determine fraud.</p>
+          </section>
+          <div class="method-grid">
+            <article class="panel formula-card">
+              <p class="eyebrow">PROTOTYPE ASSUMPTION</p>
+              <h3>Behavioral Risk Assessment</h3>
+              <div class="formula" id="method-formula">
+                <b>55%</b> Existing control score <span>+</span
+                ><b>45%</b> Behavioral anomaly score <span>+</span> approved
+                combined-pattern adjustment
+              </div>
+              <div class="thresholds" id="method-thresholds">
+                <span><i class="low-dot"></i>Low 0–34</span
+                ><span><i class="medium-dot"></i>Medium 35–74</span
+                ><span><i class="high-dot"></i>High 75–100</span>
+              </div>
+              <p>
+                Weights and thresholds are configurable test assumptions. A
+                critical approved control can establish a minimum review floor.
+                Production values require approved historical validation and
+                domain ownership.
+              </p>
+            </article>
+            <article class="panel governance-card">
+              <p class="eyebrow">HUMAN-IN-THE-LOOP</p>
+              <h3>AI suggestions never activate automatically</h3>
+              <div class="governance-chain">
+                <span>AI suggestion</span><i>→</i><span>Specialist review</span
+                ><i>→</i><span>Data &amp; AI validation</span><i>→</i
+                ><span>GM approval</span><i>→</i><span>Activation</span>
+              </div>
+              <ul class="boundary-list">
+                <li>
+                  No automatic fraud confirmation, denial, payment suspension,
+                  or adverse action.
+                </li>
+                <li>Only approved data and defined purposes may be used.</li>
+                <li>
+                  Missing or conflicting data lowers confidence and triggers
+                  human review.
+                </li>
+                <li>
+                  Every assessment, route, override, and outcome is auditable.
+                </li>
+              </ul>
+            </article>
+          </div>
+          <article class="panel agent-card">
+            <div class="card-heading">
+              <div>
+                <p class="eyebrow">AI AGENT CONTRACT</p>
+                <h3>Behavioral Risk Decision-Support Agent</h3>
+              </div>
+              <span class="status-chip approved">Human approval required</span>
+            </div>
+            <div class="agent-grid">
+              <div>
+                <strong>Goal</strong>
+                <p>
+                  Create an explainable pre-action risk assessment and recommend
+                  a proportionate route.
+                </p>
+              </div>
+              <div>
+                <strong>Allowed</strong>
+                <p>
+                  Read approved sandbox events, calculate scores, explain
+                  reasons, recommend routes, and propose indicators.
+                </p>
+              </div>
+              <div>
+                <strong>Not allowed</strong>
+                <p>
+                  Change source rules, activate indicators, declare fraud, stop
+                  payment, or access unapproved data.
+                </p>
+              </div>
+              <div>
+                <strong>Human gate</strong>
+                <p>
+                  Specialists approve case routing; Data &amp; AI validates
+                  model changes; the GM is the final activation gate within
+                  delegated authority.
+                </p>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <section id="appendix-view" class="view">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">APPENDIX · SCORING METHODOLOGY</p>
+              <h2>How the behavioral risk score is calculated</h2>
+              <p>
+                A transparent prototype method for committee review. Values
+                shown here are synthetic Sandbox assumptions—not approved
+                production policy.
+              </p>
+            </div>
+            <span class="status-chip neutral">Explainable by design</span>
+          </div>
+
+          <div class="appendix-method-grid">
+            <article class="panel appendix-step">
+              <span class="appendix-number">1</span>
+              <div>
+                <p class="eyebrow">SOURCE-SYSTEM INPUT</p>
+                <h3>Existing Control Score</h3>
+                <p>
+                  Approved source-system rules produce or contribute to an
+                  aggregated score from 0–100. The prototype consumes that
+                  result without changing the original rule.
+                </p>
+              </div>
+            </article>
+            <article class="panel appendix-step">
+              <span class="appendix-number">2</span>
+              <div>
+                <p class="eyebrow">BEHAVIORAL AI</p>
+                <h3>AI Anomaly Score</h3>
+                <p>
+                  Each observed feature is compared with the synthetic
+                  historical baseline. Greater deviation contributes more of its
+                  approved maximum weight.
+                </p>
+              </div>
+            </article>
+            <article class="panel appendix-step">
+              <span class="appendix-number">3</span>
+              <div>
+                <p class="eyebrow">SEQUENCE CONTEXT</p>
+                <h3>Pattern Adjustment</h3>
+                <p>
+                  Additional controlled points apply only when approved
+                  combinations occur together—for example, a retroactive change
+                  within a rapid event sequence.
+                </p>
+              </div>
+            </article>
+          </div>
+
+          <article class="panel appendix-formula-card">
+            <div>
+              <p class="eyebrow">CURRENT SANDBOX CONFIGURATION</p>
+              <h3>Combined assessment</h3>
+              <p id="appendix-formula" class="appendix-equation">
+                <b>55%</b> Existing Control Score <span>+</span> <b>45%</b> AI
+                Anomaly Score <span>+</span> approved Pattern Adjustment
+              </p>
+            </div>
+            <div class="appendix-worked-example">
+              <span>Worked example</span>
+              <strong>(70 × 55%) + (64 × 45%) + 8 = 75</strong>
+              <small
+                >Result: High risk → specialist review. The score prioritizes
+                review; it does not confirm fraud.</small
+              >
+            </div>
+          </article>
+
+          <div class="appendix-two-column">
+            <article class="panel appendix-table-card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">ILLUSTRATIVE EXISTING CONTROLS</p>
+                  <h3>Different rules may carry different severity</h3>
+                  <p>
+                    These synthetic examples demonstrate the design only.
+                    Production severity requires domain approval and historical
+                    validation.
+                  </p>
+                </div>
+              </div>
+              <div class="appendix-table-wrap">
+                <table class="appendix-table">
+                  <thead>
+                    <tr>
+                      <th>Illustrative rule result</th>
+                      <th>Prototype score</th>
+                      <th>Interpretation</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Verified activity consistent with history</td>
+                      <td><strong>10</strong></td>
+                      <td>Low signal</td>
+                    </tr>
+                    <tr>
+                      <td>Recent current-date exclusion change</td>
+                      <td><strong>50</strong></td>
+                      <td>Targeted verification</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        Repeated retroactive exclusion changes before request
+                      </td>
+                      <td><strong>70</strong></td>
+                      <td>Elevated control result</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        IBAN ownership mismatch across beneficiary profiles
+                      </td>
+                      <td><strong>88</strong></td>
+                      <td>Critical review signal</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </article>
+
+            <article class="panel appendix-table-card">
+              <div class="card-heading">
+                <div>
+                  <p class="eyebrow">AI ANOMALY FEATURES</p>
+                  <h3>Maximum prototype contribution</h3>
+                  <p>
+                    A feature earns only part of its maximum when its deviation
+                    from the baseline is limited.
+                  </p>
+                </div>
+              </div>
+              <div class="appendix-weight-list">
+                <div>
+                  <span>Rapid event velocity</span><strong>18 pts</strong>
+                </div>
+                <div>
+                  <span>Linked-entity concentration</span
+                  ><strong>14 pts</strong>
+                </div>
+                <div>
+                  <span>Retroactive material change</span
+                  ><strong>12 pts</strong>
+                </div>
+                <div>
+                  <span>Prior validated outcome</span><strong>12 pts</strong>
+                </div>
+                <div>
+                  <span>Identifier reuse: mobile, device or IBAN</span
+                  ><strong>12 pts</strong>
+                </div>
+                <div>
+                  <span>Material amount or wage change</span
+                  ><strong>12 pts</strong>
+                </div>
+                <div>
+                  <span>Cross-source conflict</span><strong>12 pts</strong>
+                </div>
+                <div>
+                  <span>Repeated control override</span><strong>8 pts</strong>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div class="appendix-two-column appendix-bottom-row">
+            <article class="panel appendix-note-card">
+              <p class="eyebrow">WHY AI MAY RAISE OR LOWER THE RESULT</p>
+              <h3>Rules and behavior remain separately visible</h3>
+              <p>
+                If behavior is substantially more unusual than the existing
+                control result, the AI strengthens the signal. If the observed
+                behavior is materially less unusual, it may moderate the
+                combined assessment. Neither component is hidden from the
+                specialist.
+              </p>
+            </article>
+            <article class="panel appendix-note-card governance-accent">
+              <p class="eyebrow">DECISION BOUNDARIES</p>
+              <h3>Configuration is governed</h3>
+              <ul class="boundary-list">
+                <li>
+                  Low: 0–34 · Medium: 35–74 · High: 75–100 under current Sandbox
+                  assumptions.
+                </li>
+                <li>
+                  An approved critical control can establish a minimum review
+                  floor.
+                </li>
+                <li>
+                  Confidence is shown separately and is reduced by missing or
+                  conflicting data.
+                </li>
+                <li>
+                  Specialist review, Data &amp; AI validation, and authorized
+                  approval are required before activation.
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+        <section id="ai-demo-view" class="view">
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">SYNTHETIC BACKEND DEMO</p>
+              <h2>اختبار نموذج الذكاء الاصطناعي</h2>
+              <p>
+                اختاري حالة اصطناعية يوفّرها الباكند، ثم اعرضي نتيجة النموذج.
+              </p>
+            </div>
+          </div>
+
+          <article class="panel">
+            <div class="backend-controls">
+              <label>
+                الحالة الاصطناعية
+                <select id="backend-case-select">
+                  <option value="">حمّلي الحالات أولًا</option>
+                </select>
+              </label>
+              <button class="secondary-btn" id="backend-load-cases">
+                تحميل الحالات
+              </button>
+              <button class="primary-btn" id="backend-assess-btn">
+                تقييم الحالة
+              </button>
+            </div>
+
+            <p id="backend-status" role="status">
+              الخدمة تعمل على 127.0.0.1:8787
+            </p>
+            <div id="backend-result">
+              <p class="backend-placeholder">ستظهر نتيجة التقييم هنا.</p>
+            </div>
+            <section class="backend-history" aria-labelledby="backend-history-title">
+              <div class="backend-history-heading">
+                <div>
+                  <h3 id="backend-history-title">سجل تقييمات الباكند المحفوظة</h3>
+                  <p>تُحفظ النتائج الاصطناعية محليًا في ملف داخل مجلد الباكند.</p>
+                </div>
+                <button class="secondary-btn" id="backend-load-history">
+                  تحميل السجل
+                </button>
+              </div>
+              <p id="backend-history-status" role="status"></p>
+              <div id="backend-history-list">
+                <p class="backend-placeholder">اضغطي «تحميل السجل» لعرض التقييمات المحفوظة.</p>
+              </div>
+            </section>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="override-dialog">
+      <form method="dialog" id="override-form">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">HUMAN OVERRIDE</p>
+            <h2>Select a different route</h2>
+          </div>
+          <button value="cancel" class="icon-button" aria-label="Close">
+            ×
+          </button>
+        </div>
+        <label
+          >New route<select id="override-route" required>
+            <option>Straight-through processing</option>
+            <option>Data Verification Review</option>
+            <option>Insurance Operations Audit</option>
+            <option>Payment & IBAN Verification</option>
+            <option>Eligibility Verification</option>
+            <option>Benefit Operations Review</option>
+            <option>Fraud Prevention & Inspection Review</option>
+          </select></label
+        >
+        <label
+          >Reason for override<textarea
+            id="override-reason"
+            rows="4"
+            required
+            placeholder="Record the evidence supporting this decision"
+          ></textarea>
+        </label>
+        <div class="dialog-actions">
+          <button value="cancel" class="secondary">Cancel</button
+          ><button value="confirm" id="confirm-override">Save decision</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="route-decision-dialog">
+      <form id="route-decision-form"><div class="dialog-head"><h2 id="route-decision-title">Review recommendation</h2><button type="button" class="icon-button" id="close-route-decision" aria-label="Close">×</button></div>
+      <label>Demo reviewer name<input id="route-decision-name" required maxlength="120" value="Demo specialist" /></label>
+      <label>Evidence and rationale<textarea id="route-decision-note" required maxlength="2000"></textarea></label>
+      <p id="route-decision-error" role="alert"></p><div class="dialog-actions"><button type="submit" id="save-route-decision">Save human decision</button></div></form>
+    </dialog>
+    <dialog id="scenario-review-dialog" class="scenario-review-dialog">
+      <form id="scenario-review-form">
+        <div class="dialog-head"><div><p class="eyebrow">SCENARIO GOVERNANCE</p><h2 id="scenario-review-title">Submit scenario for approval</h2></div><button type="button" class="icon-button" id="close-scenario-review" aria-label="Close">×</button></div>
+        <p id="scenario-review-context" class="dialog-intro"></p>
+        <div class="form-grid">
+          <label>Demo reviewer role<select id="scenario-review-role" required><option>Specialist</option><option>Data &amp; AI</option><option>GM</option></select></label>
+          <label>Reviewer name<input id="scenario-review-name" maxlength="120" required placeholder="e.g. Demo specialist" /></label>
+        </div>
+        <p class="session-note">Demo roles are selected manually. Named decisions are saved in the local review history.</p>
+        <label>Evidence and decision rationale<textarea id="scenario-review-note" maxlength="2000" required placeholder="Explain why this scenario is useful, the evidence reviewed, or the test results."></textarea></label>
+        <p id="scenario-review-error" role="alert"></p>
+        <div class="dialog-actions"><button type="button" class="secondary" id="cancel-scenario-review">Cancel</button><button type="submit" id="save-scenario-review">Save review</button></div>
+      </form>
+    </dialog>
+
+    <dialog id="outcome-dialog">
+      <form method="dialog" id="outcome-form">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">OUTCOME FEEDBACK</p>
+            <h2>Record specialist outcome</h2>
+          </div>
+          <button value="cancel" class="icon-button" aria-label="Close">
+            ×
+          </button>
+        </div>
+        <label
+          >Specialist classification<select id="outcome-value" required>
+            <option value="">Select outcome</option>
+            <option>Legitimate activity</option>
+            <option>Data Quality Issue</option>
+            <option>Error</option>
+            <option>Process or data error</option>
+            <option>Suspected fraud — further investigation</option>
+            <option>Confirmed violation</option>
+            <option>Inconclusive</option>
+            <option>Confirmed fraud — formally established</option>
+          </select></label
+        >
+        <div class="form-grid compact-grid financial-outcome-grid">
+          <label
+            >Financial outcome<select id="financial-outcome-value" required>
+              <option value="">Select financial outcome</option>
+              <option>Proceeded</option>
+              <option>Prevented before payment</option>
+              <option>Paid — post-payment detection</option>
+              <option>Partially prevented</option>
+              <option>No financial impact</option>
+            </select></label
+          >
+          <label
+            >Amount at risk (SAR)<input
+              id="outcome-amount-at-risk"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+              required
+          /></label>
+          <label
+            >Confirmed fraud amount (SAR)<input
+              id="outcome-confirmed-amount"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+          /></label>
+          <label
+            >Prevented amount (SAR)<input
+              id="outcome-prevented-amount"
+              type="number"
+              min="0"
+              step="0.01"
+              value="0"
+          /></label>
+        </div>
+        <p id="outcome-save-error" class="integration-error" role="alert"></p>
+        <label
+          >Evidence note<textarea
+            id="outcome-note"
+            rows="4"
+            required
+            placeholder="Summarize the evidence and next action"
+          ></textarea>
+        </label>
+        <div class="dialog-actions">
+          <button value="cancel" class="secondary">Cancel</button
+          ><button value="confirm" id="confirm-outcome">Record outcome</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="new-assessment-dialog" class="assessment-dialog">
+      <form id="new-assessment-form">
+        <div class="dialog-head">
+          <div>
+            <p class="eyebrow">SYNTHETIC SANDBOX INPUT</p>
+            <h2>Run a new behavioral assessment</h2>
+          </div>
+          <button
+            type="button"
+            class="icon-button"
+            id="close-assessment"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <p class="dialog-intro">
+          Enter a synthetic case. The prototype will calculate a behavioral
+          anomaly score, confidence, reason codes, and a recommended route.
+        </p>
+        <label class="scenario-reference-select">Approved scenario example<select id="assessment-approved-scenario"><option value="">Create a new scenario</option></select><small>Copies the approved journey and description. Enter the evidence for this new case below.</small></label>
+        <h3 class="form-section-title">Case context</h3>
+        <div class="form-grid">
+          <label
+            >Journey<select id="assessment-journey" required></select
+          ></label>
+          <label
+            >Scenario<input
+              id="assessment-scenario"
+              required
+              placeholder="e.g. unusual changes before request"
+          /></label>
+          <label
+            >Subject ID<input id="assessment-subject" required value="CTR-NEW"
+          /></label>
+          <label
+            >Related entity<input id="assessment-entity" value="EMP-NEW"
+          /></label>
+          <label
+            >Location category<select id="assessment-country" required>
+              <option value="Saudi Arabia">Saudi Arabia</option>
+              <option value="Outside Saudi Arabia">Outside Saudi Arabia</option>
+            </select></label
+          >
+          <label>Region<select id="assessment-region" required></select></label>
+          <label
+            >City / service location<input
+              id="assessment-city"
+              required
+              value="Riyadh"
+          /></label>
+          <label
+            >Transaction ID<input
+              id="assessment-transaction"
+              placeholder="Generated if blank"
+          /></label>
+        </div>
+        <h3 class="form-section-title">Financial context</h3>
+        <div class="form-grid compact-grid">
+          <label
+            >Transaction amount (SAR)<input
+              id="assessment-transaction-amount"
+              type="number"
+              min="0"
+              step="0.01"
+              value="12000"
+              required
+          /></label>
+          <label
+            >Amount at risk (SAR)<input
+              id="assessment-amount-at-risk"
+              type="number"
+              min="0"
+              step="0.01"
+              value="12000"
+              required
+          /></label>
+          <label
+            >Detection stage<select id="assessment-detection-stage" required>
+              <option>Before payment</option>
+              <option>After payment</option>
+            </select></label
+          >
+          <label
+            >Payment status<select id="assessment-payment-status" required>
+              <option>Pending</option>
+              <option>On hold</option>
+              <option>Paid</option>
+              <option>Prevented</option>
+              <option>Released</option>
+            </select></label
+          >
+        </div>
+        <h3 class="form-section-title">Observed risk features</h3>
+        <div class="form-grid compact-grid">
+          <label
+            >Existing control score<input
+              id="assessment-rule-score"
+              type="number"
+              min="0"
+              max="100"
+              value="45"
+              required
+          /></label>
+          <label
+            >Events in assessment window<input
+              id="assessment-velocity"
+              type="number"
+              min="0"
+              max="50"
+              value="2"
+              required
+          /></label>
+          <label
+            >Linked entities<input
+              id="assessment-linked"
+              type="number"
+              min="1"
+              max="100"
+              value="2"
+              required
+          /></label>
+          <label
+            >Prior risk / outcome score<input
+              id="assessment-prior-risk"
+              type="number"
+              min="0"
+              max="100"
+              value="20"
+              required
+          /></label>
+          <label
+            >Retroactive days<input
+              id="assessment-retro-days"
+              type="number"
+              min="0"
+              max="365"
+              value="0"
+              required
+          /></label>
+          <label
+            >Identifier reuse count<input
+              id="assessment-identity-reuse"
+              type="number"
+              min="1"
+              max="50"
+              value="1"
+              required
+          /></label>
+          <label
+            >Amount / salary change %<input
+              id="assessment-amount-change"
+              type="number"
+              min="0"
+              max="1000"
+              value="0"
+              required
+          /></label>
+          <label
+            >Rule overrides<input
+              id="assessment-overrides"
+              type="number"
+              min="0"
+              max="20"
+              value="0"
+              required
+          /></label>
+        </div>
+        <section id="benefit-feature-fields" class="journey-feature-panel" hidden>
+          <h3 class="form-section-title">مؤشرات مدفوعات المنافع — بيانات اصطناعية</h3>
+          <p class="dialog-intro">
+            أدخلي أعدادًا ومؤشرات مجمعة فقط. لا تدخلي رقم حساب أو IBAN أو بيانات شخصية.
+          </p>
+          <div class="form-grid compact-grid">
+            <label>طلبات/دفعات خلال 30 يومًا<input id="benefit-requests-30d" type="number" min="0" max="100" value="1" required /></label>
+            <label>تغير مبلغ المنفعة عن المعتاد (%)<input id="benefit-amount-deviation" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
+            <label>أيام منذ تغيير حساب الصرف<input id="benefit-payout-change-days" type="number" min="0" max="3650" value="365" required /></label>
+            <label>دفعات مكررة أو متشابهة<input id="benefit-duplicate-payments" type="number" min="0" max="100" value="0" required /></label>
+            <label>مستفيدون يستخدمون حساب الصرف نفسه<input id="benefit-shared-beneficiaries" type="number" min="1" max="100" value="1" required /></label>
+          </div>
+        </section>
+        <section id="employer-feature-fields" class="journey-feature-panel" hidden>
+          <h3 class="form-section-title">مؤشرات تسجيل المنشأة — بيانات اصطناعية</h3>
+          <p class="dialog-intro">
+            أدخلي أعدادًا ونسبًا مجمعة فقط. لا تدخلي أسماء أو أرقام هوية أو بيانات اتصال خامة.
+          </p>
+          <div class="form-grid compact-grid">
+            <label>تعديلات السجل خلال 30 يومًا<input id="employer-amendments-30d" type="number" min="0" max="100" value="0" required /></label>
+            <label>عمر المنشأة عند التعديل الجوهري (يوم)<input id="employer-age-at-change" type="number" min="0" max="36500" value="365" required /></label>
+            <label>منشآت مرتبطة بمرجع تواصل مستعار<input id="employer-linked-contacts" type="number" min="1" max="100" value="1" required /></label>
+            <label>تغير عدد العاملين (%)<input id="employer-workforce-change" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
+            <label>تعديلات بأثر رجعي خلال 90 يومًا<input id="employer-backdated-90d" type="number" min="0" max="100" value="0" required /></label>
+            <label>تعارضات بين المصادر<input id="employer-source-conflicts" type="number" min="0" max="100" value="0" required /></label>
+          </div>
+        </section>
+        <section id="retirement-feature-fields" class="journey-feature-panel" hidden>
+          <h3 class="form-section-title">مؤشرات التقاعد — بيانات اصطناعية</h3>
+          <p class="dialog-intro">أدخلي مؤشرات مدد مجمعة فقط؛ الأهلية الفعلية تعتمد على القواعد المعتمدة لدى مالك الخدمة.</p>
+          <div class="form-grid compact-grid">
+            <label>أشهر الاشتراك المثبتة<input id="retirement-contribution-months" type="number" min="0" max="720" value="240" required /></label>
+            <label>أشهر فجوات الاشتراك<input id="retirement-gap-months" type="number" min="0" max="120" value="0" required /></label>
+            <label>تغير الأجر قبل طلب التقاعد (%)<input id="retirement-wage-change" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
+            <label>تصحيحات اشتراك بأثر رجعي خلال 12 شهرًا<input id="retirement-retro-corrections" type="number" min="0" max="100" value="0" required /></label>
+            <label>فترات عمل متداخلة<input id="retirement-overlap-periods" type="number" min="0" max="100" value="0" required /></label>
+            <label>أشهر التداخل بين سجلات العمل<input id="retirement-overlap-months" type="number" min="0" max="120" value="0" required /></label>
+          </div>
+        </section>
+        <section id="maternity-feature-fields" class="journey-feature-panel" hidden>
+          <h3 class="form-section-title">مؤشرات منفعة الأمومة — بيانات اصطناعية</h3>
+          <p class="dialog-intro">هذه مؤشرات اختبار وليست قواعد أهلية نظامية؛ لا تدخلي بيانات تعريف شخصية.</p>
+          <div class="form-grid compact-grid">
+            <label>أشهر الاشتراك في نافذة الأهلية<input id="maternity-contribution-months" type="number" min="0" max="36" value="12" required /></label>
+            <label>الأيام بين الحدث المؤهل والطلب<input id="maternity-event-request-days" type="number" min="0" max="365" value="5" required /></label>
+            <label>تغير الأجر قبل الحدث (%)<input id="maternity-wage-change" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
+            <label>مدة علاقة العمل عند الحدث (يوم)<input id="maternity-employer-tenure" type="number" min="0" max="36500" value="365" required /></label>
+            <label>طلبات منافع مشابهة متزامنة<input id="maternity-concurrent-claims" type="number" min="0" max="100" value="0" required /></label>
+            <label>تصحيحات اشتراك بأثر رجعي خلال 12 شهرًا<input id="maternity-retro-corrections" type="number" min="0" max="100" value="0" required /></label>
+          </div>
+        </section>
+        <section id="contribution-feature-fields" class="journey-feature-panel" hidden>
+          <h3 class="form-section-title">مؤشرات الأجور والاشتراكات — بيانات اصطناعية</h3>
+          <p class="dialog-intro">استخدمي نسبًا وأعدادًا مجمعة لملف الأجور، من دون أسماء أو أرقام عاملين.</p>
+          <div class="form-grid compact-grid">
+            <label>العاملون ذوو تغير أجر جوهري (%)<input id="contribution-material-change-workers" type="number" min="0" max="100" step="0.1" value="0" required /></label>
+            <label>وسيط تغير الأجر (%)<input id="contribution-median-wage-change" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
+            <label>تأخر ملف الأجور (يوم)<input id="contribution-payroll-delay" type="number" min="0" max="365" value="0" required /></label>
+            <label>إعادة إرسال الملفات خلال 30 يومًا<input id="contribution-resubmissions" type="number" min="0" max="100" value="0" required /></label>
+            <label>تصحيحات رجعية خلال 90 يومًا<input id="contribution-retro-corrections" type="number" min="0" max="100" value="0" required /></label>
+            <label>عمال مرتبطون بمنشآت متعددة<input id="contribution-cross-employer-workers" type="number" min="0" max="100000" value="0" required /></label>
+            <label>فرق المطابقة بين إجماليات المصادر (%)<input id="contribution-reconciliation-deviation" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
+          </div>
+        </section>
+        <section id="saned-feature-fields" class="journey-feature-panel" hidden>
+          <h3 class="form-section-title">SANED model inputs — synthetic demo</h3>
+          <p class="dialog-intro">
+            هذه الحقول لتجربة نموذج SANED ببيانات اصطناعية فقط.
+          </p>
+
+          <div class="form-grid compact-grid">
+          <label>
+            حجم القوى العاملة
+            <input
+              id="model-workforce"
+              type="number"
+              min="1"
+              value="100"
+              required
+            />
+          </label>
+
+          <label>
+            تعديلات المطالبة خلال 30 يومًا
+            <input
+              id="model-amendments"
+              type="number"
+              min="0"
+              max="30"
+              value="1"
+              required
+            />
+          </label>
+
+          <label>
+            الأجر السابق
+            <input
+              id="model-previous-wage"
+              type="number"
+              min="1"
+              value="6000"
+              required
+            />
+          </label>
+
+          <label>
+            الأجر الحالي
+            <input
+              id="model-current-wage"
+              type="number"
+              min="1"
+              value="6500"
+              required
+            />
+          </label>
+
+          <label>
+            استبعادات المنشأة خلال 7 أيام
+            <input
+              id="model-exclusions"
+              type="number"
+              min="0"
+              max="100"
+              value="3"
+              required
+            />
+          </label>
+
+          <label>
+            تغييرات المشرف خلال 24 ساعة
+            <input
+              id="model-supervisor-changes"
+              type="number"
+              min="0"
+              max="100"
+              value="1"
+              required
+            />
+          </label>
+          </div>
+        </section>
+        <div class="check-grid">
+          <label class="check-field"
+            ><input id="assessment-conflict" type="checkbox" /> Conflicting
+            information across sources</label
+          >
+          <label class="check-field"
+            ><input id="assessment-missing" type="checkbox" /> Required
+            information missing</label
+          >
+          <label class="check-field"
+            ><input id="assessment-urgent" type="checkbox" /> Urgent operational
+            priority</label
+          >
+        </div>
+        <p id="new-assessment-error" class="integration-error" role="alert"></p>
+        <div class="dialog-actions">
+          <button type="button" class="secondary" id="cancel-assessment">
+            Cancel</button
+          ><button type="submit">Run behavioral assessment</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script src="app.js?v=2.0.0"></script>
+<script src="madar.js?v=2.0.0"></script>
+  </body>
+</html>

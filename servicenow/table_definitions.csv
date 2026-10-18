@@ -1,0 +1,36 @@
+table,label,field,type,reference,choice_values,mandatory
+behavioral_risk_case,Behavioral Risk Case,case_id,String,,,Yes
+behavioral_risk_case,Behavioral Risk Case,journey,Choice,,SANED|Benefit Payments|Employer Registration|Retirement|Maternity Benefit,Yes
+behavioral_risk_case,Behavioral Risk Case,scenario,String,,,Yes
+behavioral_risk_case,Behavioral Risk Case,masked_subject_id,String,,,Yes
+behavioral_risk_case,Behavioral Risk Case,masked_related_entity_id,String,,,No
+behavioral_risk_case,Behavioral Risk Case,assessment_datetime,Date/Time,,,Yes
+behavioral_risk_case,Behavioral Risk Case,existing_rule_score,Integer,,,Yes
+behavioral_risk_case,Behavioral Risk Case,ai_anomaly_score,Integer,,,Yes
+behavioral_risk_case,Behavioral Risk Case,interaction_uplift,Integer,,,No
+behavioral_risk_case,Behavioral Risk Case,overall_risk_score,Integer,,,Yes
+behavioral_risk_case,Behavioral Risk Case,risk_level,Choice,,Low|Medium|High,Yes
+behavioral_risk_case,Behavioral Risk Case,reason_codes,String,,,Yes
+behavioral_risk_case,Behavioral Risk Case,recommended_action,Choice,,Seamless processing|Additional verification|Insurance Operations Audit|IBAN Ownership Verification|Eligibility Verification|Fraud & Inspection Review|Payment Verification & Fraud Review,Yes
+behavioral_risk_case,Behavioral Risk Case,specialist_decision,String,,,No
+behavioral_risk_case,Behavioral Risk Case,override_reason,String,,,No
+behavioral_risk_case,Behavioral Risk Case,status,Choice,,Awaiting review|Route approved|Human override|Closed,Yes
+behavioral_risk_case,Behavioral Risk Case,confirmed_outcome,Choice,,Pending|Legitimate|Requires correction|Confirmed violation|Inconclusive,No
+behavioral_risk_case,Behavioral Risk Case,model_version,String,,,Yes
+behavioral_event,Behavioral Event,event_id,String,,,Yes
+behavioral_event,Behavioral Event,case,Reference,behavioral_risk_case,,Yes
+behavioral_event,Behavioral Event,event_type,String,,,Yes
+behavioral_event,Behavioral Event,event_datetime,Date/Time,,,Yes
+behavioral_event,Behavioral Event,source_system,String,,,Yes
+behavioral_event,Behavioral Event,existing_rule_trigger,Boolean,,,Yes
+behavioral_event,Behavioral Event,event_value,String,,,No
+behavioral_event,Behavioral Event,risk_contribution,Integer,,,No
+behavioral_event,Behavioral Event,data_quality_status,Choice,,Complete|Missing|Conflicting|Unverified,Yes
+risk_indicator,Risk Indicator,indicator_code,String,,,Yes
+risk_indicator,Risk Indicator,indicator_name,String,,,Yes
+risk_indicator,Risk Indicator,category,String,,,Yes
+risk_indicator,Risk Indicator,risk_weight,Integer,,,Yes
+risk_indicator,Risk Indicator,threshold,String,,,No
+risk_indicator,Risk Indicator,status,Choice,,Proposed|Testing|Approved|Inactive,Yes
+risk_indicator,Risk Indicator,source,String,,,Yes
+risk_indicator,Risk Indicator,ai_suggested,Boolean,,,Yes

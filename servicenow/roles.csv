@@ -1,0 +1,3 @@
+role_name,label,purpose
+x_gosi_abi.fraud_specialist,Fraud Specialist,Review cross-service evidence and approve or override the recommended route
+x_gosi_abi.fraud_supervisor,Fraud Supervisor,Approve indicator configuration and controlled testing changes
