@@ -16,7 +16,7 @@ test('single-server hosting supplies assets and same-origin API behind optional 
  const headers={Authorization:'Basic '+Buffer.from('madar:synthetic-test-gate').toString('base64')};
  const page=await fetch(base,{headers});assert.equal(page.status,200);const html=await page.text();assert.match(html,/Madar \| مدار/);assert.match(html,/window.MADAR_API_BASE="\/api"/);
  assert.equal((await fetch(base+'/madar.js',{headers})).status,200);
- const health=await(await fetch(base+'/api/health',{headers})).json();assert.equal(health.crossJourneyModelVersion,'madar-cross-journey-rf-20261017-v1');
+ const health=await(await fetch(base+'/api/health',{headers})).json();assert.equal(health.crossJourneyModelVersion,'madar-cross-journey-rf-20261019-v2');
  assert.equal((await fetch(base+'/anomaly-detection/data/backend-assessments.json',{headers})).status,404);
  assert.equal((await fetch(base+'/api/cross-journey/assess',{method:'POST',headers:{...headers,Origin:'https://unrelated.example'},body:'{}'})).status,403);
 });

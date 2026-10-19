@@ -4,12 +4,13 @@ import { fileURLToPath } from 'node:url';
 import { join, extname } from 'node:path';
 import { timingSafeEqual } from 'node:crypto';
 const root = fileURLToPath(new URL('.', import.meta.url));
+try { process.loadEnvFile(join(root, '.env')); } catch (error) { if (error.code !== 'ENOENT') throw error; }
 process.env.ASSESSMENT_DATA_DIR ||= join(root, '.madar-data');
 await mkdir(process.env.ASSESSMENT_DATA_DIR, {recursive:true});
 const { createInferenceServer } = await import('./anomaly-detection/server.mjs');
 const api = createInferenceServer();
 const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.csv':'text/csv; charset=utf-8'};
-const allowed = new Set(['index.html','app.js','styles.css','madar.js','madar.css','madar-mark.svg']);
+const allowed = new Set(['index.html','app.js','styles.css','madar.js','madar.css','madar-mark.svg','favicon.svg','operations.js']);
 const server = createServer(async(req,res)=>{
   if (process.env.MADAR_DEMO_PASSWORD) {
     const expected = Buffer.from('Basic '+Buffer.from('madar:'+process.env.MADAR_DEMO_PASSWORD).toString('base64'));

@@ -1,9 +1,11 @@
+import {llmStatus, explanationEvidence, generateExplanation, PROMPT_VERSION} from './lib/case-explainer.mjs';
 import { createCrossJourneyAssessment, parseEventCSV, demoCases, crossJourneyModel } from './lib/cross-journey-adapter.mjs';
 import { createServer } from "node:http";
 import { createApplicationAssessment, InputError } from "./lib/assessment-adapter.mjs";
 import { readFile, rename, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import crossJourneyReport from './cross-journey/data/evaluation.json' with {type:'json'};
 import cases from "./data/cases.json" with { type: "json" };
 import report from "./data/evaluation.json" with { type: "json" };
 import { assess, model } from "./lib/detector.mjs";
@@ -38,6 +40,11 @@ const humanReviewsPath = join(runtimeDataDirectory, "human-reviews.json");
 let scenarioWrites = Promise.resolve();
 let assessmentWrites = Promise.resolve();
 let journeyAssessmentMigration;
+const explanationsPath=join(runtimeDataDirectory,'case-explanations.json');
+let explanationWrites=Promise.resolve();
+const pendingExplanations=new Set();
+const explanationRequests=[];
+const workflowStages=['New','Triage','Investigation','Decision pending','Closed'];
 
 async function readQueueCases() {
   try {
@@ -121,8 +128,8 @@ async function saveUploadedRecords(records, mode) {
 }
 
 async function activeConfig() {
-  const saved = await readJsonFile(riskConfigPath, null);
-  return validRiskConfig(saved?.config) ? saved.config : defaultRiskConfig;
+  // Legacy sandbox drafts never change the routing policy for fitted-model cases.
+  return defaultRiskConfig;
 }
 
 const outcomeValues = ["Legitimate activity", "Data Quality Issue", "Error", "Process or data error", "Suspected fraud — further investigation", "Confirmed violation", "Inconclusive", "Confirmed fraud — formally established"];
@@ -133,24 +140,40 @@ function saveHumanReview(body, type) {
     const index = saved.findIndex((entry) => entry.caseId === body.caseId);
     if (index < 0) throw new InputError("No saved assessment for this case. Assess and save it first.", 404);
     const current = saved[index];
-    if (body.assessmentId && body.assessmentId !== current.assessmentId) throw new InputError("A newer assessment exists; refresh before reviewing.", 409);
+    if (body.assessmentId !== current.assessmentId) throw new InputError("A newer assessment exists; refresh before reviewing.", 409);
     const review = { ...body, type, reviewId: crypto.randomUUID(), assessmentId: current.assessmentId, recordedAt: new Date().toISOString(), actorName: body.actorName?.trim() || "Demo specialist", note: body.note.trim() };
     const data = { ...(current.caseData || { id: current.caseId, synthetic: true, transactionId: current.transactionId, features: {} }) };
-    if (type === "outcome") {
+    if (type === 'workflow') {
+      if (!workflowStages.includes(body.workflowStage) || typeof body.assignedTo !== 'string' || !body.assignedTo.trim() || body.assignedTo.length>120) throw new InputError('An owner and valid workflow stage are required.');
+      const previous=data.workflow || {stage:'New',revision:0};
+      if (body.expectedRevision !== previous.revision) throw new InputError('The case workflow changed. Refresh before updating it.',409);
+      if (Math.abs(workflowStages.indexOf(body.workflowStage)-workflowStages.indexOf(previous.stage))>1) throw new InputError('Complete the adjacent workflow stage first.',409);
+      if (body.workflowStage==='Closed' && (!data.outcome || /^Suspected|Inconclusive/.test(data.outcome))) throw new InputError('Record a resolved specialist outcome before closing the case.',409);
+      data.workflow={stage:body.workflowStage,assignedTo:body.assignedTo.trim(),revision:previous.revision+1,updatedAt:review.recordedAt};
+    } else if (type === "outcome") {
+      if (data.workflow?.stage === "Closed") throw new InputError("Reopen the case before changing its outcome.",409);
       if (!outcomeValues.includes(body.outcome) || !financialValues.includes(body.financialOutcome) || !["amountAtRisk", "confirmedFraudAmount", "preventedAmount"].every((key) => Number.isFinite(body[key]) && body[key] >= 0)) throw new InputError("Invalid specialist or financial outcome.");
       if (body.outcome.startsWith("Confirmed fraud") && body.confirmedFraudAmount <= 0) throw new InputError("Confirmed fraud requires a positive confirmed amount.");
       if (["Prevented before payment", "Partially prevented"].includes(body.financialOutcome) && body.preventedAmount <= 0) throw new InputError("A prevention outcome requires a positive prevented amount.");
       if (Number.isFinite(data.transactionAmount) && (body.confirmedFraudAmount > data.transactionAmount || body.preventedAmount > data.transactionAmount)) throw new InputError("Confirmed or prevented amount cannot exceed the transaction amount.");
       if (body.financialOutcome === "Proceeded" && body.preventedAmount > 0) throw new InputError("A proceeded transaction cannot also be recorded as prevented.");
+      const knownAmount = Number.isFinite(data.transactionAmount);
+      if ((!knownAmount && [body.amountAtRisk,body.confirmedFraudAmount,body.preventedAmount].some(n=>n>0)) || (knownAmount && body.amountAtRisk > data.transactionAmount)) throw new InputError("Amounts require a supplied transaction value and cannot exceed it.");
+      if (!body.outcome.startsWith("Confirmed fraud") && body.confirmedFraudAmount !== 0) throw new InputError("Only a formally confirmed fraud outcome can carry a confirmed fraud amount.");
+      if (!["Prevented before payment","Partially prevented"].includes(body.financialOutcome) && body.preventedAmount !== 0) throw new InputError("A prevented amount requires a prevention outcome.");
+      if (body.financialOutcome === "No financial impact" && [body.amountAtRisk,body.confirmedFraudAmount,body.preventedAmount].some(n=>n>0)) throw new InputError("No financial impact requires zero financial amounts.");
+      if (body.outcome === "Legitimate activity" && (body.amountAtRisk > 0 || body.preventedAmount > 0)) throw new InputError("Legitimate activity cannot retain fraud exposure or prevented loss.");
       Object.assign(data, { outcome: body.outcome, financialOutcome: body.financialOutcome, amountAtRisk: body.amountAtRisk, confirmedFraudAmount: body.confirmedFraudAmount, preventedAmount: body.preventedAmount, decisionDate: review.recordedAt, decisionOwner: review.actorName, status: body.outcome.startsWith("Suspected fraud") ? "Under investigation" : "Outcome recorded" });
       if (["Prevented before payment", "Partially prevented"].includes(body.financialOutcome)) data.paymentStatus = "Prevented";
       else if (body.financialOutcome === "Paid — post-payment detection") { data.paymentStatus = "Paid"; data.detectionStage = "After payment"; }
       else if (body.financialOutcome === "Proceeded") data.paymentStatus = "Released";
+      else if (body.financialOutcome === "No financial impact") data.paymentStatus = "Not applicable";
       if (body.financialOutcome === "Prevented before payment") data.detectionStage = "Before payment";
     } else {
       if (!["approve", "override", "reject"].includes(body.action)) throw new InputError("Unknown review decision.");
       if (body.action === "override" && (typeof body.route !== "string" || !body.route.trim() || body.route.length > 200)) throw new InputError("Select a proposed alternative route.");
       data.status = { approve: "Route approved", override: "Route overridden", reject: "Recommendation rejected" }[body.action];
+      if (body.action === "approve") data.route = current.applicationAssessment?.route || current.modelResult?.route || current.route;
       if (body.action === "override") data.route = body.route;
       if (body.action === "reject") data.route = "Specialist review — recommendation rejected";
     }
@@ -159,7 +182,7 @@ function saveHumanReview(body, type) {
     data.reviewHistory = reviews.filter((entry) => entry.caseId === body.caseId);
     data.audit = [...(data.audit || []), `Human ${type} recorded by ${review.actorName} at ${review.recordedAt}: ${review.note}`];
     // The raw model result, version, flags, feature values and score are immutable.
-    saved[index] = { ...current, caseData: data, humanDecision: review, reviewHistory: data.reviewHistory };
+    saved[index] = { ...current, caseData: data, ...(type === "decision" ? {humanDecision:review} : {}), reviewHistory: data.reviewHistory };
     await writeJsonFile(humanReviewsPath, reviews);
     await writeSavedAssessments(saved);
     return saved[index];
@@ -174,7 +197,7 @@ function updateSavedJourneyAssessment(caseId, updates) {
       const saved = await readSavedAssessments();
       const index = saved.findIndex(
         (item) =>
-          ["journey-prototype", "csv-upload"].includes(item.assessmentSource) &&
+          ["journey-prototype", "csv-upload", "cross-journey"].includes(item.assessmentSource) &&
           item.caseId === caseId,
       );
       if (index < 0) return null;
@@ -340,7 +363,7 @@ async function migrateSavedJourneyAssessments() {
   }
   return journeyAssessmentMigration;
 }
-export function createInferenceServer() {
+export function createInferenceServer({explain = generateExplanation} = {}) {
   return createServer(async (req, res) => {
     const corsHeaders = {
       "Access-Control-Allow-Origin": ["http://localhost:8080", "http://127.0.0.1:8080"].includes(req.headers.origin) ? req.headers.origin : "http://localhost:8080",
@@ -362,6 +385,37 @@ export function createInferenceServer() {
       return res.end();
     }
     const path = new URL(req.url, "http://localhost").pathname;
+    if (req.method === 'GET' && path === '/llm/status') return send(200,llmStatus());
+    if (req.method === 'POST' && path === '/case-explanation') {
+      let key, ownsLock=false;
+      try {
+        let payload='';for await (const chunk of req){payload+=chunk;if(Buffer.byteLength(payload)>4096)throw new InputError('Explanation request too large.',413)}
+        const body=JSON.parse(payload);
+        if(!body || Object.keys(body).some(k=>!['caseId','assessmentId','generate'].includes(k)) || typeof body.caseId!=='string' || typeof body.assessmentId!=='string' || typeof body.generate!=='boolean') throw new InputError('Select a saved case and its current assessment.');
+        await assessmentWrites.catch(()=>{});
+        const record=(await readSavedAssessments()).find(r=>r.caseId===body.caseId);
+        if(!record || record.assessmentId!==body.assessmentId)throw new InputError('The case assessment changed. Refresh first.',409);
+        const evidence=explanationEvidence(record), status=llmStatus();
+        await explanationWrites.catch(()=>{});
+        const existing=(await readJsonFile(explanationsPath,[])).find(x=>x.assessmentId===body.assessmentId && x.evidenceFingerprint===evidence.fingerprint && x.promptVersion===PROMPT_VERSION && x.model===status.model);
+        if(existing)return send(200,{draft:existing,cached:true});
+        if(!body.generate)return send(200,{draft:null,configured:status.configured});
+        if(!status.configured)throw new InputError('LLM explanations are not configured. Use the evidence overview or follow the API setup guide.',503);
+        key=body.caseId;if(pendingExplanations.has(key))throw new InputError('An explanation is already being prepared for this case.',409);
+        const now=Date.now();while(explanationRequests.length && explanationRequests[0]<now-60000)explanationRequests.shift();
+        if(explanationRequests.length>=5)throw new InputError('The demo allows five LLM requests per minute. Try again shortly.',429);
+        pendingExplanations.add(key);ownsLock=true;explanationRequests.push(now);
+        const draft=await explain(record);
+        const operation=explanationWrites.catch(()=>{}).then(async()=>{
+          await assessmentWrites.catch(()=>{});
+          const latest=(await readSavedAssessments()).find(r=>r.caseId===body.caseId);
+          if(!latest || latest.assessmentId!==draft.assessmentId || explanationEvidence(latest).fingerprint!==draft.evidenceFingerprint)throw new InputError('Evidence changed while the explanation was generated. Request a fresh draft.',409);
+          const saved=await readJsonFile(explanationsPath,[]);saved.unshift(draft);await writeJsonFile(explanationsPath,saved.slice(0,200));
+        });explanationWrites=operation;await operation;
+        return send(200,{draft,cached:false});
+      }catch(error){return send(error.status || (error instanceof SyntaxError?400:500),{error:error instanceof InputError?error.message:'Could not prepare the case explanation.'})}
+      finally{if(ownsLock)pendingExplanations.delete(key)}
+    }
     if (req.method === "GET" && path === "/health")
       return send(200, {
         status: "ready",
@@ -381,8 +435,9 @@ export function createInferenceServer() {
         let payload = "";
         for await (const chunk of req) { payload += chunk; if (Buffer.byteLength(payload) > 1_100_000) return send(413,{error:"Event upload is too large."}); }
         const body = JSON.parse(payload);
-        if (!body || Array.isArray(body) || Object.keys(body).length !== 1 || !["csv","case_id"].includes(Object.keys(body)[0])) throw new InputError("Supply either csv or one bundled case_id.");
-        const inputs = body.csv !== undefined ? parseEventCSV(body.csv) : [demoCases.find(c => c.id === body.case_id)];
+        if (!body || Array.isArray(body) || Object.keys(body).length !== 1 || !["csv","case_id","evidence"].includes(Object.keys(body)[0])) throw new InputError("Supply csv, a bundled case_id, or saved synthetic evidence.");
+        const inputs = body.csv !== undefined ? parseEventCSV(body.csv) : body.evidence ? [body.evidence] : [demoCases.find(c => c.id === body.case_id)];
+        if (body.evidence && (body.evidence.synthetic !== true || typeof body.evidence.id !== 'string' || !/^CJ-SYN-[\w-]+$/.test(body.evidence.id) || !Array.isArray(body.evidence.events) || body.evidence.events.length > 1000 || body.evidence.events.some(e=>!e || typeof e.eventId !== 'string' || !e.eventId.trim() || !Number.isFinite(e.recordedAt) || !Number.isFinite(new Date(e.recordedAt).getTime())) || new Set(body.evidence.events.map(e=>e.eventId)).size !== body.evidence.events.length || !Number.isFinite(body.evidence.asOf) || !Number.isFinite(new Date(body.evidence.asOf).getTime()))) throw new InputError('Supply a valid synthetic event history.');
         if (inputs.some(c=>!c)) throw new InputError("Synthetic cross-journey case not found.",404);
         const records = inputs.map(createCrossJourneyAssessment);
         const operation = assessmentWrites.catch(()=>{}).then(async()=>{
@@ -390,7 +445,7 @@ export function createInferenceServer() {
           const reviews = await readJsonFile(humanReviewsPath, []);
           const saved = records.map(record=>{
             const latest = previous.find(p=>p.caseId===record.caseId && p.assessmentSource==='cross-journey');
-            if (latest?.evidenceFingerprint === record.evidenceFingerprint) return latest;
+            if (latest?.evidenceFingerprint === record.evidenceFingerprint && latest.modelVersion === record.modelVersion) return latest;
             record.reviewHistory = reviews.filter(r=>r.caseId===record.caseId);
             record.caseData.reviewHistory = record.reviewHistory;
             return record;
@@ -547,7 +602,10 @@ export function createInferenceServer() {
       try {
         await scenarioWrites.catch(() => {});
         await assessmentWrites.catch(() => {});
+        if (pendingExplanations.size) return send(409,{error:"Wait for explanations to finish before resetting."});
+        await explanationWrites.catch(()=>{});
         await writeJsonFile(scenarioProposalsPath, []);
+        await writeJsonFile(explanationsPath, []);
         await writeJsonFile(humanReviewsPath, []);
         await writeJsonFile(assessmentsPath, []);
         await writeJsonFile(queueCasesPath, []);
@@ -574,7 +632,7 @@ export function createInferenceServer() {
           for (const signal of item.caseData?.signals || []) {
             const code = Array.isArray(signal) ? signal[0] : signal?.code;
             const label = Array.isArray(signal) ? signal[1] : signal?.label;
-            if (!code || seen.has(code) || ["COMBINED_PATTERN", "MODEL_NOT_FLAGGED", "LOWER_BEHAVIORAL_DEVIATION", "NO_MATERIAL_ANOMALY", "EVIDENCE_INCOMPLETE"].includes(code)) continue;
+            if (!code || /^CROSS_JOURNEY_EVIDENCE_|^SANED_COMPARATOR_\d+$|^MODEL_FEATURE_\d+$/.test(code) || seen.has(code) || ["COMBINED_PATTERN", "MODEL_NOT_FLAGGED", "LOWER_BEHAVIORAL_DEVIATION", "NO_MATERIAL_ANOMALY", "EVIDENCE_INCOMPLETE", "CROSS_JOURNEY_PATTERN", "MODEL_UNUSUAL_COMBINATION"].includes(code)) continue;
             seen.add(code);
             const entry = counts.get(code) || { code, label: String(label || code), confirmedCases: 0, examples: [] };
             entry.confirmedCases += 1;
@@ -589,6 +647,7 @@ export function createInferenceServer() {
           const old = existing.get(candidate.code);
           if (old) {
             old.confirmedCases = candidate.confirmedCases;
+            old.evidenceCount = candidate.confirmedCases;
             old.examples = candidate.examples;
             old.updatedAt = new Date().toISOString();
           } else {
@@ -596,7 +655,7 @@ export function createInferenceServer() {
             existing.set(candidate.code, { id: crypto.randomUUID(), code: candidate.code, name: candidate.label, detail: `Observed in ${candidate.confirmedCases} separately confirmed synthetic cases. Specialist validation is required.`, evidenceCount: candidate.confirmedCases, examples: candidate.examples, source: "Confirmed synthetic outcomes", status: "Proposed", createdAt: now, updatedAt: now, syntheticOnly: true });
           }
         }
-        const proposals = [...existing.values()];
+        const proposals = [...existing.values()].filter(item => counts.get(item.code)?.confirmedCases >= 2);
         await writeJsonFile(indicatorSuggestionsPath, proposals);
         return send(200, { proposals, confirmedCasesReviewed: confirmed.length, minimumRepeatCount: 2, syntheticOnly: true });
       } catch {
@@ -626,6 +685,7 @@ export function createInferenceServer() {
       return send(200, {
         syntheticOnly: true,
         models: [
+          {journey:"Connected journeys",version:crossJourneyModel.version,algorithm:crossJourneyModel.algorithm,syntheticOnly:true,trainingCases:crossJourneyModel.trainCount,calibrationCases:crossJourneyModel.calibrationCount,treeCount:crossJourneyModel.trees.length,threshold:crossJourneyModel.threshold,evaluation:{testCount:crossJourneyReport.test,source:crossJourneyReport.validation,...crossJourneyReport.metrics["Cross-journey pattern model only"]}},
           {
             journey: "SANED",
             version: model.version,
@@ -690,14 +750,14 @@ export function createInferenceServer() {
         return send(200, result);
       } catch (error) { return send(error.status || (error instanceof SyntaxError ? 400 : 500), { error: error instanceof InputError ? error.message : "Could not assess and save synthetic evidence." }); }
     }
-    if (req.method === "POST" && ["/record-outcome", "/outcome", "/decision"].includes(path)) {
+    if (req.method === "POST" && ["/record-outcome", "/outcome", "/decision", "/case-workflow"].includes(path)) {
       let payload = "";
       try {
         for await (const chunk of req) { payload += chunk; if (Buffer.byteLength(payload) > 8192) return send(413, { error: "Review note is too large." }); }
         const body = JSON.parse(payload);
-        const keys = new Set(["caseId", "assessmentId", "outcome", "financialOutcome", "amountAtRisk", "confirmedFraudAmount", "preventedAmount", "note", "actorName", "action", "route"]);
-        if (!body || typeof body !== "object" || Array.isArray(body) || Object.keys(body).some((key) => !keys.has(key)) || typeof body.caseId !== "string" || typeof body.note !== "string" || !body.note.trim() || body.note.length > 2000 || (body.actorName != null && (typeof body.actorName !== "string" || body.actorName.length > 120))) throw new InputError("A saved case and a review note of up to 2000 characters are required.");
-        return send(200, await saveHumanReview(body, path === "/decision" ? "decision" : "outcome"));
+        const keys = new Set(["caseId", "assessmentId", "outcome", "financialOutcome", "amountAtRisk", "confirmedFraudAmount", "preventedAmount", "note", "actorName", "action", "route", "workflowStage", "assignedTo", "expectedRevision"]);
+        if (!body || typeof body !== "object" || Array.isArray(body) || Object.keys(body).some((key) => !keys.has(key)) || typeof body.caseId !== "string" || typeof body.note !== "string" || !body.note.trim() || body.note.length > 2000 || (typeof body.actorName !== "string" || !body.actorName.trim() || body.actorName.length > 120) || typeof body.assessmentId !== "string" || !body.assessmentId) throw new InputError("A current assessment ID, reviewer name, and evidence note of up to 2000 characters are required.");
+        return send(200, await saveHumanReview(body, path === "/decision" ? "decision" : path === "/case-workflow" ? "workflow" : "outcome"));
       } catch (error) { return send(error.status || (error instanceof SyntaxError ? 400 : 500), { error: error instanceof InputError ? error.message : "Could not save the human review." }); }
     }
     if (req.method === "GET" && path === "/cases")

@@ -2,6 +2,10 @@
 
 **Status:** working synthetic proof. Haitham confirmed the business relevance of the cross-journey pattern. Exact model labels, thresholds, and production performance remain prototype Data & AI assumptions. This component does not replace the SANED Isolation Forest in the sibling directory.
 
+## Role in Madar
+
+Cross-journey detection is an example capability feeding the shared fraud operations workflow. Madar’s proposed enterprise value is connecting existing capabilities to case ownership, explanation, investigation, outcomes and governance; this detector is not presented as a new enterprise capability.
+
 ## What this proves
 
 The model connects events through the same synthetic employer and contributors across:
@@ -16,7 +20,7 @@ The result is calculated from the event history. It is not hardcoded to the case
 
 ## Model design
 
-The SANED model in the sibling `../saned-anomaly/` directory remains an unsupervised Isolation Forest for novel behavior. The cross-journey component is a supervised Random Forest trained on provisional synthetic scenario labels.
+The SANED model in the parent directory remains an unsupervised Isolation Forest for novel behavior. The cross-journey component is a supervised Random Forest trained on provisional synthetic scenario labels.
 
 This design is deliberate. A broad Isolation Forest was tested first, but legitimate high-volume activity was more globally unusual than the coordinated below-threshold sequence. A supervised pattern model is more suitable for proving detection of a specific business typology. Haitham confirmed the typology; Data & AI validation is still required before the fitted threshold or metrics can be treated as production evidence.
 
@@ -31,17 +35,17 @@ The model score measures similarity to the provisional synthetic review patterns
 - Test: 700 separate histories
 - Test population: 400 routine/legitimate and 300 provisional review cases
 - Model: 180-tree Random Forest
-- Model version: `madar-cross-journey-rf-20261017-v1`
+- Model version: `madar-cross-journey-rf-20261019-v2`
 
 | Method | Review cases found | Missed | Legitimate cases flagged | Accuracy |
 |---|---:|---:|---:|---:|
 | Provisional rules | 150 / 300 | 150 | 0 / 400 | 78.6% |
-| Cross-journey model | 300 / 300 | 0 | 16 / 400 | 97.7% |
-| Rules OR model | 300 / 300 | 0 | 16 / 400 | 97.7% |
+| Cross-journey model | 300 / 300 | 0 | 18 / 400 | 97.4% |
+| Rules OR model | 300 / 300 | 0 | 18 / 400 | 97.4% |
 
 The key proof family contains 150 coordinated-sequence test cases. The model flags all 150 while the comparator rules flag none. These results are against the same synthetic generator families used to design training data. They do not establish production fraud accuracy, savings, fairness, or generalisation to real GOSI activity.
 
-The 16 false alarms include five routine cases and eleven legitimate-growth cases. They are retained in the report and should be discussed as review workload.
+The 18 false alarms include seven routine cases and eleven legitimate-growth cases. They are retained in the report and should be discussed as review workload.
 
 ## Files for Manal
 
@@ -85,7 +89,7 @@ Inference has no npm dependencies. Retraining requires the pinned Python package
 - No automatic fraud confirmation or adverse action
 - Missing linked evidence causes abstention
 - Human specialist owns the case route
-- Final investigated outcomes are not yet stored by this component
+- The standalone detector does not store outcomes; the integrated Madar application stores specialist decisions and outcomes.
 - No automatic conversion of a reviewed case into a rule or automatic retraining
 - Cross-journey business pattern confirmed for the synthetic prototype
 - Exact model threshold and production performance remain unvalidated

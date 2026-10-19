@@ -2,7 +2,7 @@
 (() => {
   const root = document.querySelector('#madar-workspace');
   const names = {routine:'Routine activity',coordinated_claim_sequence:'Connected SANED sequence',legitimate_restructuring:'Legitimate restructuring',identifier_reuse_network:'Shared identifier network',retroactive_source_conflict:'Conflicting evidence',missing:'Missing employer evidence'};
-  let catalog = [], records = new Map(), selected = 'CJ-SYN-demo-00001', busy = false, error = '';
+  let catalog = [], records = new Map(), selected = 'CJ-SYN-demo-00001', busy = false, error = '', activeModelVersion = '';
   const esc = escapeHtml;
   const date = value => new Date(value).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Riyadh'});
   const eventNames = {registration:'Registration',wage:'Wage change',exclusion:'Employment exclusion',claim:'SANED request',payment:'Payment',retirement:'Retirement',maternity:'Maternity'};
@@ -17,6 +17,7 @@
   async function load() {
     try {
       catalog = await backendJSON('/cross-journey/cases');
+      activeModelVersion = (await backendJSON('/health')).crossJourneyModelVersion;
       const saved = await backendJSON('/assessments');
       const unique = new Map();
       for (const record of saved) if(record.assessmentSource === 'cross-journey' && !unique.has(record.caseId)) unique.set(record.caseId,record);
@@ -45,7 +46,7 @@
   function resultBadge(record) {
     if(!record) return '<span class="cj-badge neutral">Not assessed</span>';
     if(!record.complete) return '<span class="cj-badge incomplete">Complete evidence</span>';
-    return record.modelFlagged ? '<span class="cj-badge review">Specialist review</span>' : '<span class="cj-badge typical">Standard review</span>';
+    return (record.modelFlagged || record.ruleFlagged) ? '<span class="cj-badge review">Specialist review</span>' : '<span class="cj-badge typical">Standard review</span>';
   }
   function timeline(evidence) {
     const items = evidence.events.filter(e=>e.recordedAt<=evidence.asOf && e.recordedAt>=evidence.asOf-30*86400000).sort((a,b)=>a.recordedAt-b.recordedAt);
@@ -68,14 +69,14 @@
     const contributors=new Set((c.sourceTimeline||[]).map(e=>e.subjectId)).size;
     const currentDecision=record.humanDecision;
     return `<article class="cj-case"><div class="cj-case-heading"><div><p class="eyebrow">${esc(record.caseId)} · SYNTHETIC SCENARIO</p><h2>${esc(c.scenario)}</h2><p>${journeys.map(esc).join(' <span aria-hidden="true">→</span> ')}</p></div>${resultBadge(record)}</div>
-      <div class="cj-checkpoint"><span>01 <strong>Request received</strong></span><span>02 <strong>Evidence assessed</strong></span><span class="${currentDecision?'done':'current'}">03 <strong>${currentDecision?'Decision recorded':'Specialist decision'}</strong></span><small>Before payment · simulated checkpoint</small></div>
+      ${activeModelVersion && r.modelVersion !== activeModelVersion ? '<p class="cj-error">This saved assessment uses an earlier model version. Reassess supplied evidence to use the current model; previous reviews remain in history.</p>' : ''}<div class="cj-checkpoint"><span>01 <strong>Request received</strong></span><span>02 <strong>Evidence assessed</strong></span><span class="${currentDecision?'done':'current'}">03 <strong>${currentDecision?'Decision recorded':'Specialist decision'}</strong></span><small>Before payment · simulated checkpoint</small></div>
       ${currentDecision?`<div class="cj-recorded"><strong>Recorded specialist route: ${esc(c.route)}</strong><span>${esc(c.status)} · ${esc(currentDecision.actorName)}</span></div>`:''}<div class="cj-results"><div><span>COMPARATOR RULES</span><strong>${!r.complete?'Not assessed':r.ruleFlagged?'Triggered':'No rule triggered'}</strong><small>${!r.complete?'Linked evidence is incomplete':r.ruleFlagged?'Included demonstration thresholds exceeded':'Individual comparator thresholds remain quiet'}</small></div><div class="${r.modelFlagged?'cj-ai-flag':''}"><span>CROSS-JOURNEY AI</span><strong>${!r.complete?'Abstained':r.modelFlagged?'Review pattern detected':'No review pattern flagged'}</strong><small>${!r.complete?'No score or low-risk classification produced':'Fitted model assessed the combined history'}</small></div><div><span>RECOMMENDED ROUTE</span><strong>${esc(r.route)}</strong><small>Specialist retains the decision</small></div></div>
-      <div class="cj-explanation"><p class="eyebrow">WHY THIS CASE WAS ROUTED</p><ul>${r.reasons.map(reason=>`<li>${esc(reason)}</li>`).join('')}</ul>${r.modelFlagged&&!r.ruleFlagged?'<p class="cj-insight">The added value is in the connected history: the model recommends review even though the included comparator rules do not trigger.</p>':''}<small>A review recommendation is not a fraud determination. This is a synthetic proof.</small></div>
+      <div class="cj-explanation"><p class="eyebrow">WHY THIS CASE WAS ROUTED</p><ul>${r.reasons.map(reason=>`<li>${esc(reason)}</li>`).join('')}</ul>${r.modelFlagged&&!r.ruleFlagged?'<p class="cj-insight">This example detector recommends review while its comparator rules remain quiet. Madar brings the finding, evidence and specialist decision into one workflow.</p>':''}<small>A review recommendation is not a fraud determination. This is a synthetic proof.</small></div>
       <div class="cj-evidence-heading"><div><p class="eyebrow">CONNECTED EVIDENCE</p><h3>${contributors} contributor${contributors===1?'':'s'} · ${journeys.length} journey${journeys.length===1?'':'s'} · ${(c.sourceTimeline||[]).length} event${(c.sourceTimeline||[]).length===1?'':'s'}</h3></div><span class="data-badge">30-day window ending ${esc(date(evidence.asOf))}</span></div>
       ${timeline(evidence)}
       <div class="cj-review"><div><p class="eyebrow">SPECIALIST REVIEW · DEMO ROLES</p><h3>Decide the next step</h3><p>Record a routing decision and the evidence behind it. The original model assessment remains unchanged.</p><small>This records a demo decision. It does not release or stop a payment.</small></div><form id="cj-review-form"><label>Reviewer name<input name="actor" required maxlength="120" placeholder="Enter your name"></label><label>Decision<select name="action"><option value="approve">Approve recommended route</option><option value="override">Recommend a different route</option><option value="reject">Return recommendation for review</option></select></label><label id="cj-route-label" hidden>Alternative route<select name="route"><option>Additional verification</option><option>Specialist review</option><option>Standard review</option><option>Complete evidence</option></select></label><label class="cj-note">Evidence and rationale<textarea name="note" required maxlength="2000" rows="3" placeholder="What supports this decision? What should be checked next?"></textarea></label><button class="primary-btn" type="submit" ${busy?'disabled':''}>Save review decision</button><span class="cj-form-status" role="status"></span></form></div>
       <div class="cj-history"><h3>Review history <span>${reviewHistory.length}</span></h3>${reviewHistory.length?reviewHistory.map(h=>`<div><strong>${esc(h.actorName)} · ${esc(h.action||h.outcome||h.type)}${h.route?' → '+esc(h.route):''}</strong><small>${esc(date(h.recordedAt))} · Assessment ${esc(h.assessmentId.slice(0,8))}</small><p>${esc(h.note)}</p></div>`).join(''):'<p>No specialist decision recorded yet.</p>'}</div>
-      <details class="cj-model"><summary>Model evidence and validation boundaries</summary><p><strong>Model:</strong> ${esc(r.modelVersion)} · Random Forest</p><p><strong>Assessed:</strong> ${esc(date(record.assessedAt))}</p><p><strong>Review-pattern score:</strong> ${r.complete?r.score:'Not produced'} · <strong>Calibration percentile:</strong> ${r.complete?r.percentile:'Not produced'}</p><p>The score is similarity to synthetic review patterns, not a fraud probability. Reference ranges are context, not exact feature contributions. Business pattern confirmed for this synthetic proof; model thresholds and production performance remain unvalidated.</p><div class="cj-table-wrap"><table><thead><tr><th>Derived feature</th><th>Observed</th><th>Reference median</th></tr></thead><tbody>${r.features.map(f=>`<tr><td>${esc(f.name)}</td><td>${Number(f.value).toFixed(2)}</td><td>${Number(f.median).toFixed(2)}</td></tr>`).join('')}</tbody></table></div></details>
+      <details class="cj-model"><summary>Model evidence and validation boundaries</summary><p><strong>Model:</strong> ${esc(r.modelVersion)} · Random Forest</p><p><strong>Assessed:</strong> ${esc(date(record.assessedAt))}</p><p><strong>Review-pattern score:</strong> ${r.complete?r.score:'Not produced'} · <strong>Calibration percentile:</strong> ${r.complete?r.percentile:'Not produced'}</p><p>The score is similarity to synthetic review patterns, not a fraud probability. Reference ranges are context, not exact feature contributions. Synthetic prototype; business interpretation, thresholds and production performance require validation.</p><div class="cj-table-wrap"><table><thead><tr><th>Derived feature</th><th>Observed</th><th>Reference median</th></tr></thead><tbody>${r.features.map(f=>`<tr><td>${esc(f.name)}</td><td>${Number(f.value).toFixed(2)}</td><td>${Number(f.median).toFixed(2)}</td></tr>`).join('')}</tbody></table></div></details>
       <div class="cj-case-actions"><button class="secondary-btn" id="cj-open-queue">Open in investigation queue</button><button class="text-btn" id="cj-run-selected" ${busy?'disabled':''}>Reassess supplied evidence</button></div>
     </article>`;
   }
@@ -84,14 +85,14 @@
     const available = new Map(catalog.map(c=>[c.id,c]));
     for(const r of records.values()) if(!available.has(r.caseId)) available.set(r.caseId,{id:r.caseId,family:r.scenario});
     const items=[...available.values()].sort((a,b)=>(a.id==='CJ-SYN-demo-00001'?-1:b.id==='CJ-SYN-demo-00001'?1:a.id.localeCompare(b.id)));
-    root.innerHTML = `<div class="cj-hero"><div><p class="eyebrow">MADAR · CONNECTED JOURNEY INTELLIGENCE</p><h2>A clearer picture.<br>A better-informed decision.</h2><p>Bring existing controls and connected behavior into one view, before the payment decision.</p><div class="cj-pills"><span>Explainable evidence</span><span>Human decision</span><span>Synthetic proof</span></div></div><div class="cj-hero-side"><img src="madar-mark.svg" alt=""><span lang="ar">مدار</span><small>Connected journeys.<br>Clearer risk decisions.</small></div></div>
+    root.innerHTML = `<div class="cj-hero"><div><p class="eyebrow">MADAR · CONNECTED JOURNEY INTELLIGENCE</p><h2>Connected evidence.<br>One case workflow.</h2><p>An example detection capability feeding Madar’s investigation, explanation and review workflow.</p><div class="cj-pills"><span>Explainable evidence</span><span>Human decision</span><span>Synthetic proof</span></div></div><div class="cj-hero-side"><img src="madar-mark.svg" alt=""><span lang="ar">مدار</span><small>Connected journeys.<br>Clearer risk decisions.</small></div></div>
       <div class="cj-toolbar"><div><h2>Connected journey review</h2><p>Employer Registration → Contribution & Wage → SANED</p></div><div><button class="primary-btn" id="cj-run-all" ${busy?'disabled':''}>${busy?'Assessing evidence…':'Assess demo portfolio'}</button><label class="secondary-btn cj-upload">Upload events<input id="cj-upload" type="file" accept=".csv,text/csv" ${busy?'disabled':''}></label><a class="text-btn" href="${backendBaseUrl}/cross-journey/template" download>Download event CSV</a></div></div>
       ${error?`<div class="cj-error" role="alert">${esc(error)} <button id="cj-retry" class="text-btn">Retry connection</button></div>`:''}
       <div class="cj-layout"><aside class="cj-cases"><p class="eyebrow">SYNTHETIC CASES</p>${items.length?items.map(item=>`<button class="cj-case-choice ${selected===item.id?'selected':''}" data-cj-id="${esc(item.id)}" aria-pressed="${selected===item.id}"><strong>${esc(names[item.family]||item.family)}</strong><small>${esc(item.id)}</small>${resultBadge(records.get(item.id))}</button>`).join(''):'<p>Connecting to the model service…</p>'}<div class="cj-boundary"><strong>What this proves</strong><p>Linked event evidence is evaluated by a fitted model. Source systems and payments are simulated.</p><button class="text-btn" id="cj-vision">View enterprise vision →</button></div></aside><div>${detail(record)}</div></div>`;
     root.querySelectorAll('[data-cj-id]').forEach(button=>button.onclick=()=>{selected=button.dataset.cjId;render();});
     root.querySelector('#cj-run-selected')?.addEventListener('click',()=>{
-      if(!catalog.some(c=>c.id===selected)) return showToast('Re-upload this case’s event CSV to reassess its evidence.');
-      run({case_id:selected});
+      const current=records.get(selected);
+      run(current ? {evidence:current.caseData.crossJourneyEvidence} : {case_id:selected});
     });
     root.querySelector('#cj-run-all').onclick=async()=>{
       try { const response=await fetch(backendBaseUrl+'/cross-journey/template'); if(!response.ok) throw new Error('Cannot load event evidence.'); await run({csv:await response.text()}); } catch(e){error=e.message;render();}
@@ -104,7 +105,7 @@
     root.querySelector('#cj-retry')?.addEventListener('click',load);
     root.querySelector('#cj-vision').onclick=()=>switchView('executive');
     root.querySelector('#cj-open-queue')?.addEventListener('click',()=>{
-      selectedId=selected;activeFilter='All';activeJourney='All';activeRegion='All';searchQuery='';document.querySelector('#case-search').value='';renderAll();switchView('queue');
+      useAssessedPortfolio();selectedId=selected;activeFilter='All';activeJourney='All';activeRegion='All';searchQuery='';document.querySelector('#case-search').value='';renderAll();switchView('queue');
     });
     const form=root.querySelector('#cj-review-form');
     if(form){
@@ -126,7 +127,7 @@
   }
   document.querySelector('[data-view="connected"]').addEventListener('click',load);
   window.addEventListener('madar-reset',()=>{records=new Map();load();});
-  switchView('connected'); render(); load(); refreshHealth();
+  render(); load(); refreshHealth();
   setInterval(refreshHealth,15000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshHealth();});
 })();

@@ -110,3 +110,21 @@ test("Data Intake event CSV carries the assessment time needed for the 30-day wi
     assert.equal(columns[assessmentIndex], "1792195200000");
   }
 });
+
+test('contributor sequences cannot be assembled from different people or repeated event counts',()=>{
+ const proof=structuredClone(cases[1]);const subjects=[...new Set(proof.events.map(e=>e.subjectId))];
+ for(const e of proof.events)e.subjectId=subjects[{registration:0,wage:1,exclusion:2,claim:0}[e.type]];
+ const result=assess(proof);assert.equal(result.completedContributorChains,0);assert.ok(!result.reasons.some(r=>r.includes('each complete')));
+ const repeated=structuredClone(cases[1]);for(const e of repeated.events)e.subjectId=subjects[0];
+ assert.equal(assess(repeated).completedContributorChains,1);
+ assert.equal(assess(cases[1]).completedContributorChains,3);
+});
+test('invalid wages and missing or mismatched journeys abstain',()=>{
+ for(const mutate of [c=>c.events.forEach(e=>e.journey=''),c=>c.events[0].journey='SANED',c=>c.events.find(e=>e.type==='wage').amount=-100,c=>c.events.find(e=>e.type==='wage').amount=0]){
+  const c=structuredClone(cases[1]);mutate(c);const result=assess(c);assert.equal(result.complete,false);assert.equal(result.percentile,null);
+ }
+});
+test('reported journeys use the same evidence window as the model',()=>{
+ const c=structuredClone(cases[0]);c.events.push({...c.events[0],type:'payment',journey:'Benefit Payments',recordedAt:c.asOf-31*86400000});
+ assert.ok(!assess(c).involvedJourneys.includes('Benefit Payments'));
+});

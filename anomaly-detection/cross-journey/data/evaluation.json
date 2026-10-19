@@ -1,13 +1,13 @@
 {
-  "modelVersion": "madar-cross-journey-rf-20261017-v1",
-  "artifactSha256": "c37a38f9cc7a7f815f8b4ea9c0d970f27d98c1e2c94ccf282864306cb1132ed9",
-  "validation": "Business typology confirmed by Haitham; exact synthetic labels and threshold remain prototype assumptions",
+  "modelVersion": "madar-cross-journey-rf-20261019-v2",
+  "artifactSha256": "8966a9575c4ba0b25e9c26b2bcd6a0a7d24de42cee9b37a76825c26088d080b6",
+  "validation": "Synthetic prototype with contributor-level sequence correction; business validation and real-data evaluation required",
   "train": 6700,
   "calibration": 1000,
   "test": 700,
   "routineOrLegitimate": 400,
   "review": 300,
-  "threshold": 0.00038115594062715477,
+  "threshold": 0.00017636189085619078,
   "thresholdMethod": "97th percentile of a separate routine and legitimate calibration population",
   "splitMethod": "Disjoint synthetic case, employer, contributor, and identifier IDs; common generator; no real-world generalisation claim",
   "metrics": {
@@ -23,29 +23,29 @@
     },
     "Cross-journey pattern model only": {
       "tp": 300,
-      "fp": 16,
+      "fp": 18,
       "fn": 0,
-      "tn": 384,
-      "accuracy": 0.9771428571428571,
-      "precision": 0.9493670886075949,
+      "tn": 382,
+      "accuracy": 0.9742857142857143,
+      "precision": 0.9433962264150944,
       "recall": 1.0,
-      "falsePositiveRate": 0.04
+      "falsePositiveRate": 0.045
     },
     "Rules OR cross-journey AI": {
       "tp": 300,
-      "fp": 16,
+      "fp": 18,
       "fn": 0,
-      "tn": 384,
-      "accuracy": 0.9771428571428571,
-      "precision": 0.9493670886075949,
+      "tn": 382,
+      "accuracy": 0.9742857142857143,
+      "precision": 0.9433962264150944,
       "recall": 1.0,
-      "falsePositiveRate": 0.04
+      "falsePositiveRate": 0.045
     }
   },
   "byScenario": {
     "routine": {
       "count": 250,
-      "aiFlagged": 5,
+      "aiFlagged": 7,
       "ruleFlagged": 0
     },
     "legitimate_growth": {

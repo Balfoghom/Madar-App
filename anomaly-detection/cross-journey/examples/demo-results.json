@@ -4,13 +4,15 @@
     "scenario": "routine",
     "synthetic": true,
     "businessValidation": "Business pattern confirmed; model threshold remains a prototype assumption",
-    "modelVersion": "madar-cross-journey-rf-20261017-v1",
+    "modelVersion": "madar-cross-journey-rf-20261019-v2",
     "complete": true,
     "score": 0,
-    "percentile": 95.7,
+    "percentile": 96.6,
     "modelFlagged": false,
     "ruleFlagged": false,
     "ruleReasons": [],
+    "ruleFindings": [],
+    "completedContributorChains": 0,
     "involvedJourneys": [
       "Contribution & Wage",
       "Employer Registration",
@@ -26,6 +28,7 @@
         "median": 3,
         "low": 2,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -34,6 +37,7 @@
         "median": 6,
         "low": 3,
         "high": 12,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -42,6 +46,7 @@
         "median": 2,
         "low": 1,
         "high": 7,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -50,6 +55,7 @@
         "median": 1,
         "low": 0,
         "high": 5,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -58,6 +64,7 @@
         "median": 2,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -66,6 +73,7 @@
         "median": 1,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -74,6 +82,7 @@
         "median": 1,
         "low": 1,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -82,6 +91,7 @@
         "median": 15.923583030700684,
         "low": -1.4243667125701904,
         "high": 58.49081802368164,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -90,14 +100,16 @@
         "median": 5.427642345428467,
         "low": 0,
         "high": 65.07260131835938,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
-        "name": "Hours since latest wage change (log1p)",
+        "name": "Hours since latest wage change",
         "value": 217.41025861111106,
         "median": 340.937871690999,
         "low": 122.80266287079489,
         "high": 720.0001622612529,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -106,6 +118,7 @@
         "median": 0,
         "low": 0,
         "high": 6,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -114,6 +127,7 @@
         "median": 0,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -122,6 +136,7 @@
         "median": 0,
         "low": 0,
         "high": 1,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -130,6 +145,7 @@
         "median": 0,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -138,14 +154,16 @@
         "median": 0,
         "low": 0,
         "high": 1,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Completed chain span (days)",
         "value": 30,
         "median": 30,
-        "low": 21.67193031311035,
+        "low": 20.635461807250977,
         "high": 30,
+        "unusual": false,
         "outsideReferenceRange": false
       }
     ],
@@ -160,13 +178,15 @@
     "scenario": "coordinated_claim_sequence",
     "synthetic": true,
     "businessValidation": "Business pattern confirmed; model threshold remains a prototype assumption",
-    "modelVersion": "madar-cross-journey-rf-20261017-v1",
+    "modelVersion": "madar-cross-journey-rf-20261019-v2",
     "complete": true,
     "score": 1,
     "percentile": 100,
     "modelFlagged": true,
     "ruleFlagged": false,
     "ruleReasons": [],
+    "ruleFindings": [],
+    "completedContributorChains": 3,
     "involvedJourneys": [
       "Employer Registration",
       "Contribution & Wage",
@@ -182,6 +202,7 @@
         "median": 3,
         "low": 2,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -190,6 +211,7 @@
         "median": 6,
         "low": 3,
         "high": 12,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -198,6 +220,7 @@
         "median": 2,
         "low": 1,
         "high": 7,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -206,6 +229,7 @@
         "median": 1,
         "low": 0,
         "high": 5,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -214,6 +238,7 @@
         "median": 2,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -222,6 +247,7 @@
         "median": 1,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -230,6 +256,7 @@
         "median": 1,
         "low": 1,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -238,6 +265,7 @@
         "median": 15.923583030700684,
         "low": -1.4243667125701904,
         "high": 58.49081802368164,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -246,14 +274,16 @@
         "median": 5.427642345428467,
         "low": 0,
         "high": 65.07260131835938,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
-        "name": "Hours since latest wage change (log1p)",
+        "name": "Hours since latest wage change",
         "value": 378.1916111111111,
         "median": 340.937871690999,
         "low": 122.80266287079489,
         "high": 720.0001622612529,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -262,6 +292,7 @@
         "median": 0,
         "low": 0,
         "high": 6,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -270,6 +301,7 @@
         "median": 0,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -278,6 +310,7 @@
         "median": 0,
         "low": 0,
         "high": 1,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -286,6 +319,7 @@
         "median": 0,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -294,20 +328,22 @@
         "median": 0,
         "low": 0,
         "high": 1,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Completed chain span (days)",
-        "value": 23.496033344907406,
+        "value": 22.68033153935185,
         "median": 30,
-        "low": 21.67193031311035,
+        "low": 20.635461807250977,
         "high": 30,
+        "unusual": false,
         "outsideReferenceRange": false
       }
     ],
     "reasons": [
       "The trained cross-journey model found similarity to provisional review patterns.",
-      "3 linked contributors participate in a registration → wage → exclusion → SANED sequence."
+      "3 linked contributors each complete a registration → wage → exclusion → SANED sequence."
     ],
     "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
     "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions."
@@ -317,13 +353,15 @@
     "scenario": "legitimate_restructuring",
     "synthetic": true,
     "businessValidation": "Business pattern confirmed; model threshold remains a prototype assumption",
-    "modelVersion": "madar-cross-journey-rf-20261017-v1",
+    "modelVersion": "madar-cross-journey-rf-20261019-v2",
     "complete": true,
     "score": 0,
-    "percentile": 95.7,
+    "percentile": 96.6,
     "modelFlagged": false,
     "ruleFlagged": false,
     "ruleReasons": [],
+    "ruleFindings": [],
+    "completedContributorChains": 0,
     "involvedJourneys": [
       "Employer Registration",
       "SANED"
@@ -338,6 +376,7 @@
         "median": 3,
         "low": 2,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -346,6 +385,7 @@
         "median": 6,
         "low": 3,
         "high": 12,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -354,6 +394,7 @@
         "median": 2,
         "low": 1,
         "high": 7,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -362,6 +403,7 @@
         "median": 1,
         "low": 0,
         "high": 5,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -370,6 +412,7 @@
         "median": 2,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -378,6 +421,7 @@
         "median": 1,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -386,6 +430,7 @@
         "median": 1,
         "low": 1,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -394,6 +439,7 @@
         "median": 15.923583030700684,
         "low": -1.4243667125701904,
         "high": 58.49081802368164,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -402,14 +448,16 @@
         "median": 5.427642345428467,
         "low": 0,
         "high": 65.07260131835938,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
-        "name": "Hours since latest wage change (log1p)",
+        "name": "Hours since latest wage change",
         "value": 720.0000000000002,
         "median": 340.937871690999,
         "low": 122.80266287079489,
         "high": 720.0001622612529,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -418,6 +466,7 @@
         "median": 0,
         "low": 0,
         "high": 6,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -426,6 +475,7 @@
         "median": 0,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -434,6 +484,7 @@
         "median": 0,
         "low": 0,
         "high": 1,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -442,6 +493,7 @@
         "median": 0,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -450,14 +502,16 @@
         "median": 0,
         "low": 0,
         "high": 1,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Completed chain span (days)",
         "value": 30,
         "median": 30,
-        "low": 21.67193031311035,
+        "low": 20.635461807250977,
         "high": 30,
+        "unusual": false,
         "outsideReferenceRange": false
       }
     ],
@@ -472,7 +526,7 @@
     "scenario": "identifier_reuse_network",
     "synthetic": true,
     "businessValidation": "Business pattern confirmed; model threshold remains a prototype assumption",
-    "modelVersion": "madar-cross-journey-rf-20261017-v1",
+    "modelVersion": "madar-cross-journey-rf-20261019-v2",
     "complete": true,
     "score": 1,
     "percentile": 100,
@@ -481,6 +535,13 @@
     "ruleReasons": [
       "Identifier shared by four or more contributors"
     ],
+    "ruleFindings": [
+      {
+        "code": "CJ_IDENTIFIER_REUSE",
+        "description": "Identifier shared by four or more contributors"
+      }
+    ],
+    "completedContributorChains": 0,
     "involvedJourneys": [
       "Benefit Payments",
       "SANED"
@@ -495,6 +556,7 @@
         "median": 3,
         "low": 2,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -503,6 +565,7 @@
         "median": 6,
         "low": 3,
         "high": 12,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -511,6 +574,7 @@
         "median": 2,
         "low": 1,
         "high": 7,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -519,6 +583,7 @@
         "median": 1,
         "low": 0,
         "high": 5,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -527,6 +592,7 @@
         "median": 2,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -535,6 +601,7 @@
         "median": 1,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -543,6 +610,7 @@
         "median": 1,
         "low": 1,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -551,6 +619,7 @@
         "median": 15.923583030700684,
         "low": -1.4243667125701904,
         "high": 58.49081802368164,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -559,14 +628,16 @@
         "median": 5.427642345428467,
         "low": 0,
         "high": 65.07260131835938,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
-        "name": "Hours since latest wage change (log1p)",
+        "name": "Hours since latest wage change",
         "value": 720.0000000000002,
         "median": 340.937871690999,
         "low": 122.80266287079489,
         "high": 720.0001622612529,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -575,6 +646,7 @@
         "median": 0,
         "low": 0,
         "high": 6,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -583,6 +655,7 @@
         "median": 0,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -591,6 +664,7 @@
         "median": 0,
         "low": 0,
         "high": 1,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -599,6 +673,7 @@
         "median": 0,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -607,14 +682,16 @@
         "median": 0,
         "low": 0,
         "high": 1,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Completed chain span (days)",
         "value": 30,
         "median": 30,
-        "low": 21.67193031311035,
+        "low": 20.635461807250977,
         "high": 30,
+        "unusual": false,
         "outsideReferenceRange": false
       }
     ],
@@ -630,7 +707,7 @@
     "scenario": "retroactive_source_conflict",
     "synthetic": true,
     "businessValidation": "Business pattern confirmed; model threshold remains a prototype assumption",
-    "modelVersion": "madar-cross-journey-rf-20261017-v1",
+    "modelVersion": "madar-cross-journey-rf-20261019-v2",
     "complete": true,
     "score": 1,
     "percentile": 100,
@@ -640,6 +717,17 @@
       "Retroactive change of 30 days or more",
       "Two or more cross-source conflicts"
     ],
+    "ruleFindings": [
+      {
+        "code": "CJ_RETROACTIVE_CHANGE",
+        "description": "Retroactive change of 30 days or more"
+      },
+      {
+        "code": "CJ_SOURCE_CONFLICT",
+        "description": "Two or more cross-source conflicts"
+      }
+    ],
+    "completedContributorChains": 0,
     "involvedJourneys": [
       "Contribution & Wage",
       "Retirement",
@@ -655,6 +743,7 @@
         "median": 3,
         "low": 2,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -663,6 +752,7 @@
         "median": 6,
         "low": 3,
         "high": 12,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -671,6 +761,7 @@
         "median": 2,
         "low": 1,
         "high": 7,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -679,6 +770,7 @@
         "median": 1,
         "low": 0,
         "high": 5,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -687,6 +779,7 @@
         "median": 2,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -695,6 +788,7 @@
         "median": 1,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -703,6 +797,7 @@
         "median": 1,
         "low": 1,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -711,6 +806,7 @@
         "median": 15.923583030700684,
         "low": -1.4243667125701904,
         "high": 58.49081802368164,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -719,14 +815,16 @@
         "median": 5.427642345428467,
         "low": 0,
         "high": 65.07260131835938,
+        "unusual": true,
         "outsideReferenceRange": true
       },
       {
-        "name": "Hours since latest wage change (log1p)",
+        "name": "Hours since latest wage change",
         "value": 150.71551666666673,
         "median": 340.937871690999,
         "low": 122.80266287079489,
         "high": 720.0001622612529,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -735,6 +833,7 @@
         "median": 0,
         "low": 0,
         "high": 6,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -743,6 +842,7 @@
         "median": 0,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -751,6 +851,7 @@
         "median": 0,
         "low": 0,
         "high": 1,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -759,6 +860,7 @@
         "median": 0,
         "low": 0,
         "high": 3,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
@@ -767,14 +869,16 @@
         "median": 0,
         "low": 0,
         "high": 1,
+        "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Completed chain span (days)",
         "value": 30,
         "median": 30,
-        "low": 21.67193031311035,
+        "low": 20.635461807250977,
         "high": 30,
+        "unusual": false,
         "outsideReferenceRange": false
       }
     ],
@@ -791,7 +895,7 @@
     "scenario": "missing",
     "synthetic": true,
     "businessValidation": "Business pattern confirmed; model threshold remains a prototype assumption",
-    "modelVersion": "madar-cross-journey-rf-20261017-v1",
+    "modelVersion": "madar-cross-journey-rf-20261019-v2",
     "complete": false,
     "route": "Complete evidence",
     "band": "Incomplete",

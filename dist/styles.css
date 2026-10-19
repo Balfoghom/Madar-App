@@ -3342,10 +3342,10 @@ dialog label.check-field {
   .indicator-row {
     grid-template-columns: 1.5fr 0.8fr 0.7fr;
   }
-  .indicator-row > :nth-child(4),
-  .indicator-row > :nth-child(5) {
-    display: none;
-  }
+    .indicator-row > :nth-child(4),
+  .indicator-row > :nth-child(5) { display: block; }
+  .indicator-row:not(.header) > :nth-child(4)::before { content: 'Status: '; }
+  .indicator-row > :nth-child(5) { grid-column: 2 / -1; }
   .pipeline {
     grid-template-columns: 1fr;
   }

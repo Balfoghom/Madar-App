@@ -1,59 +1,48 @@
-# GOSI Adaptive Behavioral Intelligence — Technical Blueprint
+# Madar — current technical blueprint
 
-## Product position
+## Runtime
 
-The prototype demonstrates an enterprise multi-journey behavioral intelligence capability. It does not consolidate or replace source-system rules. It consumes approved rule results and behavioral events, links them into one explainable assessment, and recommends a proportionate route for an authorized specialist.
+Node.js 22.13+ runs `start.mjs`, serving an allowlisted static interface from `dist/` and routing `/api/*` to `anomaly-detection/server.mjs`. No npm dependencies are required for inference. Model training is an offline task with separate pinned Python dependencies.
 
-SANED is one demonstration journey and remains a strong candidate for the first measured Proof of Value. The shared capability is intentionally extensible to other authorized journeys.
+The launcher reads an optional root `.env` before importing the API. Host environment variables take precedence. `.env` files are ignored by Git and Docker. Secrets must remain on the server.
 
-## Prototype architecture
+## Components
 
-1. Existing source-system rule results and approved events remain in their original systems.
-2. A shared event foundation links masked contributor, beneficiary, employer, payment, payroll, contact, device, and request activity.
-3. Feature preparation derives reusable behavioral and contextual indicators.
-4. An anomaly component compares observed activity with a robust synthetic baseline.
-5. A hybrid assessment combines the existing control score, behavioral anomaly score, and approved combined-pattern adjustments.
-6. The specialist workspace presents the risk band, confidence, reason codes, timeline, and recommended route.
-7. An authorized specialist approves or overrides the route and records the final outcome.
-8. Validated outcomes may support new indicator proposals, but no proposal or weight change activates without review, testing, and approval.
+| Component | Responsibility |
+|---|---|
+| `dist/operations.js` | Fraud Operations landing page, case ownership form and optional LLM explanation panel |
+| `dist/app.js` | Intake, queue, decisions, outcomes, reports, governance views and separately scoped legacy simulation |
+| `dist/madar.js` | Connected-event example, evidence timeline, inference and specialist review |
+| `anomaly-detection/server.mjs` | Validation, inference APIs, serialized local mutations, workflow, explanations and model registry |
+| `lib/assessment-adapter.mjs` | Six journey models and separate operational-control routing policy |
+| `lib/cross-journey-adapter.mjs` | Event CSV contract and connected-model case mapping |
+| `cross-journey/inference/detector.mjs` | Derived features and fitted Random Forest inference |
+| `lib/case-explainer.mjs` | Minimal evidence packet, OpenAI Responses request, strict output validation |
 
-## Demonstrated journeys and scenarios
+Paths under `lib/` are relative to `anomaly-detection/`.
 
-- SANED: repeated or retroactive exclusion changes and employer-wide request clusters.
-- Benefit payments: IBAN ownership mismatch, identifier reuse, and conflicting session sequences.
-- Employer registration: rapid registration/exclusion activity and shared supervisor relationships.
-- Retirement: WPS or approved payroll evidence that conflicts with the recorded retirement status.
-- Maternity benefit: material salary change or unusually short employment-benefit sequence.
-- Contribution and wage: repeated salary changes, retroactive wage updates, and cross-source discrepancies.
+## Key contracts
 
-The current dataset contains 60 fully synthetic cases across these six journeys. It includes generated evidence timelines, Saudi regional distribution, and contextual cross-border activity. Geography never increases risk by itself.
+- Assessments retain `assessmentId`, `caseId`, assessed time, model version, raw model result, input evidence and application routing separately.
+- Decisions and outcomes reference the current assessment, require a named reviewer and note, and leave the original model result unchanged.
+- `/case-workflow` stores assigned owner, stage and revision. Stale revisions, skipped stages and unresolved closures are rejected.
+- `/case-explanation` retrieves or generates a draft for a current saved synthetic assessment. Cache identity includes assessment ID, evidence fingerprint, prompt version and configured model. Changed facts require a fresh explanation; evidence changing during generation prevents saving that draft.
+- `/llm/status` exposes configuration status, not credentials. Only explicit generation requests call the external provider. Provider refusal, timeout or invalid output cannot become a fabricated successful explanation.
+- Repeated identical connected evidence with the same model version is idempotent. Changed evidence/version creates a new assessment while preserving historical human reviews.
+- Sandbox configuration is never used as the active routing policy for fitted-model cases.
 
-## Input and synthetic model flow
+## Storage and concurrency
 
-The static PoV supports 60 built-in synthetic cases and a manual synthetic assessment form. File and pasted-CSV intake have been removed.
+`.madar-data/` is the launcher’s default runtime directory. Writes are queued within the single Node process and use temporary-file replacement. Ownership, assessments, human reviews, proposals and explanations use separate JSON files. These files are not a multi-instance transactional database or an immutable audit system. A process interruption across multiple related files can still require recovery/reconciliation.
 
-All six service journeys have synthetic-only Isolation Forest models. Model metadata, generated training and calibration counts, holdout size, and synthetic evaluation summaries are available from the backend's `/journey-models` endpoint. SANED retains its Python training pipeline. The other five journeys are regenerated with `npm run train:journeys` from `anomaly-detection`; their artifacts are saved in `anomaly-detection/data/journey-models.json` and loaded by the backend.
+Manal’s earlier checked-in session is preserved under `demo-sessions/manal-20261019/`. It is a historical fixture, not the default seed for a fresh installation. Local sessions stay excluded from Git.
 
-The prototype's Data Intake page accepts CSV uploads or pasted CSV rows for browser-session assessment; it does not persist those imports as training data. The production target would use approved APIs or event streams, with separate validation of real-time operation, latency, integration, ownership, security, and recovery controls. The PoV does not train from specialist outcomes.
+## LLM controls
 
-## AI agent boundary
+The server sends derived features, reason codes, model/routing context and recorded outcome/amount fields. It omits subject identifiers, names, contact details, event identifiers, reviewer notes and scenario free text. Synthetic flags are an input contract, not a mechanism for anonymizing real records. Only approved synthetic data should be used.
 
-The Behavioral Risk Decision-Support Agent may read approved sandbox inputs, calculate anomaly and combined assessments, generate reason codes, recommend a route, record a human decision, and propose an indicator for review.
+Responses use `store:false` and strict structured outputs. The server validates expected fields, text size and cited evidence IDs. Requests have a 45-second timeout, one in-flight generation per case and a five-generation-per-minute prototype limit. These measures are not an enterprise budget or abuse-control system. Provider retention and processing terms must be checked separately.
 
-It may not modify source rules, activate indicators, confirm fraud, stop or reject a payment, make an adverse eligibility decision, access unapproved data, or send data to an external party.
+## Deployment boundary
 
-Human approval is required for high-risk routing, overrides, adverse-action recommendations, final outcomes, and all changes to indicators, weights, or thresholds. Model changes follow specialist review, Data & AI validation, and GM approval before activation; changes outside the GM's delegated authority are escalated through the applicable approval structure.
-
-The prototype includes a sandbox-only Scoring Simulation Lab. Users can vary the existing-control/AI-anomaly mix, interaction contribution, risk thresholds, and approved indicator contributions; compare the resulting risk-band distribution; reset to defaults; and submit a configuration for governed review. No simulation changes an operational source rule or activates a production model.
-
-## Prototype boundaries
-
-- No live GOSI integration or real personal data.
-- No automatic payment hold, rejection, eligibility decision, fraud confirmation, or inspection order.
-- No source-system rule modification or enterprise rule migration.
-- No claim of real-world accuracy, prevented loss, or operational benefit from synthetic results.
-- No production authorization, retention model, monitoring, or security accreditation.
-
-## Validation path
-
-Production consideration requires confirmation of permitted data use, accountable ownership, existing capabilities, historical outcomes, data quality, architecture, security and privacy controls, fairness, performance, shadow-mode results, monitoring, rollback, and domain-approved thresholds.
+Single Node service, persistent runtime directory, HTTPS from the hosting platform and optional shared demo password. Enterprise deployment needs SSO and enforced roles, transactional storage, approved connectors and provider, audit integrity, retention, observability, evaluation and controlled release processes. Existing ServiceNow files are import examples, not an implemented connector.

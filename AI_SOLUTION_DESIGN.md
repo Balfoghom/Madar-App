@@ -1,97 +1,40 @@
-# AI Solution Design
+# Madar | مدار — solution design
 
-## 1. Objective
+## Business purpose
 
-The solution supports proactive external-fraud risk assessment by assembling authorized events across a customer, beneficiary, employer, payment, and service journey. It does not automate fraud determination. It prioritizes cases, explains the contributing evidence, and recommends a proportionate route for human decision.
+Madar proposes one operating layer for the fraud business team across existing detection capabilities. Findings become owned cases with source evidence, explanation, investigation steps, specialist decisions, recorded outcomes and a governed improvement process. Cross-journey detection can already exist in the enterprise; it is an input to this process, not the central innovation claim.
 
-## 2. Current prototype components
+The intended value is less time assembling evidence and writing case summaries, more consistent investigation, clearer accountability and better measurement of confirmed outcomes and verified financial interventions. These are hypotheses to evaluate, not measured results of this prototype.
 
-### A. Behavioral Anomaly Detection
+## Enterprise end state
 
-**Current implementation:** transparent unsupervised calculation in `dist/app.js`.
+1. Connect existing fraud use cases, controls and models through a common finding contract. Preserve source, model or rule version, source timestamps and evidence identifiers.
+2. Deduplicate and relate findings into cases. Assign accountable owners and service-level expectations.
+3. Prepare an evidence-grounded LLM brief: what was observed, why the originating capability flagged it, what is missing and what the specialist should check.
+4. Investigate with controlled access, work notes, evidence requests and explicit decision authority.
+5. Record specialist conclusions separately from detector signals. Integrate authorized violation issuance and intervention processes, rather than treating a model flag as a finding of fraud.
+6. Reconcile outcomes and amounts with the relevant systems. Measure elapsed specialist effort, useful findings, false positives, confirmed cases, issued violations and verified prevented/recovered amounts.
+7. Aggregate feedback into candidate indicators and model improvements. Validate, approve, version and monitor changes before deployment.
 
-For each numeric feature, the prototype measures positive deviation from the 60-case synthetic baseline using the median and median absolute deviation (MAD). Deviations are capped and multiplied by configurable feature contributions. A verified cross-source conflict contributes only when explicitly present.
+## Implemented prototype
 
-**Output:** Behavioral Anomaly Score from 0 to 100.
+- English Madar / مدار workspace opens on Fraud Operations.
+- Seven bundled synthetic models supply cases: six journey-specific Isolation Forest models and one connected-journey Random Forest.
+- CSV/manual synthetic intake, calculated model evidence and a shared case queue.
+- Named ownership and staged work: New → Triage → Investigation → Decision pending → Closed. Adjacent transitions and a resolved outcome before closure are enforced server-side.
+- Named human routing decisions, outcomes, financial consistency checks, assessment-version checks and persisted local review history.
+- Optional OpenAI Responses API explanation adapter. It sends a minimal evidence packet, validates the response structure and evidence IDs, caches by assessment/evidence/model, and displays an unreviewed draft. It never changes the detector or case decision.
+- Indicator suggestions and example scenario-governance stages. They do not activate a production rule or retrain a model.
+- Assessed cases and illustrative legacy portfolio are separate reporting scopes.
 
-**Production target:** a versioned anomaly-model service trained and validated on approved historical behavioral events, with monitoring for quality, drift, fairness, and performance.
+## Evidence and boundaries
 
-### B. Hybrid Decisioning Engine
+All supplied examples are synthetic. Anomaly scores, pattern similarity and calibration percentiles are not fraud probabilities. The current connected model’s synthetic holdout has 300 true positives, 18 false positives, no false negatives and 382 true negatives; this is not evidence of enterprise performance.
 
-**Current implementation:** deterministic explainable calculation in `dist/app.js`.
+The prototype records outcomes; it does not formally issue violations, block payments or verify recovered money. A zero recorded amount is not proof that there was no exposure. Missing transaction values remain “Not supplied.” The app has no measured specialist-effort saving or detection uplift.
 
-```text
-Behavioral Risk Score =
-55% Existing Control Score
-+ 45% Behavioral Anomaly Score
-+ Approved Combined-Pattern Adjustment
-```
+The LLM is an advisory assistant. Valid evidence citations do not guarantee that the generated interpretation is correct. Specialist review and provider-specific validation remain necessary.
 
-The score is mapped to Low, Medium, or High. Missing required information reduces confidence and routes the case to data verification rather than silently treating missingness as evidence of fraud.
+## Validation before an enterprise pilot
 
-**Production target:** an internal decisioning service with domain-owned configurations, version control, approval workflow, full audit history, and rollback.
-
-### C. AI Case Summary
-
-**Current implementation:** controlled bilingual evidence-to-text templates. The summary uses only the structured evidence already visible in the case and never labels a person as fraudulent.
-
-**Production target:** GOSI Brain or another approved internal LLM endpoint. Retrieval and prompting must be restricted to the authorized case, reason codes, event timeline, and policy context. The response must remain advisory, attributable, logged, and subject to human review.
-
-### D. New Risk Indicator Suggestions
-
-**Current implementation:** prototype suggestions demonstrate the governance workflow and are not learned or activated automatically.
-
-**Production target:** periodic analytics over validated outcomes to identify recurring event combinations, emerging patterns, or control gaps. Every proposal follows:
-
-```text
-AI suggestion → Specialist review → Data & AI validation → Approval → Activation → Monitoring
-```
-
-## 3. Current processing flow
-
-1. Load one of the 60 built-in synthetic cases or enter a synthetic assessment manually.
-2. Validate required fields and normalize the input.
-3. Calculate behavioral anomaly signals with the saved model for the selected journey.
-4. Combine anomaly output with the existing-control score and approved interaction logic.
-5. Generate risk band, confidence, reason codes, and recommended route.
-6. Present the complete case context to the specialist.
-7. Record the specialist classification and verified financial outcome.
-8. Recalculate executive and monthly business-owner metrics from the current session.
-
-## 4. Target internal architecture
-
-| Layer | Responsibility | Suggested internal implementation |
-| --- | --- | --- |
-| Source systems | Existing rules, requests, profile, employer, payment, WPS and outcome events | Approved APIs or event streams |
-| Integration | Schema validation, event correlation, identity resolution | Internal integration/API platform |
-| Behavioral store | Authorized historical event sequence and reusable features | Governed internal data platform |
-| Anomaly service | Model inference, version, confidence and monitoring | Data & AI model-serving platform |
-| Decision service | Domain weights, thresholds, reason codes and routes | Internal API with governed configuration |
-| LLM service | Case summary and controlled indicator proposals | GOSI Brain/approved internal LLM |
-| Specialist workspace | Queue, explanation, review, override and outcomes | Existing UI adapted for internal hosting |
-| Reporting | Operational, executive and benefit-realization views | Internal reporting/BI integration |
-
-## 5. API contracts recommended for the next phase
-
-- `POST /api/v1/assessments` — submit a case and approved events; return component scores, combined assessment, confidence, reason codes, model versions, and route.
-- `GET /api/v1/cases/{caseId}` — retrieve the authorized case, timeline, explanations, and audit history.
-- `POST /api/v1/cases/{caseId}/decisions` — record specialist approval, override, classification, evidence note, and financial outcome.
-- `POST /api/v1/cases/{caseId}/summary` — request an approved internal LLM summary from structured evidence.
-- `GET /api/v1/indicators` — retrieve active and proposed indicators by domain and version.
-- `POST /api/v1/indicator-proposals` — submit a proposal into the governed review workflow; never activate it directly.
-- `GET /api/v1/reports/monthly` — produce reconciled management metrics using verified outcomes and payment status.
-
-## 6. Human and governance boundaries
-
-The AI may calculate an assessment, summarize evidence, recommend a route, and propose an indicator. It may not independently confirm fraud, prove intent, stop or reject payment, change eligibility, activate an indicator, change a production weight, access unapproved data, or send information outside approved internal services.
-
-## 7. Evidence required before production
-
-- Confirmed business owner and domain decision rights.
-- Approved data purpose, fields, retention, access, and masking rules.
-- Historical outcome quality and fraud/error classification standard.
-- Back-testing and shadow testing against agreed baselines.
-- Precision, recall where measurable, false-positive rate, review effort, customer impact, and fairness assessment.
-- Security architecture, threat model, penetration testing, logging, monitoring, recovery, and rollback.
-- Operational SLA for any future temporary hold, specialist action, release, and escalation.
-
+Agree the common finding contract and case ownership rules with the business team. Connect a small, approved set of existing capabilities. Use authorized retrospective cases to compare review effort, explanation quality, false positives, missed findings and outcome traceability against the current process. Establish a baseline and an evaluation protocol before claiming improvement. Add enterprise identity, role enforcement, database transactions, audit integrity and retention controls before operational use.

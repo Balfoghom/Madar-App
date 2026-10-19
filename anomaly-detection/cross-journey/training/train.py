@@ -252,17 +252,11 @@ def features(case):
         identifier = event.get("identifierId")
         if identifier:
             identifier_counts.setdefault(identifier, set()).add(event["subjectId"])
-    chain, chain_span = ordered_chain(events)
-    chain_count = (
-        min(
-            sum(event["type"] == "registration" for event in events),
-            len(wages),
-            len(exclusions),
-            len(claims),
-        )
-        if chain
-        else 0
-    )
+    completed = [ordered_chain([event for event in events if event["subjectId"] == subject])
+                 for subject in sorted({event["subjectId"] for event in events})]
+    completed = [span for found, span in completed if found]
+    chain_count = len(completed)
+    chain, chain_span = bool(completed), min(completed) if completed else 30.0
     latest_wage_hours = (
         (case["asOf"] - max(event["recordedAt"] for event in wages)) / HOUR
         if wages
@@ -493,7 +487,7 @@ def main():
         )
 
     artifact = {
-        "version": "madar-cross-journey-rf-20261017-v1",
+        "version": "madar-cross-journey-rf-20261019-v2",
         "algorithm": "Random Forest cross-journey pattern classifier",
         "sklearnVersion": sklearn.__version__,
         "seed": 20261017,
@@ -519,7 +513,7 @@ def main():
     report = {
         "modelVersion": artifact["version"],
         "artifactSha256": hashlib.sha256(model_raw.encode()).hexdigest(),
-        "validation": "Supervised with provisional synthetic cross-journey labels; Haitham review pending",
+        "validation": "Synthetic prototype with contributor-level sequence correction; business validation and real-data evaluation required",
         "train": len(train),
         "calibration": len(calibration),
         "test": len(test),

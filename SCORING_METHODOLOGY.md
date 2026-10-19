@@ -1,69 +1,27 @@
-# GOSI Adaptive Behavioral Intelligence — Prototype Scoring Methodology
+# Madar — assessment methodology
 
-## Purpose
+The interface contains three different assessment modes. Their numbers must not be combined or presented as one probability of fraud.
 
-The prototype produces an explainable **Behavioral Risk Assessment** for prioritization and proportionate review. It does not produce an AI Fraud Score, prove intent, determine eligibility, or authorize an adverse action.
+| Mode | Meaning | How it affects the case |
+|---|---|---|
+| Six journey-specific fitted models | Isolation Forest anomaly score and rank against synthetic reference data | Model/comparator flags can require review; the supplied operational control score remains separate |
+| Connected-journey fitted model | Random Forest similarity to provisional synthetic review patterns | A model or comparator-rule flag recommends specialist review; missing evidence causes abstention |
+| Illustrative legacy portfolio | Median/MAD statistical demonstration with configurable weighted control and pattern adjustments | Browser sandbox only; never changes the fitted-model policy or retrains a model |
 
-## Inputs
+## Fitted journey routing
 
-- Existing control score from approved source rules, from 0 to 100.
-- Behavioral features: event velocity, retroactive changes, linked-entity volume, prior validated outcomes, overrides, identifier reuse, source conflict, and material amount or salary change.
-- Data-quality signals, including missing required information.
-- Approved combined-pattern conditions.
+The prototype operational-control bands are Low 0–34, Medium 35–74 and High 75–100. Missing required model evidence yields Incomplete. A model flag, comparator flag or supplied cross-source conflict raises a Low case to at least Medium. These are provisional routing assumptions, not validated enterprise risk bands. Model percentiles are not added to the operational score.
 
-## Behavioral anomaly score
+## Connected-journey routing
 
-For every numeric feature, the prototype calculates positive deviation from the 60-case synthetic baseline using the median and median absolute deviation (MAD). Each deviation is capped and multiplied by a transparent prototype contribution. A cross-source conflict contributes only when explicitly present.
+Events are assessed within a 30-day window. A completed sequence requires the same contributor to have registration → wage change → exclusion → SANED request, in order. Counts represent distinct contributors with completed sequences; unrelated contributors cannot collectively supply one sequence. Inputs with unsupported journey/type combinations or invalid wages cause abstention.
 
-The result is a 0–100 Behavioral Anomaly Score. It may be above or below the Existing Control Score. A higher anomaly may strengthen a distributed-rule signal; a lower anomaly may moderate it. Both values remain visible to the specialist.
+A complete unflagged case routes to Standard review. Model or comparator flags route to Specialist review. No operational control score or transaction amount is supplied in the bundled connected examples; these fields display “Not supplied.” Pattern similarity and reference percentiles are technical model outputs, not fraud probability or calibrated case risk percentages.
 
-This unsupervised method demonstrates technical behavior without requiring fraud labels. It does not claim real-world detection performance.
+Model `madar-cross-journey-rf-20261019-v2` uses 16 derived features and 180 trees. Its held-out synthetic evaluation records 300 true positives, 18 false positives, zero false negatives and 382 true negatives (97.4% accuracy). Generator-based evaluation does not establish performance on real enterprise cases.
 
-## Combined assessment
+## Explanation and governance
 
-**Behavioral Risk Score = 55% Existing Control Score + 45% Behavioral Anomaly Score + Approved Combined-Pattern Adjustment**
+Reason codes identify evidence categories consistently. Repeated-indicator suggestions exclude generic model flags and ambiguous positional legacy reasons; unrelated reasons cannot become one repeated indicator. Reference-range deviations provide context, not causal feature attribution.
 
-Prototype bands:
-
-- Low: 0–34 — accelerated or straight-through processing recommendation.
-- Medium: 35–74 — targeted journey-specific verification.
-- High: 75–100 — fraud prevention, inspection, or investigation review.
-
-Guardrails:
-
-- An approved critical control score of 80 or above establishes a minimum High-review floor in this simulation.
-- Missing required information does not silently raise fraud risk; it lowers Assessment Confidence and routes the case to Data Verification Review.
-- Operational urgency changes priority, not risk.
-- Location outside Saudi Arabia does not contribute to risk by itself. It contributes only when combined with verified conflicting or implausible event evidence.
-
-Weights, floors, interactions, and thresholds are prototype assumptions. The Scoring Simulation Lab may be used to test alternatives against sandbox data, but it does not change source rules or activate a production configuration. Production use requires historical validation, authorized domain ownership, Data & AI validation, and GM approval within the applicable delegation of authority.
-
-## Assessment confidence
-
-Risk and confidence are separate:
-
-- **High confidence:** sufficient, consistent information is available.
-- **Medium confidence:** conflicting evidence or limited context requires verification.
-- **Low confidence:** required information is missing or insufficient; the recommendation cannot be relied upon without human review.
-
-## Explainability and audit
-
-Every assessment retains:
-
-- Existing Control Score;
-- Behavioral Anomaly Score;
-- Combined-Pattern Adjustment;
-- Behavioral Risk Score and band;
-- Assessment Confidence;
-- reason codes and evidence timeline;
-- model version and source;
-- recommended route; and
-- specialist approval, override, evidence note, and final outcome.
-
-## Indicator governance
-
-**AI suggestion → Specialist review → Data & AI validation → GM approval → Activation → Monitoring**
-
-Material, cross-domain, or adverse-action changes may require escalation above the GM according to the applicable delegation of authority.
-
-The AI cannot activate a proposed indicator, change a production weight, or execute an adverse action. Validated outcomes may inform future proposals, but all material changes remain domain-owned and auditable.
+LLM explanations use saved evidence and do not change scores, routes, findings or outcomes. Human review, formal violation issuance, payment intervention and verified financial impact are distinct steps. The prototype records human outcomes and validates amount consistency; it does not execute those enterprise actions.

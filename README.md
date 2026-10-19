@@ -1,144 +1,77 @@
-# Madar | مدار — working synthetic demonstration
+# Madar | مدار — Enterprise Fraud Operations
 
-The application now opens with **Connected Journeys**, using the fitted cross-journey Random Forest alongside the existing SANED model. English is the default interface language. This is a synthetic decision-support prototype, not a live payment service.
+Madar’s proposed value is a shared operating layer for existing fraud capabilities: receive findings, explain evidence, assign ownership, investigate, record outcomes and track governance. Cross-journey detection is one example input, not the novelty of the enterprise proposal.
 
-## Start the improved app
+This repository is a working **synthetic prototype** of that process. English is the default interface, with Madar / مدار branding. It has seven bundled model artifacts, saved cases and human reviews, a staged investigation workflow and an optional API-based LLM case explainer. It has no live enterprise integrations or payment actions.
 
-Requires Node.js 22.13 or newer. No package installation or API key is required.
+## Run it yourself
 
-1. Open Terminal in this folder (the folder containing this README and `start.mjs`).
-2. Run `npm start`.
-3. Open **http://localhost:8090**.
+Requires **Node.js 22.13 or newer**. No package installation, Python training or API key is needed for the core app.
 
-On macOS, `Start Madar.command` is a convenience launcher. The single server supplies both the interface and `/api` routes; no second terminal or separate static server is needed. Stop it with Control+C.
+1. Open this project folder in Terminal.
+2. Run `npm start` (or double-click `Start Madar.command` on macOS).
+3. Open [Madar](http://localhost:8090).
+4. Keep the terminal open. Stop with Control+C.
 
-## Rehearsal checklist
+The app opens on **Fraud Operations**. One server supplies the interface and API; do not start a separate frontend or model service. If the port is occupied, stop the previous app or run `PORT=8091 npm start` and open that port.
 
-- [ ] Click **Assess demo portfolio**. The server groups 35 source events into six cases and calculates their model results.
-- [ ] Open **Connected SANED sequence**: three contributors, three journeys, 12 events; comparator rules quiet, AI flagged, specialist review.
-- [ ] Expand **Inspect source events** to examine real synthetic event times, identities and wage evidence.
-- [ ] Compare **Routine activity** and **Legitimate restructuring**: neither model nor included comparator rules flags these examples.
-- [ ] Open **Missing employer evidence**: abstention, no model score, request to complete evidence.
-- [ ] Enter a reviewer name and evidence note, then save a routing decision. Refresh: the decision and original model result remain.
-- [ ] Re-import the same event CSV: existing case assessments and reviews remain without duplicate queue entries.
-- [ ] Open the investigation queue and monthly report. Select an empty month and confirm that its report has no cases.
+For optional LLM explanations, follow [LLM_SETUP.md](LLM_SETUP.md). The app works without them and clearly displays “API setup required.”
 
-The supplied event CSV is available through **Download event CSV**. Both the Connected Journeys upload and the existing Data Intake page accept it. Case labels are display metadata; model results are calculated from the supplied event evidence.
+## Validate the working journey
 
-## Records and reset
+Use synthetic evidence only. These checks write to your local demo session.
 
-The improved single-server launcher uses `.madar-data/` for new demo records. Manal's existing records in `anomaly-detection/data/` are preserved and are not automatically migrated. Set `ASSESSMENT_DATA_DIR` if deliberately using another record directory. Preserve that directory between restarts.
+- [ ] Open **Fraud Operations → Open connected case example → Assess demo portfolio**. Expect six saved cases from 35 events.
+- [ ] Open **Connected SANED sequence**. Expect three contributors, each with a complete linked sequence, a model review flag, quiet comparator rules and a specialist-review recommendation.
+- [ ] Compare **Routine activity** and **Legitimate restructuring**. Both should remain unflagged by the bundled model and comparator rules.
+- [ ] Open **Missing employer evidence**. Expect abstention and “Complete evidence,” without a model score.
+- [ ] Open **Inspect source events**. Check timestamps, identities and wage evidence against the displayed history.
+- [ ] Select **Open in investigation queue**. Assign a case owner, choose **Triage**, enter reviewer name and work note, then save.
+- [ ] Move to **Investigation**, then **Decision pending**. Stage skipping is rejected. A reviewer name and rationale are required for every saved update.
+- [ ] Override the recommended route, then approve the original recommendation. The route should return to the original recommendation while both decisions remain in history.
+- [ ] Record a specialist outcome. Cross-journey examples do not supply transaction amounts, so use zero financial amounts and “No financial impact”; do not claim prevented loss from these examples.
+- [ ] Close only after recording a resolved outcome. Reopen a closed case before changing its outcome.
+- [ ] Refresh. The owner, stage, reviews, outcome and original model evidence should remain.
+- [ ] Return to **Fraud Operations** and check its saved-case and work-in-progress counts.
+- [ ] Reassess unchanged evidence with the same model version. It should not create a duplicate case or discard human reviews. A model-version change creates a new assessment and retains prior reviews in history.
+- [ ] Open **Model & Governance**. The registry should include six journey models and the connected-journey model.
+- [ ] Switch **Workspace data** between **Assessed synthetic cases** and **Illustrative portfolio**. Dashboards, queue and reports must not mix their results.
+- [ ] Select an empty reporting month. Expect an empty report, not fallback cases.
+- [ ] With an LLM configured, generate a brief from a saved case. Inspect its evidence references, missing-evidence questions and suggested checks. Verify every claim before relying on the draft.
 
-The existing Data Intake reset clears the current demo's saved assessments and reviews; use it only when you want a fresh rehearsal. Built-in indicator testing requests and legacy configuration review drafts are browser-local demonstration states, not completed governance approvals. Models do not retrain or activate rules from a decision.
+The former **AI Backend Demo** is now named **Model Evidence** in the left navigation. It contains model examples and saved backend evidence.
 
-## Validation
+## Records and team collaboration
 
-Run `npm test` from this folder. Tests cover model parity, held-out synthetic metrics, event grouping, invalid imports, abstention, duplicate imports, review persistence and stale assessment rejection. Browser checks also cover the connected journey, source evidence, incomplete case, review/reload, empty search and month filters. All model performance claims remain synthetic and require business and Data & AI validation before operational use.
+The launcher uses `.madar-data/`, excluded from Git. Set `ASSESSMENT_DATA_DIR` to use a different directory. Preserve it between restarts. Existing local session files are not deleted by this update.
+
+Manal’s October 19 session is preserved as a historical fixture in [demo-sessions/manal-20261019](demo-sessions/manal-20261019/README.md). It uses the earlier model version. Shared example data belongs there; live rehearsal writes belong in `.madar-data/` and should not be committed.
+
+Data Intake’s reset clears the selected local session. Case notes, model evidence and generated LLM drafts are local prototype records, not an enterprise immutable audit store. Governance roles are named demo roles rather than authenticated permissions. Candidate indicators and scenario review stages do not deploy rules or retrain models.
+
+## Automated checks
+
+Run `npm test`. The suite covers inference parity, synthetic holdout metrics, event grouping and validation, contributor-level sequences, duplicate imports, model-version handling, policy isolation, review and ownership persistence, stale edits, financial consistency, indicator evidence grouping, and LLM request/output validation. Provider calls are mocked in automated tests; a real configured API requires a separate smoke test.
+
+The corrected cross-journey model is `madar-cross-journey-rf-20261019-v2`. It finds 300/300 provisional review cases with 18 false alarms among 400 routine or legitimate cases in its synthetic holdout. These figures do not establish production accuracy, prevented loss or specialist time savings.
 
 ## Hosting
 
-This app can run as one Node service using `npm start`. Set `HOST=0.0.0.0`, a provider-supplied `PORT`, and an `ASSESSMENT_DATA_DIR` on a persistent volume. The included Dockerfile provides this layout with data at `/data`; its image build has not been verified here. Use one application instance with this file store. Multi-instance hosting requires transactional database storage.
+Run as one Node service with `npm start`, `HOST=0.0.0.0`, the host’s `PORT`, and `ASSESSMENT_DATA_DIR` on persistent storage. Use one application instance with this file store. The supplied Dockerfile describes this layout; its image build is not verified in this update.
 
-For a privately shared demonstration, set `MADAR_DEMO_PASSWORD` through the host's secret settings (username: `madar`), and use the host's HTTPS endpoint. This optional shared demo gate is not enterprise role-based access control. Never place passwords in source files. Runtime records are excluded from the container build.
+For a privately shared demonstration, configure `MADAR_DEMO_PASSWORD` through the host’s secret settings, use username `madar`, and require the host’s HTTPS endpoint. This optional shared gate is not enterprise identity or role-based access control. Put API keys in the host’s secret settings. Never commit `.env` or runtime records.
 
-ChatGPT Sites supports compatible web apps. This Node HTTP server and filesystem persistence must be adapted to Sites' Worker runtime and supported persistent storage before hosting the complete experience there. Uploading `dist/` alone will not provide the model APIs or saved review history. No hosted site has been created or modified during this update.
+Hosting the full app needs a Node-compatible server and persistent storage. A static upload of `dist/` cannot run inference or save reviews. No new deployment was made in this update.
 
-Official Sites information: https://learn.chatgpt.com/docs/sites?surface=web
+## Current scope and next integrations
 
-## Scope of this update
-
-- Madar bilingual branding, an orbit-style mark and a focused English investigation workspace.
-- Actual cross-journey inference and grouped CSV import, immutable model evidence, linked timelines and persistent specialist routing.
-- Incomplete-case chart/filter fixes, working reporting period, corrected signal drill-down and empty selection, chronological activity, preserved uploaded identities, and fresh model health status.
-- Legacy simulation preview no longer recalculates fitted-model cases; reported source conflicts require additional verification independently of the model.
-- Indicator generation excludes non-risk and missing-evidence reason codes.
-
-Still outside this prototype: live enterprise connections, automatic payment intervention, production model validation, full role-based case governance, an LLM summary service, automatic indicator activation and model retraining. The portfolio pages retain clearly labeled illustrative legacy cases; use Connected Journeys for the main fitted-model demonstration. Financial values are not supplied by the cross-journey examples and must not be presented as prevented loss.
-
----
-
-## Original delivery documentation (legacy two-server startup)
-
-The material below describes Manal's original delivery. Use the single-server instructions above for the improved Madar demo.
-
-# GOSI Adaptive Behavioral Intelligence
-
-نموذج أولي للهاكثون يساعد المختص على مراجعة الحالات: يستقبل حالة أو ملف CSV ببيانات وهمية، يعرض نتائج القواعد وتحليل السلوك، ويقترح مسار المراجعة. القرار النهائي يبقى للمختص.
-
-## كيف يعمل؟
-
-1. تدخل الحالة من **New Assessment** أو ترفع ملفًا من **Data Intake**.
-2. ترسل الواجهة البيانات إلى الباكند، الذي يشغّل النموذج المحفوظ للمسار المختار.
-3. تظهر النتيجة والأسباب وخصائص النموذج في **Intelligence Queue**. درجة القواعد ونسبة غرابة السلوك تظهران بشكل مستقل.
-4. يعتمد المختص التوصية أو يعدّلها أو يرفضها، ويسجّل نتيجة المراجعة.
-5. تُحفظ النتائج وقرارات المختص محليًا، وتستخدمها لوحات المتابعة والتقرير الشهري.
-
-إذا كانت الأدلة ناقصة، تظهر «استكمال البيانات». وإذا تعذّر الاتصال بالباكند، تظهر رسالة خطأ دون إنشاء تقييم بديل.
-
-## وين الكود؟ وش وظيفة الملفات؟
-
-| المجلد أو الملف | وظيفته |
+| Working prototype | Enterprise integration still required |
 |---|---|
-| [`dist/index.html`](dist/index.html) | هيكل الصفحات والنماذج والأزرار. |
-| [`dist/styles.css`](dist/styles.css) | الألوان والتنسيق وأحجام العناصر وتناسب العرض مع الشاشة. |
-| [`dist/app.js`](dist/app.js) | تفاعل الواجهة، قراءة CSV، الاتصال بالباكند، عرض الحالات والرسوم والتقارير؛ ويحتوي أيضًا على المحاكاة الإحصائية القديمة. |
-| [`anomaly-detection/server.mjs`](anomaly-detection/server.mjs) | الباكند: يستقبل طلبات التقييم والرفع، ويحفظ الحالات وقرارات المختص والإعدادات. |
-| [`lib/assessment-adapter.mjs`](anomaly-detection/lib/assessment-adapter.mjs) | يتحقق من بيانات الحالة، يختار النموذج، ويجهّز النتيجة والأسباب ومسار المراجعة للواجهة. |
-| [`lib/detector.mjs`](anomaly-detection/lib/detector.mjs) | يحوّل أحداث ساند إلى خصائص، ويشغّل نموذج ساند المحفوظ ويعيد درجة الشذوذ والأسباب. |
-| [`lib/journey-detector.mjs`](anomaly-detection/lib/journey-detector.mjs) | يشغّل النماذج المحفوظة لبقية المسارات على خصائص الحالة المدخلة. |
-| [`anomaly-detection/data/`](anomaly-detection/data/) | ملفات النماذج، الحالات المرجعية الوهمية، وبيانات تقييم النموذج. تُنشأ فيه أيضًا سجلات التجارب المحلية المستبعدة من Git. |
-| [`ml/`](anomaly-detection/ml/) و[`lib/journey-training.mjs`](anomaly-detection/lib/journey-training.mjs) | كود التدريب المنفصل الموجود في المشروع؛ لا يعمل تلقائيًا عند تشغيل البرنامج أو رفع الحالات. |
-| [`anomaly-detection/examples/`](anomaly-detection/examples/) | ملف CSV جاهز للتجربة وأمثلة على نتائج التقييم. |
-| [`anomaly-detection/tests/`](anomaly-detection/tests/) | اختبارات صحة نتائج النموذج، الربط بالباكند، حفظ القرارات ومسار المراجعة. |
-| [`servicenow/`](servicenow/) | ملفات CSV لتعريف الجداول والأدوار وحالات وأحداث ومؤشرات وهمية لتجربة ServiceNow؛ ليست اتصالًا مباشرًا به. |
+| Shared synthetic case workspace and seven bundled models | Connect existing fraud use cases and their source systems |
+| Named owner, staged case work, durable local reviews | Enterprise SSO, enforced roles, assignment and escalation controls |
+| Optional cited LLM explanation adapter | Approved provider, live API validation, specialist quality evaluation |
+| Recorded outcomes and financial consistency checks | Verified violation issuance, recovery/payment integrations and reconciled financial reporting |
+| Indicator suggestions and review examples | Controlled deployment, production validation, monitoring and model governance |
+| Local JSON persistence | Transactional database, concurrency, backup, immutable audit and retention policies |
 
-## وش الموجود في الواجهة؟
-
-| الصفحة | استخدامها |
-|---|---|
-| **Dashboard / Executive Dashboard** | متابعة الحالات وتوزيع المخاطر والمؤشرات الإجمالية. |
-| **Intelligence Queue** | البحث عن حالة، قراءة الأدلة، وتسجيل قرار المختص. |
-| **Monthly Business Report** | تجميع النتائج حسب الشهر والمسار وإعداد تقرير قابل للطباعة. |
-| **Data Intake** | إدخال حالات وهمية من ملف CSV أو نص CSV. |
-| **Scoring Simulation** | تجربة أوزان المحاكاة الإحصائية القديمة؛ لا تعيد تدريب النماذج. |
-| **Risk Indicators** | عرض المؤشرات ومقترحات المؤشرات للمراجعة. |
-| **Model & Governance / Appendix: Scoring** | عرض معلومات النماذج والحوكمة وشرح التقييم. |
-| **AI Backend Demo** | تجربة حالات النموذج وعرض نتائج الباكند المحفوظة. |
-
-## وين الذكاء الاصطناعي؟
-
-يستخدم المشروع **Isolation Forest** لاكتشاف السلوك غير المعتاد. نموذج ساند يقرأ خصائص مستخرجة من أحداث الحالة، وبقية المسارات تستخدم خصائصها المحددة مع نماذجها المحفوظة. المسارات هي: ساند، صرف المنافع، تسجيل المنشآت، التقاعد، منفعة الأمومة، والاشتراكات والأجور.
-
-تظهر نتيجة النموذج بإصداره ودرجة الشذوذ ونسبة الغرابة وإشارات المراجعة والخصائص المستخدمة. نسبة الغرابة **ليست احتمال احتيال**. ملخص الحالة نص منظم يولّده الكود، ولا يستخدم نموذج محادثة. رفع الحالات وقرارات المختص لا يدرّبان النموذج تلقائيًا؛ التدريب مسؤولية مالك النموذج.
-
-الحالات التجريبية القديمة تستخدم حسابات **Median/MAD** وأوزان المحاكاة، وتُميّز عن نتائج النموذج. جميع البيانات المرفقة وهمية، ونتائج التجربة لا تثبت الأداء على بيانات المؤسسة الحقيقية.
-
-## التشغيل والتجربة
-
-تحتاج **Node.js 22.13 أو أحدث** و**Python 3**. افتح نافذتي Terminal من مجلد المشروع.
-
-في الأولى، شغّل الباكند:
-
-```sh
-cd anomaly-detection
-npm start
-```
-
-في الثانية، شغّل الواجهة:
-
-```sh
-cd dist
-python3 -m http.server 8080 --bind 127.0.0.1
-```
-
-افتح [localhost:8080](http://localhost:8080)، واترك النافذتين تعملان. للإيقاف اضغط **Control+C**. يمكن قراءة حالة الباكند من [health](http://127.0.0.1:8787/health).
-
-للتجربة: افتح **Data Intake** وارفع [ملف الحالات الوهمية](anomaly-detection/examples/synthetic-model-evidence.csv)، ثم افتح الحالات في **Intelligence Queue** لمشاهدة النتائج. لا تحتاج إلى تدريب النموذج لتشغيل البرنامج.
-
-## ملفات الشرح الأخرى
-
-- [INTEGRATION.md](anomaly-detection/INTEGRATION.md): طريقة ربط الواجهة بالنموذج والحقول التي يعيدها الباكند.
-- [شرح النموذج](anomaly-detection/README.md) و[خصائص المسارات](anomaly-detection/JOURNEY_FEATURES.md): تفاصيل التحليل والتقييم.
-- [SCENARIO_REVIEW.md](anomaly-detection/SCENARIO_REVIEW.md): خطوات مراجعة السيناريوهات واعتمادها في العرض التجريبي.
-- [AI_SOLUTION_DESIGN.md](AI_SOLUTION_DESIGN.md) و[TECHNICAL_BLUEPRINT.md](TECHNICAL_BLUEPRINT.md): فكرة الحل وتصميمه التقني.
-- [DATA_DICTIONARY.md](DATA_DICTIONARY.md)، [SCORING_METHODOLOGY.md](SCORING_METHODOLOGY.md)، [VDI_DEPLOYMENT_GUIDE.md](VDI_DEPLOYMENT_GUIDE.md): معاني البيانات، منهج التقييم الأصلي، ودليل التشغيل. بعض هذه الوثائق تصف التصميم الأولي؛ تفاصيل الربط الحالي موضحة في `INTEGRATION.md`.
+See [solution design](AI_SOLUTION_DESIGN.md), [technical blueprint](TECHNICAL_BLUEPRINT.md), [scoring methodology](SCORING_METHODOLOGY.md), and [LLM setup](LLM_SETUP.md). Component READMEs and ServiceNow import files remain supporting material; they are not live integrations.
