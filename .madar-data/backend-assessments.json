@@ -1,0 +1,4622 @@
+[
+  {
+    "assessmentId": "04dbbf5b-caf7-43e3-883c-5ea3b56d3c49",
+    "assessedAt": "2026-10-19T07:15:36.618Z",
+    "caseId": "CJ-SYN-demo-00000",
+    "transactionId": "CJ-SYN-demo-00000",
+    "synthetic": true,
+    "assessmentSource": "cross-journey",
+    "journey": "SANED",
+    "scenario": "Routine linked activity",
+    "modelVersion": "madar-cross-journey-rf-20261017-v1",
+    "complete": true,
+    "score": 0,
+    "percentile": 95.7,
+    "modelFlagged": false,
+    "ruleFlagged": false,
+    "ruleReasons": [],
+    "involvedJourneys": [
+      "Contribution & Wage",
+      "Employer Registration",
+      "SANED"
+    ],
+    "linkedContributorCount": 2,
+    "route": "Standard review",
+    "band": "Typical",
+    "features": [
+      {
+        "name": "Distinct journeys in 30 days",
+        "value": 3,
+        "median": 3,
+        "low": 2,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Events in 30 days",
+        "value": 7,
+        "median": 6,
+        "low": 3,
+        "high": 12,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Linked contributors in 30 days",
+        "value": 2,
+        "median": 2,
+        "low": 1,
+        "high": 7,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registrations in 30 days",
+        "value": 2,
+        "median": 1,
+        "low": 0,
+        "high": 5,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Wage changes in 30 days",
+        "value": 3,
+        "median": 2,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Exclusions in 30 days",
+        "value": 1,
+        "median": 1,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "SANED requests in 30 days",
+        "value": 1,
+        "median": 1,
+        "low": 1,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum wage change (%)",
+        "value": 16.31016666666667,
+        "median": 15.923583030700684,
+        "low": -1.4243667125701904,
+        "high": 58.49081802368164,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum retroactive days",
+        "value": 0.32937827546296294,
+        "median": 5.427642345428467,
+        "low": 0,
+        "high": 65.07260131835938,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours since latest wage change (log1p)",
+        "value": 217.41025861111106,
+        "median": 340.937871690999,
+        "low": 122.80266287079489,
+        "high": 720.0001622612529,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum identifier reuse",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 6,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Cross-source conflicts",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Rule overrides",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Coordinated chain count",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registration-wage-exclusion-SANED chain",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Completed chain span (days)",
+        "value": 30,
+        "median": 30,
+        "low": 21.67193031311035,
+        "high": 30,
+        "outsideReferenceRange": false
+      }
+    ],
+    "reasons": [
+      "The trained cross-journey model did not cross the selected review threshold."
+    ],
+    "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+    "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+    "risk": "Low",
+    "modelResult": {
+      "modelVersion": "madar-cross-journey-rf-20261017-v1",
+      "complete": true,
+      "score": 0,
+      "percentile": 95.7,
+      "modelFlagged": false,
+      "ruleFlagged": false,
+      "ruleReasons": [],
+      "involvedJourneys": [
+        "Contribution & Wage",
+        "Employer Registration",
+        "SANED"
+      ],
+      "linkedContributorCount": 2,
+      "route": "Standard review",
+      "band": "Typical",
+      "features": [
+        {
+          "name": "Distinct journeys in 30 days",
+          "value": 3,
+          "median": 3,
+          "low": 2,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Events in 30 days",
+          "value": 7,
+          "median": 6,
+          "low": 3,
+          "high": 12,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Linked contributors in 30 days",
+          "value": 2,
+          "median": 2,
+          "low": 1,
+          "high": 7,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Registrations in 30 days",
+          "value": 2,
+          "median": 1,
+          "low": 0,
+          "high": 5,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Wage changes in 30 days",
+          "value": 3,
+          "median": 2,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Exclusions in 30 days",
+          "value": 1,
+          "median": 1,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "SANED requests in 30 days",
+          "value": 1,
+          "median": 1,
+          "low": 1,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum wage change (%)",
+          "value": 16.31016666666667,
+          "median": 15.923583030700684,
+          "low": -1.4243667125701904,
+          "high": 58.49081802368164,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum retroactive days",
+          "value": 0.32937827546296294,
+          "median": 5.427642345428467,
+          "low": 0,
+          "high": 65.07260131835938,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Hours since latest wage change (log1p)",
+          "value": 217.41025861111106,
+          "median": 340.937871690999,
+          "low": 122.80266287079489,
+          "high": 720.0001622612529,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum identifier reuse",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 6,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Cross-source conflicts",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Rule overrides",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 1,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Coordinated chain count",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Registration-wage-exclusion-SANED chain",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 1,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Completed chain span (days)",
+          "value": 30,
+          "median": 30,
+          "low": 21.67193031311035,
+          "high": 30,
+          "outsideReferenceRange": false
+        }
+      ],
+      "reasons": [
+        "The trained cross-journey model did not cross the selected review threshold."
+      ],
+      "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+      "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+      "assessmentId": "04dbbf5b-caf7-43e3-883c-5ea3b56d3c49",
+      "assessedAt": "2026-10-19T07:15:36.618Z",
+      "algorithm": "Random Forest cross-journey pattern classifier"
+    },
+    "caseData": {
+      "id": "CJ-SYN-demo-00000",
+      "transactionId": "CJ-SYN-demo-00000",
+      "synthetic": true,
+      "journey": "SANED",
+      "scenario": "Routine linked activity",
+      "assessmentId": "04dbbf5b-caf7-43e3-883c-5ea3b56d3c49",
+      "assessedAt": "2026-10-19T07:15:36.618Z",
+      "assessmentSource": "cross-journey",
+      "assessmentMode": "model-separated",
+      "subject": "CTR-SYN-demo-00000-01, CTR-SYN-demo-00000-02",
+      "entity": "EMP-SYN-demo-00000",
+      "customerName": "2 linked contributors",
+      "employerName": "EMP-SYN-demo-00000",
+      "requested": "2026-10-19T07:15:36.618Z",
+      "country": "Saudi Arabia",
+      "region": "Not supplied",
+      "city": "Not supplied",
+      "source": "Synthetic linked event history",
+      "score": null,
+      "ruleScore": 0,
+      "risk": "Low",
+      "route": "Standard review",
+      "status": "Standard review",
+      "comparison": "No review threshold crossed",
+      "confidence": "Not calibrated",
+      "confidenceScore": null,
+      "anomalyScore": 95.7,
+      "interaction": 0,
+      "features": {
+        "velocity": 7,
+        "linkedEntities": 2,
+        "retroDays": 0,
+        "priorRisk": 0,
+        "overrides": 0,
+        "identityReuse": 0,
+        "amountChangePct": 0,
+        "crossSourceConflict": false,
+        "missingData": false,
+        "urgentPriority": 0
+      },
+      "primaryCode": "MODEL_NOT_FLAGGED",
+      "primaryReason": "The trained cross-journey model did not cross the selected review threshold.",
+      "reasonCodes": [
+        {
+          "code": "MODEL_NOT_FLAGGED",
+          "description": "The trained cross-journey model did not cross the selected review threshold."
+        }
+      ],
+      "signals": [
+        [
+          "MODEL_NOT_FLAGGED",
+          "The trained cross-journey model did not cross the selected review threshold."
+        ]
+      ],
+      "modelAssessment": {
+        "modelVersion": "madar-cross-journey-rf-20261017-v1",
+        "complete": true,
+        "score": 0,
+        "percentile": 95.7,
+        "modelFlagged": false,
+        "ruleFlagged": false,
+        "ruleReasons": [],
+        "involvedJourneys": [
+          "Contribution & Wage",
+          "Employer Registration",
+          "SANED"
+        ],
+        "linkedContributorCount": 2,
+        "route": "Standard review",
+        "band": "Typical",
+        "features": [
+          {
+            "name": "Distinct journeys in 30 days",
+            "value": 3,
+            "median": 3,
+            "low": 2,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Events in 30 days",
+            "value": 7,
+            "median": 6,
+            "low": 3,
+            "high": 12,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Linked contributors in 30 days",
+            "value": 2,
+            "median": 2,
+            "low": 1,
+            "high": 7,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registrations in 30 days",
+            "value": 2,
+            "median": 1,
+            "low": 0,
+            "high": 5,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Wage changes in 30 days",
+            "value": 3,
+            "median": 2,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Exclusions in 30 days",
+            "value": 1,
+            "median": 1,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "SANED requests in 30 days",
+            "value": 1,
+            "median": 1,
+            "low": 1,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum wage change (%)",
+            "value": 16.31016666666667,
+            "median": 15.923583030700684,
+            "low": -1.4243667125701904,
+            "high": 58.49081802368164,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum retroactive days",
+            "value": 0.32937827546296294,
+            "median": 5.427642345428467,
+            "low": 0,
+            "high": 65.07260131835938,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Hours since latest wage change (log1p)",
+            "value": 217.41025861111106,
+            "median": 340.937871690999,
+            "low": 122.80266287079489,
+            "high": 720.0001622612529,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum identifier reuse",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 6,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Cross-source conflicts",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Rule overrides",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Coordinated chain count",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registration-wage-exclusion-SANED chain",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Completed chain span (days)",
+            "value": 30,
+            "median": 30,
+            "low": 21.67193031311035,
+            "high": 30,
+            "outsideReferenceRange": false
+          }
+        ],
+        "reasons": [
+          "The trained cross-journey model did not cross the selected review threshold."
+        ],
+        "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+        "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+        "assessmentId": "04dbbf5b-caf7-43e3-883c-5ea3b56d3c49",
+        "assessedAt": "2026-10-19T07:15:36.618Z",
+        "algorithm": "Random Forest cross-journey pattern classifier"
+      },
+      "aiModel": {
+        "version": "madar-cross-journey-rf-20261017-v1",
+        "rawScore": 0,
+        "percentile": 95.7,
+        "flagged": false,
+        "complete": true,
+        "ruleFlagged": false,
+        "features": [
+          {
+            "name": "Distinct journeys in 30 days",
+            "value": 3,
+            "median": 3,
+            "low": 2,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Events in 30 days",
+            "value": 7,
+            "median": 6,
+            "low": 3,
+            "high": 12,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Linked contributors in 30 days",
+            "value": 2,
+            "median": 2,
+            "low": 1,
+            "high": 7,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registrations in 30 days",
+            "value": 2,
+            "median": 1,
+            "low": 0,
+            "high": 5,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Wage changes in 30 days",
+            "value": 3,
+            "median": 2,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Exclusions in 30 days",
+            "value": 1,
+            "median": 1,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "SANED requests in 30 days",
+            "value": 1,
+            "median": 1,
+            "low": 1,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum wage change (%)",
+            "value": 16.31016666666667,
+            "median": 15.923583030700684,
+            "low": -1.4243667125701904,
+            "high": 58.49081802368164,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum retroactive days",
+            "value": 0.32937827546296294,
+            "median": 5.427642345428467,
+            "low": 0,
+            "high": 65.07260131835938,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Hours since latest wage change (log1p)",
+            "value": 217.41025861111106,
+            "median": 340.937871690999,
+            "low": 122.80266287079489,
+            "high": 720.0001622612529,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum identifier reuse",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 6,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Cross-source conflicts",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Rule overrides",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Coordinated chain count",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registration-wage-exclusion-SANED chain",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Completed chain span (days)",
+            "value": 30,
+            "median": 30,
+            "low": 21.67193031311035,
+            "high": 30,
+            "outsideReferenceRange": false
+          }
+        ],
+        "algorithm": "Random Forest"
+      },
+      "crossJourneyEvidence": {
+        "id": "CJ-SYN-demo-00000",
+        "synthetic": true,
+        "employerId": "EMP-SYN-demo-00000",
+        "asOf": 1792195200000,
+        "events": [
+          {
+            "eventId": "EVT-CJ-SYN-demo-00000-005",
+            "recordedAt": 1789862818203,
+            "journey": "Contribution & Wage",
+            "type": "wage",
+            "subjectId": "CTR-SYN-demo-00000-01",
+            "employerId": "EMP-SYN-demo-00000",
+            "amount": 6010.3,
+            "previousAmount": 6000,
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00000-004",
+            "recordedAt": 1790086857999,
+            "journey": "Contribution & Wage",
+            "type": "wage",
+            "subjectId": "CTR-SYN-demo-00000-02",
+            "employerId": "EMP-SYN-demo-00000",
+            "amount": 6978.61,
+            "previousAmount": 6000,
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00000-006",
+            "recordedAt": 1790187476989,
+            "effectiveAt": 1790159018706,
+            "journey": "Employer Registration",
+            "type": "exclusion",
+            "subjectId": "CTR-SYN-demo-00000-01",
+            "employerId": "EMP-SYN-demo-00000",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00000-002",
+            "recordedAt": 1790663406217,
+            "journey": "Employer Registration",
+            "type": "registration",
+            "subjectId": "CTR-SYN-demo-00000-02",
+            "employerId": "EMP-SYN-demo-00000",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00000-001",
+            "recordedAt": 1791032143862,
+            "journey": "Employer Registration",
+            "type": "registration",
+            "subjectId": "CTR-SYN-demo-00000-01",
+            "employerId": "EMP-SYN-demo-00000",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00000-003",
+            "recordedAt": 1791412523069,
+            "journey": "Contribution & Wage",
+            "type": "wage",
+            "subjectId": "CTR-SYN-demo-00000-01",
+            "employerId": "EMP-SYN-demo-00000",
+            "amount": 6719.32,
+            "previousAmount": 6000,
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00000-007",
+            "recordedAt": 1792195200000,
+            "journey": "SANED",
+            "type": "claim",
+            "subjectId": "CTR-SYN-demo-00000-01",
+            "employerId": "EMP-SYN-demo-00000",
+            "sourceConflict": false,
+            "ruleOverride": false
+          }
+        ]
+      },
+      "sourceTimeline": [
+        {
+          "eventId": "EVT-CJ-SYN-demo-00000-005",
+          "recordedAt": 1789862818203,
+          "journey": "Contribution & Wage",
+          "type": "wage",
+          "subjectId": "CTR-SYN-demo-00000-01",
+          "employerId": "EMP-SYN-demo-00000",
+          "amount": 6010.3,
+          "previousAmount": 6000,
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00000-004",
+          "recordedAt": 1790086857999,
+          "journey": "Contribution & Wage",
+          "type": "wage",
+          "subjectId": "CTR-SYN-demo-00000-02",
+          "employerId": "EMP-SYN-demo-00000",
+          "amount": 6978.61,
+          "previousAmount": 6000,
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00000-006",
+          "recordedAt": 1790187476989,
+          "effectiveAt": 1790159018706,
+          "journey": "Employer Registration",
+          "type": "exclusion",
+          "subjectId": "CTR-SYN-demo-00000-01",
+          "employerId": "EMP-SYN-demo-00000",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00000-002",
+          "recordedAt": 1790663406217,
+          "journey": "Employer Registration",
+          "type": "registration",
+          "subjectId": "CTR-SYN-demo-00000-02",
+          "employerId": "EMP-SYN-demo-00000",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00000-001",
+          "recordedAt": 1791032143862,
+          "journey": "Employer Registration",
+          "type": "registration",
+          "subjectId": "CTR-SYN-demo-00000-01",
+          "employerId": "EMP-SYN-demo-00000",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00000-003",
+          "recordedAt": 1791412523069,
+          "journey": "Contribution & Wage",
+          "type": "wage",
+          "subjectId": "CTR-SYN-demo-00000-01",
+          "employerId": "EMP-SYN-demo-00000",
+          "amount": 6719.32,
+          "previousAmount": 6000,
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00000-007",
+          "recordedAt": 1792195200000,
+          "journey": "SANED",
+          "type": "claim",
+          "subjectId": "CTR-SYN-demo-00000-01",
+          "employerId": "EMP-SYN-demo-00000",
+          "sourceConflict": false,
+          "ruleOverride": false
+        }
+      ],
+      "events": [
+        [
+          "Contribution & Wage · CTR-SYN-demo-00000-01 · wage",
+          "2026-09-20T00:06:58.203Z"
+        ],
+        [
+          "Contribution & Wage · CTR-SYN-demo-00000-02 · wage",
+          "2026-09-22T14:20:57.999Z"
+        ],
+        [
+          "Employer Registration · CTR-SYN-demo-00000-01 · exclusion",
+          "2026-09-23T18:17:56.989Z"
+        ],
+        [
+          "Employer Registration · CTR-SYN-demo-00000-02 · registration",
+          "2026-09-29T06:30:06.217Z"
+        ],
+        [
+          "Employer Registration · CTR-SYN-demo-00000-01 · registration",
+          "2026-10-03T12:55:43.862Z"
+        ],
+        [
+          "Contribution & Wage · CTR-SYN-demo-00000-01 · wage",
+          "2026-10-07T22:35:23.069Z"
+        ],
+        [
+          "SANED · CTR-SYN-demo-00000-01 · claim",
+          "2026-10-17T00:00:00.000Z"
+        ]
+      ],
+      "audit": [
+        "Cross-journey model madar-cross-journey-rf-20261017-v1 assessed at 2026-10-19T07:15:36.618Z."
+      ],
+      "paymentStatus": "Pending · simulation",
+      "detectionStage": "Before payment",
+      "transactionAmount": 0,
+      "amountAtRisk": 0,
+      "confirmedFraudAmount": 0,
+      "preventedAmount": 0,
+      "currency": "SAR",
+      "outcome": null,
+      "financialOutcome": null,
+      "reviewHistory": []
+    },
+    "evidenceFingerprint": "42d34ddc49259dd0125b8e8eee912f25e70c3eedcbd358ae6fbb380da2ab8007",
+    "reviewHistory": []
+  },
+  {
+    "assessmentId": "e3411a95-68aa-4165-81f5-6119cca374c3",
+    "assessedAt": "2026-10-19T07:15:36.639Z",
+    "caseId": "CJ-SYN-demo-00001",
+    "transactionId": "CJ-SYN-demo-00001",
+    "synthetic": true,
+    "assessmentSource": "cross-journey",
+    "journey": "SANED",
+    "scenario": "Connected activity before a SANED request",
+    "modelVersion": "madar-cross-journey-rf-20261017-v1",
+    "complete": true,
+    "score": 1,
+    "percentile": 100,
+    "modelFlagged": true,
+    "ruleFlagged": false,
+    "ruleReasons": [],
+    "involvedJourneys": [
+      "Employer Registration",
+      "Contribution & Wage",
+      "SANED"
+    ],
+    "linkedContributorCount": 3,
+    "route": "Specialist review",
+    "band": "Review",
+    "features": [
+      {
+        "name": "Distinct journeys in 30 days",
+        "value": 3,
+        "median": 3,
+        "low": 2,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Events in 30 days",
+        "value": 12,
+        "median": 6,
+        "low": 3,
+        "high": 12,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Linked contributors in 30 days",
+        "value": 3,
+        "median": 2,
+        "low": 1,
+        "high": 7,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registrations in 30 days",
+        "value": 3,
+        "median": 1,
+        "low": 0,
+        "high": 5,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Wage changes in 30 days",
+        "value": 3,
+        "median": 2,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Exclusions in 30 days",
+        "value": 3,
+        "median": 1,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "SANED requests in 30 days",
+        "value": 3,
+        "median": 1,
+        "low": 1,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum wage change (%)",
+        "value": 45.483166666666655,
+        "median": 15.923583030700684,
+        "low": -1.4243667125701904,
+        "high": 58.49081802368164,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum retroactive days",
+        "value": 15.719318738425926,
+        "median": 5.427642345428467,
+        "low": 0,
+        "high": 65.07260131835938,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours since latest wage change (log1p)",
+        "value": 378.1916111111111,
+        "median": 340.937871690999,
+        "low": 122.80266287079489,
+        "high": 720.0001622612529,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum identifier reuse",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 6,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Cross-source conflicts",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Rule overrides",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Coordinated chain count",
+        "value": 3,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registration-wage-exclusion-SANED chain",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Completed chain span (days)",
+        "value": 23.496033344907406,
+        "median": 30,
+        "low": 21.67193031311035,
+        "high": 30,
+        "outsideReferenceRange": false
+      }
+    ],
+    "reasons": [
+      "The trained cross-journey model found similarity to provisional review patterns.",
+      "3 linked contributors participate in a registration → wage → exclusion → SANED sequence."
+    ],
+    "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+    "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+    "risk": "Medium",
+    "modelResult": {
+      "modelVersion": "madar-cross-journey-rf-20261017-v1",
+      "complete": true,
+      "score": 1,
+      "percentile": 100,
+      "modelFlagged": true,
+      "ruleFlagged": false,
+      "ruleReasons": [],
+      "involvedJourneys": [
+        "Employer Registration",
+        "Contribution & Wage",
+        "SANED"
+      ],
+      "linkedContributorCount": 3,
+      "route": "Specialist review",
+      "band": "Review",
+      "features": [
+        {
+          "name": "Distinct journeys in 30 days",
+          "value": 3,
+          "median": 3,
+          "low": 2,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Events in 30 days",
+          "value": 12,
+          "median": 6,
+          "low": 3,
+          "high": 12,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Linked contributors in 30 days",
+          "value": 3,
+          "median": 2,
+          "low": 1,
+          "high": 7,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Registrations in 30 days",
+          "value": 3,
+          "median": 1,
+          "low": 0,
+          "high": 5,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Wage changes in 30 days",
+          "value": 3,
+          "median": 2,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Exclusions in 30 days",
+          "value": 3,
+          "median": 1,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "SANED requests in 30 days",
+          "value": 3,
+          "median": 1,
+          "low": 1,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum wage change (%)",
+          "value": 45.483166666666655,
+          "median": 15.923583030700684,
+          "low": -1.4243667125701904,
+          "high": 58.49081802368164,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum retroactive days",
+          "value": 15.719318738425926,
+          "median": 5.427642345428467,
+          "low": 0,
+          "high": 65.07260131835938,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Hours since latest wage change (log1p)",
+          "value": 378.1916111111111,
+          "median": 340.937871690999,
+          "low": 122.80266287079489,
+          "high": 720.0001622612529,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum identifier reuse",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 6,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Cross-source conflicts",
+          "value": 1,
+          "median": 0,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Rule overrides",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 1,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Coordinated chain count",
+          "value": 3,
+          "median": 0,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Registration-wage-exclusion-SANED chain",
+          "value": 1,
+          "median": 0,
+          "low": 0,
+          "high": 1,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Completed chain span (days)",
+          "value": 23.496033344907406,
+          "median": 30,
+          "low": 21.67193031311035,
+          "high": 30,
+          "outsideReferenceRange": false
+        }
+      ],
+      "reasons": [
+        "The trained cross-journey model found similarity to provisional review patterns.",
+        "3 linked contributors participate in a registration → wage → exclusion → SANED sequence."
+      ],
+      "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+      "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+      "assessmentId": "e3411a95-68aa-4165-81f5-6119cca374c3",
+      "assessedAt": "2026-10-19T07:15:36.639Z",
+      "algorithm": "Random Forest cross-journey pattern classifier"
+    },
+    "caseData": {
+      "id": "CJ-SYN-demo-00001",
+      "transactionId": "CJ-SYN-demo-00001",
+      "synthetic": true,
+      "journey": "SANED",
+      "scenario": "Connected activity before a SANED request",
+      "assessmentId": "e3411a95-68aa-4165-81f5-6119cca374c3",
+      "assessedAt": "2026-10-19T07:15:36.639Z",
+      "assessmentSource": "cross-journey",
+      "assessmentMode": "model-separated",
+      "subject": "CTR-SYN-demo-00001-03, CTR-SYN-demo-00001-02, CTR-SYN-demo-00001-01",
+      "entity": "EMP-SYN-demo-00001",
+      "customerName": "3 linked contributors",
+      "employerName": "EMP-SYN-demo-00001",
+      "requested": "2026-10-19T07:15:36.639Z",
+      "country": "Saudi Arabia",
+      "region": "Not supplied",
+      "city": "Not supplied",
+      "source": "Synthetic linked event history",
+      "score": null,
+      "ruleScore": 0,
+      "risk": "Medium",
+      "route": "Data Verification Review",
+      "status": "Route overridden",
+      "comparison": "AI-only detection across connected journeys",
+      "confidence": "Not calibrated",
+      "confidenceScore": null,
+      "anomalyScore": 100,
+      "interaction": 0,
+      "features": {
+        "velocity": 12,
+        "linkedEntities": 3,
+        "retroDays": 0,
+        "priorRisk": 0,
+        "overrides": 0,
+        "identityReuse": 0,
+        "amountChangePct": 0,
+        "crossSourceConflict": true,
+        "missingData": false,
+        "urgentPriority": 0
+      },
+      "primaryCode": "CROSS_JOURNEY_PATTERN",
+      "primaryReason": "The trained cross-journey model found similarity to provisional review patterns. 3 linked contributors participate in a registration → wage → exclusion → SANED sequence.",
+      "reasonCodes": [
+        {
+          "code": "CROSS_JOURNEY_PATTERN",
+          "description": "The trained cross-journey model found similarity to provisional review patterns."
+        },
+        {
+          "code": "CROSS_JOURNEY_EVIDENCE_1",
+          "description": "3 linked contributors participate in a registration → wage → exclusion → SANED sequence."
+        }
+      ],
+      "signals": [
+        [
+          "CROSS_JOURNEY_PATTERN",
+          "The trained cross-journey model found similarity to provisional review patterns."
+        ],
+        [
+          "CROSS_JOURNEY_EVIDENCE_1",
+          "3 linked contributors participate in a registration → wage → exclusion → SANED sequence."
+        ]
+      ],
+      "modelAssessment": {
+        "modelVersion": "madar-cross-journey-rf-20261017-v1",
+        "complete": true,
+        "score": 1,
+        "percentile": 100,
+        "modelFlagged": true,
+        "ruleFlagged": false,
+        "ruleReasons": [],
+        "involvedJourneys": [
+          "Employer Registration",
+          "Contribution & Wage",
+          "SANED"
+        ],
+        "linkedContributorCount": 3,
+        "route": "Specialist review",
+        "band": "Review",
+        "features": [
+          {
+            "name": "Distinct journeys in 30 days",
+            "value": 3,
+            "median": 3,
+            "low": 2,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Events in 30 days",
+            "value": 12,
+            "median": 6,
+            "low": 3,
+            "high": 12,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Linked contributors in 30 days",
+            "value": 3,
+            "median": 2,
+            "low": 1,
+            "high": 7,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registrations in 30 days",
+            "value": 3,
+            "median": 1,
+            "low": 0,
+            "high": 5,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Wage changes in 30 days",
+            "value": 3,
+            "median": 2,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Exclusions in 30 days",
+            "value": 3,
+            "median": 1,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "SANED requests in 30 days",
+            "value": 3,
+            "median": 1,
+            "low": 1,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum wage change (%)",
+            "value": 45.483166666666655,
+            "median": 15.923583030700684,
+            "low": -1.4243667125701904,
+            "high": 58.49081802368164,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum retroactive days",
+            "value": 15.719318738425926,
+            "median": 5.427642345428467,
+            "low": 0,
+            "high": 65.07260131835938,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Hours since latest wage change (log1p)",
+            "value": 378.1916111111111,
+            "median": 340.937871690999,
+            "low": 122.80266287079489,
+            "high": 720.0001622612529,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum identifier reuse",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 6,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Cross-source conflicts",
+            "value": 1,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Rule overrides",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Coordinated chain count",
+            "value": 3,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registration-wage-exclusion-SANED chain",
+            "value": 1,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Completed chain span (days)",
+            "value": 23.496033344907406,
+            "median": 30,
+            "low": 21.67193031311035,
+            "high": 30,
+            "outsideReferenceRange": false
+          }
+        ],
+        "reasons": [
+          "The trained cross-journey model found similarity to provisional review patterns.",
+          "3 linked contributors participate in a registration → wage → exclusion → SANED sequence."
+        ],
+        "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+        "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+        "assessmentId": "e3411a95-68aa-4165-81f5-6119cca374c3",
+        "assessedAt": "2026-10-19T07:15:36.639Z",
+        "algorithm": "Random Forest cross-journey pattern classifier"
+      },
+      "aiModel": {
+        "version": "madar-cross-journey-rf-20261017-v1",
+        "rawScore": 1,
+        "percentile": 100,
+        "flagged": true,
+        "complete": true,
+        "ruleFlagged": false,
+        "features": [
+          {
+            "name": "Distinct journeys in 30 days",
+            "value": 3,
+            "median": 3,
+            "low": 2,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Events in 30 days",
+            "value": 12,
+            "median": 6,
+            "low": 3,
+            "high": 12,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Linked contributors in 30 days",
+            "value": 3,
+            "median": 2,
+            "low": 1,
+            "high": 7,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registrations in 30 days",
+            "value": 3,
+            "median": 1,
+            "low": 0,
+            "high": 5,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Wage changes in 30 days",
+            "value": 3,
+            "median": 2,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Exclusions in 30 days",
+            "value": 3,
+            "median": 1,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "SANED requests in 30 days",
+            "value": 3,
+            "median": 1,
+            "low": 1,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum wage change (%)",
+            "value": 45.483166666666655,
+            "median": 15.923583030700684,
+            "low": -1.4243667125701904,
+            "high": 58.49081802368164,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum retroactive days",
+            "value": 15.719318738425926,
+            "median": 5.427642345428467,
+            "low": 0,
+            "high": 65.07260131835938,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Hours since latest wage change (log1p)",
+            "value": 378.1916111111111,
+            "median": 340.937871690999,
+            "low": 122.80266287079489,
+            "high": 720.0001622612529,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum identifier reuse",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 6,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Cross-source conflicts",
+            "value": 1,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Rule overrides",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Coordinated chain count",
+            "value": 3,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registration-wage-exclusion-SANED chain",
+            "value": 1,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Completed chain span (days)",
+            "value": 23.496033344907406,
+            "median": 30,
+            "low": 21.67193031311035,
+            "high": 30,
+            "outsideReferenceRange": false
+          }
+        ],
+        "algorithm": "Random Forest"
+      },
+      "crossJourneyEvidence": {
+        "id": "CJ-SYN-demo-00001",
+        "synthetic": true,
+        "employerId": "EMP-SYN-demo-00001",
+        "asOf": 1792195200000,
+        "events": [
+          {
+            "eventId": "EVT-CJ-SYN-demo-00001-003",
+            "recordedAt": 1789992342719,
+            "journey": "Employer Registration",
+            "type": "registration",
+            "subjectId": "CTR-SYN-demo-00001-03",
+            "employerId": "EMP-SYN-demo-00001",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00001-002",
+            "recordedAt": 1790041443396,
+            "journey": "Employer Registration",
+            "type": "registration",
+            "subjectId": "CTR-SYN-demo-00001-02",
+            "employerId": "EMP-SYN-demo-00001",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00001-001",
+            "recordedAt": 1790062819355,
+            "journey": "Employer Registration",
+            "type": "registration",
+            "subjectId": "CTR-SYN-demo-00001-01",
+            "employerId": "EMP-SYN-demo-00001",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00001-006",
+            "recordedAt": 1790617713548,
+            "journey": "Contribution & Wage",
+            "type": "wage",
+            "subjectId": "CTR-SYN-demo-00001-03",
+            "employerId": "EMP-SYN-demo-00001",
+            "amount": 8633.69,
+            "previousAmount": 6000,
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00001-005",
+            "recordedAt": 1790744202006,
+            "journey": "Contribution & Wage",
+            "type": "wage",
+            "subjectId": "CTR-SYN-demo-00001-02",
+            "employerId": "EMP-SYN-demo-00001",
+            "amount": 8728.99,
+            "previousAmount": 6000,
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00001-004",
+            "recordedAt": 1790833710200,
+            "journey": "Contribution & Wage",
+            "type": "wage",
+            "subjectId": "CTR-SYN-demo-00001-01",
+            "employerId": "EMP-SYN-demo-00001",
+            "amount": 8500.81,
+            "previousAmount": 6000,
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00001-009",
+            "recordedAt": 1791430487045,
+            "effectiveAt": 1790072337906,
+            "journey": "Employer Registration",
+            "type": "exclusion",
+            "subjectId": "CTR-SYN-demo-00001-03",
+            "employerId": "EMP-SYN-demo-00001",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00001-008",
+            "recordedAt": 1791515676262,
+            "effectiveAt": 1790157527123,
+            "journey": "Employer Registration",
+            "type": "exclusion",
+            "subjectId": "CTR-SYN-demo-00001-02",
+            "employerId": "EMP-SYN-demo-00001",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00001-007",
+            "recordedAt": 1791595533162,
+            "effectiveAt": 1790237384023,
+            "journey": "Employer Registration",
+            "type": "exclusion",
+            "subjectId": "CTR-SYN-demo-00001-01",
+            "employerId": "EMP-SYN-demo-00001",
+            "sourceConflict": true,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00001-010",
+            "recordedAt": 1792022400000,
+            "journey": "SANED",
+            "type": "claim",
+            "subjectId": "CTR-SYN-demo-00001-01",
+            "employerId": "EMP-SYN-demo-00001",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00001-011",
+            "recordedAt": 1792108800000,
+            "journey": "SANED",
+            "type": "claim",
+            "subjectId": "CTR-SYN-demo-00001-02",
+            "employerId": "EMP-SYN-demo-00001",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00001-012",
+            "recordedAt": 1792195200000,
+            "journey": "SANED",
+            "type": "claim",
+            "subjectId": "CTR-SYN-demo-00001-03",
+            "employerId": "EMP-SYN-demo-00001",
+            "sourceConflict": false,
+            "ruleOverride": false
+          }
+        ]
+      },
+      "sourceTimeline": [
+        {
+          "eventId": "EVT-CJ-SYN-demo-00001-003",
+          "recordedAt": 1789992342719,
+          "journey": "Employer Registration",
+          "type": "registration",
+          "subjectId": "CTR-SYN-demo-00001-03",
+          "employerId": "EMP-SYN-demo-00001",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00001-002",
+          "recordedAt": 1790041443396,
+          "journey": "Employer Registration",
+          "type": "registration",
+          "subjectId": "CTR-SYN-demo-00001-02",
+          "employerId": "EMP-SYN-demo-00001",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00001-001",
+          "recordedAt": 1790062819355,
+          "journey": "Employer Registration",
+          "type": "registration",
+          "subjectId": "CTR-SYN-demo-00001-01",
+          "employerId": "EMP-SYN-demo-00001",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00001-006",
+          "recordedAt": 1790617713548,
+          "journey": "Contribution & Wage",
+          "type": "wage",
+          "subjectId": "CTR-SYN-demo-00001-03",
+          "employerId": "EMP-SYN-demo-00001",
+          "amount": 8633.69,
+          "previousAmount": 6000,
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00001-005",
+          "recordedAt": 1790744202006,
+          "journey": "Contribution & Wage",
+          "type": "wage",
+          "subjectId": "CTR-SYN-demo-00001-02",
+          "employerId": "EMP-SYN-demo-00001",
+          "amount": 8728.99,
+          "previousAmount": 6000,
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00001-004",
+          "recordedAt": 1790833710200,
+          "journey": "Contribution & Wage",
+          "type": "wage",
+          "subjectId": "CTR-SYN-demo-00001-01",
+          "employerId": "EMP-SYN-demo-00001",
+          "amount": 8500.81,
+          "previousAmount": 6000,
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00001-009",
+          "recordedAt": 1791430487045,
+          "effectiveAt": 1790072337906,
+          "journey": "Employer Registration",
+          "type": "exclusion",
+          "subjectId": "CTR-SYN-demo-00001-03",
+          "employerId": "EMP-SYN-demo-00001",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00001-008",
+          "recordedAt": 1791515676262,
+          "effectiveAt": 1790157527123,
+          "journey": "Employer Registration",
+          "type": "exclusion",
+          "subjectId": "CTR-SYN-demo-00001-02",
+          "employerId": "EMP-SYN-demo-00001",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00001-007",
+          "recordedAt": 1791595533162,
+          "effectiveAt": 1790237384023,
+          "journey": "Employer Registration",
+          "type": "exclusion",
+          "subjectId": "CTR-SYN-demo-00001-01",
+          "employerId": "EMP-SYN-demo-00001",
+          "sourceConflict": true,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00001-010",
+          "recordedAt": 1792022400000,
+          "journey": "SANED",
+          "type": "claim",
+          "subjectId": "CTR-SYN-demo-00001-01",
+          "employerId": "EMP-SYN-demo-00001",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00001-011",
+          "recordedAt": 1792108800000,
+          "journey": "SANED",
+          "type": "claim",
+          "subjectId": "CTR-SYN-demo-00001-02",
+          "employerId": "EMP-SYN-demo-00001",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00001-012",
+          "recordedAt": 1792195200000,
+          "journey": "SANED",
+          "type": "claim",
+          "subjectId": "CTR-SYN-demo-00001-03",
+          "employerId": "EMP-SYN-demo-00001",
+          "sourceConflict": false,
+          "ruleOverride": false
+        }
+      ],
+      "events": [
+        [
+          "Employer Registration · CTR-SYN-demo-00001-03 · registration",
+          "2026-09-21T12:05:42.719Z"
+        ],
+        [
+          "Employer Registration · CTR-SYN-demo-00001-02 · registration",
+          "2026-09-22T01:44:03.396Z"
+        ],
+        [
+          "Employer Registration · CTR-SYN-demo-00001-01 · registration",
+          "2026-09-22T07:40:19.355Z"
+        ],
+        [
+          "Contribution & Wage · CTR-SYN-demo-00001-03 · wage",
+          "2026-09-28T17:48:33.548Z"
+        ],
+        [
+          "Contribution & Wage · CTR-SYN-demo-00001-02 · wage",
+          "2026-09-30T04:56:42.006Z"
+        ],
+        [
+          "Contribution & Wage · CTR-SYN-demo-00001-01 · wage",
+          "2026-10-01T05:48:30.200Z"
+        ],
+        [
+          "Employer Registration · CTR-SYN-demo-00001-03 · exclusion",
+          "2026-10-08T03:34:47.045Z"
+        ],
+        [
+          "Employer Registration · CTR-SYN-demo-00001-02 · exclusion",
+          "2026-10-09T03:14:36.262Z"
+        ],
+        [
+          "Employer Registration · CTR-SYN-demo-00001-01 · exclusion",
+          "2026-10-10T01:25:33.162Z"
+        ],
+        [
+          "SANED · CTR-SYN-demo-00001-01 · claim",
+          "2026-10-15T00:00:00.000Z"
+        ],
+        [
+          "SANED · CTR-SYN-demo-00001-02 · claim",
+          "2026-10-16T00:00:00.000Z"
+        ],
+        [
+          "SANED · CTR-SYN-demo-00001-03 · claim",
+          "2026-10-17T00:00:00.000Z"
+        ]
+      ],
+      "audit": [
+        "Cross-journey model madar-cross-journey-rf-20261017-v1 assessed at 2026-10-19T07:15:36.639Z.",
+        "Human decision recorded by Manal at 2026-10-19T07:18:21.451Z: Evidence and rationale",
+        "Human decision recorded by Demo specialist at 2026-10-19T07:31:27.886Z: manal"
+      ],
+      "paymentStatus": "Pending · simulation",
+      "detectionStage": "Before payment",
+      "transactionAmount": 0,
+      "amountAtRisk": 0,
+      "confirmedFraudAmount": 0,
+      "preventedAmount": 0,
+      "currency": "SAR",
+      "outcome": null,
+      "financialOutcome": null,
+      "reviewHistory": [
+        {
+          "caseId": "CJ-SYN-demo-00001",
+          "assessmentId": "e3411a95-68aa-4165-81f5-6119cca374c3",
+          "actorName": "Manal",
+          "action": "approve",
+          "note": "Evidence and rationale",
+          "type": "decision",
+          "reviewId": "a3142ae8-a62b-4cfc-b08d-2b57cd901574",
+          "recordedAt": "2026-10-19T07:18:21.451Z"
+        },
+        {
+          "caseId": "CJ-SYN-demo-00001",
+          "assessmentId": "e3411a95-68aa-4165-81f5-6119cca374c3",
+          "action": "override",
+          "route": "Data Verification Review",
+          "note": "manal",
+          "type": "decision",
+          "reviewId": "453e0288-9f66-4f65-b903-6a917fb42d54",
+          "recordedAt": "2026-10-19T07:31:27.886Z",
+          "actorName": "Demo specialist"
+        }
+      ]
+    },
+    "evidenceFingerprint": "28bd79eff69c7a6b06fe04e15324fd3eb4d6f89a74556ce4937179faaa1ac54e",
+    "reviewHistory": [
+      {
+        "caseId": "CJ-SYN-demo-00001",
+        "assessmentId": "e3411a95-68aa-4165-81f5-6119cca374c3",
+        "actorName": "Manal",
+        "action": "approve",
+        "note": "Evidence and rationale",
+        "type": "decision",
+        "reviewId": "a3142ae8-a62b-4cfc-b08d-2b57cd901574",
+        "recordedAt": "2026-10-19T07:18:21.451Z"
+      },
+      {
+        "caseId": "CJ-SYN-demo-00001",
+        "assessmentId": "e3411a95-68aa-4165-81f5-6119cca374c3",
+        "action": "override",
+        "route": "Data Verification Review",
+        "note": "manal",
+        "type": "decision",
+        "reviewId": "453e0288-9f66-4f65-b903-6a917fb42d54",
+        "recordedAt": "2026-10-19T07:31:27.886Z",
+        "actorName": "Demo specialist"
+      }
+    ],
+    "humanDecision": {
+      "caseId": "CJ-SYN-demo-00001",
+      "assessmentId": "e3411a95-68aa-4165-81f5-6119cca374c3",
+      "action": "override",
+      "route": "Data Verification Review",
+      "note": "manal",
+      "type": "decision",
+      "reviewId": "453e0288-9f66-4f65-b903-6a917fb42d54",
+      "recordedAt": "2026-10-19T07:31:27.886Z",
+      "actorName": "Demo specialist"
+    }
+  },
+  {
+    "assessmentId": "6712988e-a496-48cc-98c8-761d3e3fd36f",
+    "assessedAt": "2026-10-19T07:15:36.639Z",
+    "caseId": "CJ-SYN-demo-00002",
+    "transactionId": "CJ-SYN-demo-00002",
+    "synthetic": true,
+    "assessmentSource": "cross-journey",
+    "journey": "SANED",
+    "scenario": "Legitimate restructuring",
+    "modelVersion": "madar-cross-journey-rf-20261017-v1",
+    "complete": true,
+    "score": 0,
+    "percentile": 95.7,
+    "modelFlagged": false,
+    "ruleFlagged": false,
+    "ruleReasons": [],
+    "involvedJourneys": [
+      "Employer Registration",
+      "SANED"
+    ],
+    "linkedContributorCount": 3,
+    "route": "Standard review",
+    "band": "Typical",
+    "features": [
+      {
+        "name": "Distinct journeys in 30 days",
+        "value": 2,
+        "median": 3,
+        "low": 2,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Events in 30 days",
+        "value": 4,
+        "median": 6,
+        "low": 3,
+        "high": 12,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Linked contributors in 30 days",
+        "value": 3,
+        "median": 2,
+        "low": 1,
+        "high": 7,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registrations in 30 days",
+        "value": 0,
+        "median": 1,
+        "low": 0,
+        "high": 5,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Wage changes in 30 days",
+        "value": 0,
+        "median": 2,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Exclusions in 30 days",
+        "value": 3,
+        "median": 1,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "SANED requests in 30 days",
+        "value": 1,
+        "median": 1,
+        "low": 1,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum wage change (%)",
+        "value": 0,
+        "median": 15.923583030700684,
+        "low": -1.4243667125701904,
+        "high": 58.49081802368164,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum retroactive days",
+        "value": 6.303023657407407,
+        "median": 5.427642345428467,
+        "low": 0,
+        "high": 65.07260131835938,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours since latest wage change (log1p)",
+        "value": 720.0000000000002,
+        "median": 340.937871690999,
+        "low": 122.80266287079489,
+        "high": 720.0001622612529,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum identifier reuse",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 6,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Cross-source conflicts",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Rule overrides",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Coordinated chain count",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registration-wage-exclusion-SANED chain",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Completed chain span (days)",
+        "value": 30,
+        "median": 30,
+        "low": 21.67193031311035,
+        "high": 30,
+        "outsideReferenceRange": false
+      }
+    ],
+    "reasons": [
+      "The trained cross-journey model did not cross the selected review threshold."
+    ],
+    "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+    "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+    "risk": "Low",
+    "modelResult": {
+      "modelVersion": "madar-cross-journey-rf-20261017-v1",
+      "complete": true,
+      "score": 0,
+      "percentile": 95.7,
+      "modelFlagged": false,
+      "ruleFlagged": false,
+      "ruleReasons": [],
+      "involvedJourneys": [
+        "Employer Registration",
+        "SANED"
+      ],
+      "linkedContributorCount": 3,
+      "route": "Standard review",
+      "band": "Typical",
+      "features": [
+        {
+          "name": "Distinct journeys in 30 days",
+          "value": 2,
+          "median": 3,
+          "low": 2,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Events in 30 days",
+          "value": 4,
+          "median": 6,
+          "low": 3,
+          "high": 12,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Linked contributors in 30 days",
+          "value": 3,
+          "median": 2,
+          "low": 1,
+          "high": 7,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Registrations in 30 days",
+          "value": 0,
+          "median": 1,
+          "low": 0,
+          "high": 5,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Wage changes in 30 days",
+          "value": 0,
+          "median": 2,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Exclusions in 30 days",
+          "value": 3,
+          "median": 1,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "SANED requests in 30 days",
+          "value": 1,
+          "median": 1,
+          "low": 1,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum wage change (%)",
+          "value": 0,
+          "median": 15.923583030700684,
+          "low": -1.4243667125701904,
+          "high": 58.49081802368164,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum retroactive days",
+          "value": 6.303023657407407,
+          "median": 5.427642345428467,
+          "low": 0,
+          "high": 65.07260131835938,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Hours since latest wage change (log1p)",
+          "value": 720.0000000000002,
+          "median": 340.937871690999,
+          "low": 122.80266287079489,
+          "high": 720.0001622612529,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum identifier reuse",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 6,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Cross-source conflicts",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Rule overrides",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 1,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Coordinated chain count",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Registration-wage-exclusion-SANED chain",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 1,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Completed chain span (days)",
+          "value": 30,
+          "median": 30,
+          "low": 21.67193031311035,
+          "high": 30,
+          "outsideReferenceRange": false
+        }
+      ],
+      "reasons": [
+        "The trained cross-journey model did not cross the selected review threshold."
+      ],
+      "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+      "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+      "assessmentId": "6712988e-a496-48cc-98c8-761d3e3fd36f",
+      "assessedAt": "2026-10-19T07:15:36.639Z",
+      "algorithm": "Random Forest cross-journey pattern classifier"
+    },
+    "caseData": {
+      "id": "CJ-SYN-demo-00002",
+      "transactionId": "CJ-SYN-demo-00002",
+      "synthetic": true,
+      "journey": "SANED",
+      "scenario": "Legitimate restructuring",
+      "assessmentId": "6712988e-a496-48cc-98c8-761d3e3fd36f",
+      "assessedAt": "2026-10-19T07:15:36.639Z",
+      "assessmentSource": "cross-journey",
+      "assessmentMode": "model-separated",
+      "subject": "CTR-SYN-demo-00002-02, CTR-SYN-demo-00002-01, CTR-SYN-demo-00002-03",
+      "entity": "EMP-SYN-demo-00002",
+      "customerName": "3 linked contributors",
+      "employerName": "EMP-SYN-demo-00002",
+      "requested": "2026-10-19T07:15:36.639Z",
+      "country": "Saudi Arabia",
+      "region": "Not supplied",
+      "city": "Not supplied",
+      "source": "Synthetic linked event history",
+      "score": null,
+      "ruleScore": 0,
+      "risk": "Low",
+      "route": "Standard review",
+      "status": "Standard review",
+      "comparison": "No review threshold crossed",
+      "confidence": "Not calibrated",
+      "confidenceScore": null,
+      "anomalyScore": 95.7,
+      "interaction": 0,
+      "features": {
+        "velocity": 4,
+        "linkedEntities": 3,
+        "retroDays": 0,
+        "priorRisk": 0,
+        "overrides": 0,
+        "identityReuse": 0,
+        "amountChangePct": 0,
+        "crossSourceConflict": false,
+        "missingData": false,
+        "urgentPriority": 0
+      },
+      "primaryCode": "MODEL_NOT_FLAGGED",
+      "primaryReason": "The trained cross-journey model did not cross the selected review threshold.",
+      "reasonCodes": [
+        {
+          "code": "MODEL_NOT_FLAGGED",
+          "description": "The trained cross-journey model did not cross the selected review threshold."
+        }
+      ],
+      "signals": [
+        [
+          "MODEL_NOT_FLAGGED",
+          "The trained cross-journey model did not cross the selected review threshold."
+        ]
+      ],
+      "modelAssessment": {
+        "modelVersion": "madar-cross-journey-rf-20261017-v1",
+        "complete": true,
+        "score": 0,
+        "percentile": 95.7,
+        "modelFlagged": false,
+        "ruleFlagged": false,
+        "ruleReasons": [],
+        "involvedJourneys": [
+          "Employer Registration",
+          "SANED"
+        ],
+        "linkedContributorCount": 3,
+        "route": "Standard review",
+        "band": "Typical",
+        "features": [
+          {
+            "name": "Distinct journeys in 30 days",
+            "value": 2,
+            "median": 3,
+            "low": 2,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Events in 30 days",
+            "value": 4,
+            "median": 6,
+            "low": 3,
+            "high": 12,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Linked contributors in 30 days",
+            "value": 3,
+            "median": 2,
+            "low": 1,
+            "high": 7,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registrations in 30 days",
+            "value": 0,
+            "median": 1,
+            "low": 0,
+            "high": 5,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Wage changes in 30 days",
+            "value": 0,
+            "median": 2,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Exclusions in 30 days",
+            "value": 3,
+            "median": 1,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "SANED requests in 30 days",
+            "value": 1,
+            "median": 1,
+            "low": 1,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum wage change (%)",
+            "value": 0,
+            "median": 15.923583030700684,
+            "low": -1.4243667125701904,
+            "high": 58.49081802368164,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum retroactive days",
+            "value": 6.303023657407407,
+            "median": 5.427642345428467,
+            "low": 0,
+            "high": 65.07260131835938,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Hours since latest wage change (log1p)",
+            "value": 720.0000000000002,
+            "median": 340.937871690999,
+            "low": 122.80266287079489,
+            "high": 720.0001622612529,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum identifier reuse",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 6,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Cross-source conflicts",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Rule overrides",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Coordinated chain count",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registration-wage-exclusion-SANED chain",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Completed chain span (days)",
+            "value": 30,
+            "median": 30,
+            "low": 21.67193031311035,
+            "high": 30,
+            "outsideReferenceRange": false
+          }
+        ],
+        "reasons": [
+          "The trained cross-journey model did not cross the selected review threshold."
+        ],
+        "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+        "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+        "assessmentId": "6712988e-a496-48cc-98c8-761d3e3fd36f",
+        "assessedAt": "2026-10-19T07:15:36.639Z",
+        "algorithm": "Random Forest cross-journey pattern classifier"
+      },
+      "aiModel": {
+        "version": "madar-cross-journey-rf-20261017-v1",
+        "rawScore": 0,
+        "percentile": 95.7,
+        "flagged": false,
+        "complete": true,
+        "ruleFlagged": false,
+        "features": [
+          {
+            "name": "Distinct journeys in 30 days",
+            "value": 2,
+            "median": 3,
+            "low": 2,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Events in 30 days",
+            "value": 4,
+            "median": 6,
+            "low": 3,
+            "high": 12,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Linked contributors in 30 days",
+            "value": 3,
+            "median": 2,
+            "low": 1,
+            "high": 7,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registrations in 30 days",
+            "value": 0,
+            "median": 1,
+            "low": 0,
+            "high": 5,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Wage changes in 30 days",
+            "value": 0,
+            "median": 2,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Exclusions in 30 days",
+            "value": 3,
+            "median": 1,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "SANED requests in 30 days",
+            "value": 1,
+            "median": 1,
+            "low": 1,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum wage change (%)",
+            "value": 0,
+            "median": 15.923583030700684,
+            "low": -1.4243667125701904,
+            "high": 58.49081802368164,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum retroactive days",
+            "value": 6.303023657407407,
+            "median": 5.427642345428467,
+            "low": 0,
+            "high": 65.07260131835938,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Hours since latest wage change (log1p)",
+            "value": 720.0000000000002,
+            "median": 340.937871690999,
+            "low": 122.80266287079489,
+            "high": 720.0001622612529,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum identifier reuse",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 6,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Cross-source conflicts",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Rule overrides",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Coordinated chain count",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registration-wage-exclusion-SANED chain",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Completed chain span (days)",
+            "value": 30,
+            "median": 30,
+            "low": 21.67193031311035,
+            "high": 30,
+            "outsideReferenceRange": false
+          }
+        ],
+        "algorithm": "Random Forest"
+      },
+      "crossJourneyEvidence": {
+        "id": "CJ-SYN-demo-00002",
+        "synthetic": true,
+        "employerId": "EMP-SYN-demo-00002",
+        "asOf": 1792195200000,
+        "events": [
+          {
+            "eventId": "EVT-CJ-SYN-demo-00002-002",
+            "recordedAt": 1790627404084,
+            "effectiveAt": 1790082822840,
+            "journey": "Employer Registration",
+            "type": "exclusion",
+            "subjectId": "CTR-SYN-demo-00002-02",
+            "employerId": "EMP-SYN-demo-00002",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00002-001",
+            "recordedAt": 1790762674601,
+            "effectiveAt": 1790386856082,
+            "journey": "Employer Registration",
+            "type": "exclusion",
+            "subjectId": "CTR-SYN-demo-00002-01",
+            "employerId": "EMP-SYN-demo-00002",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00002-003",
+            "recordedAt": 1791114594263,
+            "effectiveAt": 1790775108771,
+            "journey": "Employer Registration",
+            "type": "exclusion",
+            "subjectId": "CTR-SYN-demo-00002-03",
+            "employerId": "EMP-SYN-demo-00002",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00002-004",
+            "recordedAt": 1792195200000,
+            "journey": "SANED",
+            "type": "claim",
+            "subjectId": "CTR-SYN-demo-00002-01",
+            "employerId": "EMP-SYN-demo-00002",
+            "sourceConflict": false,
+            "ruleOverride": false
+          }
+        ]
+      },
+      "sourceTimeline": [
+        {
+          "eventId": "EVT-CJ-SYN-demo-00002-002",
+          "recordedAt": 1790627404084,
+          "effectiveAt": 1790082822840,
+          "journey": "Employer Registration",
+          "type": "exclusion",
+          "subjectId": "CTR-SYN-demo-00002-02",
+          "employerId": "EMP-SYN-demo-00002",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00002-001",
+          "recordedAt": 1790762674601,
+          "effectiveAt": 1790386856082,
+          "journey": "Employer Registration",
+          "type": "exclusion",
+          "subjectId": "CTR-SYN-demo-00002-01",
+          "employerId": "EMP-SYN-demo-00002",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00002-003",
+          "recordedAt": 1791114594263,
+          "effectiveAt": 1790775108771,
+          "journey": "Employer Registration",
+          "type": "exclusion",
+          "subjectId": "CTR-SYN-demo-00002-03",
+          "employerId": "EMP-SYN-demo-00002",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00002-004",
+          "recordedAt": 1792195200000,
+          "journey": "SANED",
+          "type": "claim",
+          "subjectId": "CTR-SYN-demo-00002-01",
+          "employerId": "EMP-SYN-demo-00002",
+          "sourceConflict": false,
+          "ruleOverride": false
+        }
+      ],
+      "events": [
+        [
+          "Employer Registration · CTR-SYN-demo-00002-02 · exclusion",
+          "2026-09-28T20:30:04.084Z"
+        ],
+        [
+          "Employer Registration · CTR-SYN-demo-00002-01 · exclusion",
+          "2026-09-30T10:04:34.601Z"
+        ],
+        [
+          "Employer Registration · CTR-SYN-demo-00002-03 · exclusion",
+          "2026-10-04T11:49:54.263Z"
+        ],
+        [
+          "SANED · CTR-SYN-demo-00002-01 · claim",
+          "2026-10-17T00:00:00.000Z"
+        ]
+      ],
+      "audit": [
+        "Cross-journey model madar-cross-journey-rf-20261017-v1 assessed at 2026-10-19T07:15:36.639Z."
+      ],
+      "paymentStatus": "Pending · simulation",
+      "detectionStage": "Before payment",
+      "transactionAmount": 0,
+      "amountAtRisk": 0,
+      "confirmedFraudAmount": 0,
+      "preventedAmount": 0,
+      "currency": "SAR",
+      "outcome": null,
+      "financialOutcome": null,
+      "reviewHistory": []
+    },
+    "evidenceFingerprint": "b4d9708a822b83424e85dbe868bea494364894112e6bf668a21ee63bc7162aeb",
+    "reviewHistory": []
+  },
+  {
+    "assessmentId": "b280de70-a8c5-41eb-8a31-de852f27a575",
+    "assessedAt": "2026-10-19T07:15:36.640Z",
+    "caseId": "CJ-SYN-demo-00003",
+    "transactionId": "CJ-SYN-demo-00003",
+    "synthetic": true,
+    "assessmentSource": "cross-journey",
+    "journey": "SANED",
+    "scenario": "Shared identifiers across contributors",
+    "modelVersion": "madar-cross-journey-rf-20261017-v1",
+    "complete": true,
+    "score": 1,
+    "percentile": 100,
+    "modelFlagged": true,
+    "ruleFlagged": true,
+    "ruleReasons": [
+      "Identifier shared by four or more contributors"
+    ],
+    "involvedJourneys": [
+      "Benefit Payments",
+      "SANED"
+    ],
+    "linkedContributorCount": 6,
+    "route": "Specialist review",
+    "band": "Review",
+    "features": [
+      {
+        "name": "Distinct journeys in 30 days",
+        "value": 2,
+        "median": 3,
+        "low": 2,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Events in 30 days",
+        "value": 7,
+        "median": 6,
+        "low": 3,
+        "high": 12,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Linked contributors in 30 days",
+        "value": 6,
+        "median": 2,
+        "low": 1,
+        "high": 7,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registrations in 30 days",
+        "value": 0,
+        "median": 1,
+        "low": 0,
+        "high": 5,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Wage changes in 30 days",
+        "value": 0,
+        "median": 2,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Exclusions in 30 days",
+        "value": 0,
+        "median": 1,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "SANED requests in 30 days",
+        "value": 1,
+        "median": 1,
+        "low": 1,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum wage change (%)",
+        "value": 0,
+        "median": 15.923583030700684,
+        "low": -1.4243667125701904,
+        "high": 58.49081802368164,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum retroactive days",
+        "value": 0,
+        "median": 5.427642345428467,
+        "low": 0,
+        "high": 65.07260131835938,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours since latest wage change (log1p)",
+        "value": 720.0000000000002,
+        "median": 340.937871690999,
+        "low": 122.80266287079489,
+        "high": 720.0001622612529,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum identifier reuse",
+        "value": 6,
+        "median": 0,
+        "low": 0,
+        "high": 6,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Cross-source conflicts",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Rule overrides",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Coordinated chain count",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registration-wage-exclusion-SANED chain",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Completed chain span (days)",
+        "value": 30,
+        "median": 30,
+        "low": 21.67193031311035,
+        "high": 30,
+        "outsideReferenceRange": false
+      }
+    ],
+    "reasons": [
+      "The trained cross-journey model found similarity to provisional review patterns.",
+      "Identifier shared by four or more contributors"
+    ],
+    "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+    "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+    "risk": "Medium",
+    "modelResult": {
+      "modelVersion": "madar-cross-journey-rf-20261017-v1",
+      "complete": true,
+      "score": 1,
+      "percentile": 100,
+      "modelFlagged": true,
+      "ruleFlagged": true,
+      "ruleReasons": [
+        "Identifier shared by four or more contributors"
+      ],
+      "involvedJourneys": [
+        "Benefit Payments",
+        "SANED"
+      ],
+      "linkedContributorCount": 6,
+      "route": "Specialist review",
+      "band": "Review",
+      "features": [
+        {
+          "name": "Distinct journeys in 30 days",
+          "value": 2,
+          "median": 3,
+          "low": 2,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Events in 30 days",
+          "value": 7,
+          "median": 6,
+          "low": 3,
+          "high": 12,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Linked contributors in 30 days",
+          "value": 6,
+          "median": 2,
+          "low": 1,
+          "high": 7,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Registrations in 30 days",
+          "value": 0,
+          "median": 1,
+          "low": 0,
+          "high": 5,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Wage changes in 30 days",
+          "value": 0,
+          "median": 2,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Exclusions in 30 days",
+          "value": 0,
+          "median": 1,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "SANED requests in 30 days",
+          "value": 1,
+          "median": 1,
+          "low": 1,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum wage change (%)",
+          "value": 0,
+          "median": 15.923583030700684,
+          "low": -1.4243667125701904,
+          "high": 58.49081802368164,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum retroactive days",
+          "value": 0,
+          "median": 5.427642345428467,
+          "low": 0,
+          "high": 65.07260131835938,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Hours since latest wage change (log1p)",
+          "value": 720.0000000000002,
+          "median": 340.937871690999,
+          "low": 122.80266287079489,
+          "high": 720.0001622612529,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum identifier reuse",
+          "value": 6,
+          "median": 0,
+          "low": 0,
+          "high": 6,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Cross-source conflicts",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Rule overrides",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 1,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Coordinated chain count",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Registration-wage-exclusion-SANED chain",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 1,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Completed chain span (days)",
+          "value": 30,
+          "median": 30,
+          "low": 21.67193031311035,
+          "high": 30,
+          "outsideReferenceRange": false
+        }
+      ],
+      "reasons": [
+        "The trained cross-journey model found similarity to provisional review patterns.",
+        "Identifier shared by four or more contributors"
+      ],
+      "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+      "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+      "assessmentId": "b280de70-a8c5-41eb-8a31-de852f27a575",
+      "assessedAt": "2026-10-19T07:15:36.640Z",
+      "algorithm": "Random Forest cross-journey pattern classifier"
+    },
+    "caseData": {
+      "id": "CJ-SYN-demo-00003",
+      "transactionId": "CJ-SYN-demo-00003",
+      "synthetic": true,
+      "journey": "SANED",
+      "scenario": "Shared identifiers across contributors",
+      "assessmentId": "b280de70-a8c5-41eb-8a31-de852f27a575",
+      "assessedAt": "2026-10-19T07:15:36.640Z",
+      "assessmentSource": "cross-journey",
+      "assessmentMode": "model-separated",
+      "subject": "CTR-SYN-demo-00003-04, CTR-SYN-demo-00003-01, CTR-SYN-demo-00003-03, CTR-SYN-demo-00003-02, CTR-SYN-demo-00003-05, CTR-SYN-demo-00003-06",
+      "entity": "EMP-SYN-demo-00003",
+      "customerName": "6 linked contributors",
+      "employerName": "EMP-SYN-demo-00003",
+      "requested": "2026-10-19T07:15:36.640Z",
+      "country": "Saudi Arabia",
+      "region": "Not supplied",
+      "city": "Not supplied",
+      "source": "Synthetic linked event history",
+      "score": null,
+      "ruleScore": 0,
+      "risk": "Medium",
+      "route": "Specialist review",
+      "status": "Awaiting specialist",
+      "comparison": "Rules and AI recommend review",
+      "confidence": "Not calibrated",
+      "confidenceScore": null,
+      "anomalyScore": 100,
+      "interaction": 0,
+      "features": {
+        "velocity": 7,
+        "linkedEntities": 6,
+        "retroDays": 0,
+        "priorRisk": 0,
+        "overrides": 0,
+        "identityReuse": 0,
+        "amountChangePct": 0,
+        "crossSourceConflict": false,
+        "missingData": false,
+        "urgentPriority": 0
+      },
+      "primaryCode": "CROSS_JOURNEY_PATTERN",
+      "primaryReason": "The trained cross-journey model found similarity to provisional review patterns. Identifier shared by four or more contributors",
+      "reasonCodes": [
+        {
+          "code": "CROSS_JOURNEY_PATTERN",
+          "description": "The trained cross-journey model found similarity to provisional review patterns."
+        },
+        {
+          "code": "CROSS_JOURNEY_EVIDENCE_1",
+          "description": "Identifier shared by four or more contributors"
+        }
+      ],
+      "signals": [
+        [
+          "CROSS_JOURNEY_PATTERN",
+          "The trained cross-journey model found similarity to provisional review patterns."
+        ],
+        [
+          "CROSS_JOURNEY_EVIDENCE_1",
+          "Identifier shared by four or more contributors"
+        ]
+      ],
+      "modelAssessment": {
+        "modelVersion": "madar-cross-journey-rf-20261017-v1",
+        "complete": true,
+        "score": 1,
+        "percentile": 100,
+        "modelFlagged": true,
+        "ruleFlagged": true,
+        "ruleReasons": [
+          "Identifier shared by four or more contributors"
+        ],
+        "involvedJourneys": [
+          "Benefit Payments",
+          "SANED"
+        ],
+        "linkedContributorCount": 6,
+        "route": "Specialist review",
+        "band": "Review",
+        "features": [
+          {
+            "name": "Distinct journeys in 30 days",
+            "value": 2,
+            "median": 3,
+            "low": 2,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Events in 30 days",
+            "value": 7,
+            "median": 6,
+            "low": 3,
+            "high": 12,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Linked contributors in 30 days",
+            "value": 6,
+            "median": 2,
+            "low": 1,
+            "high": 7,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registrations in 30 days",
+            "value": 0,
+            "median": 1,
+            "low": 0,
+            "high": 5,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Wage changes in 30 days",
+            "value": 0,
+            "median": 2,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Exclusions in 30 days",
+            "value": 0,
+            "median": 1,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "SANED requests in 30 days",
+            "value": 1,
+            "median": 1,
+            "low": 1,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum wage change (%)",
+            "value": 0,
+            "median": 15.923583030700684,
+            "low": -1.4243667125701904,
+            "high": 58.49081802368164,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum retroactive days",
+            "value": 0,
+            "median": 5.427642345428467,
+            "low": 0,
+            "high": 65.07260131835938,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Hours since latest wage change (log1p)",
+            "value": 720.0000000000002,
+            "median": 340.937871690999,
+            "low": 122.80266287079489,
+            "high": 720.0001622612529,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum identifier reuse",
+            "value": 6,
+            "median": 0,
+            "low": 0,
+            "high": 6,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Cross-source conflicts",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Rule overrides",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Coordinated chain count",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registration-wage-exclusion-SANED chain",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Completed chain span (days)",
+            "value": 30,
+            "median": 30,
+            "low": 21.67193031311035,
+            "high": 30,
+            "outsideReferenceRange": false
+          }
+        ],
+        "reasons": [
+          "The trained cross-journey model found similarity to provisional review patterns.",
+          "Identifier shared by four or more contributors"
+        ],
+        "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+        "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+        "assessmentId": "b280de70-a8c5-41eb-8a31-de852f27a575",
+        "assessedAt": "2026-10-19T07:15:36.640Z",
+        "algorithm": "Random Forest cross-journey pattern classifier"
+      },
+      "aiModel": {
+        "version": "madar-cross-journey-rf-20261017-v1",
+        "rawScore": 1,
+        "percentile": 100,
+        "flagged": true,
+        "complete": true,
+        "ruleFlagged": true,
+        "features": [
+          {
+            "name": "Distinct journeys in 30 days",
+            "value": 2,
+            "median": 3,
+            "low": 2,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Events in 30 days",
+            "value": 7,
+            "median": 6,
+            "low": 3,
+            "high": 12,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Linked contributors in 30 days",
+            "value": 6,
+            "median": 2,
+            "low": 1,
+            "high": 7,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registrations in 30 days",
+            "value": 0,
+            "median": 1,
+            "low": 0,
+            "high": 5,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Wage changes in 30 days",
+            "value": 0,
+            "median": 2,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Exclusions in 30 days",
+            "value": 0,
+            "median": 1,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "SANED requests in 30 days",
+            "value": 1,
+            "median": 1,
+            "low": 1,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum wage change (%)",
+            "value": 0,
+            "median": 15.923583030700684,
+            "low": -1.4243667125701904,
+            "high": 58.49081802368164,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum retroactive days",
+            "value": 0,
+            "median": 5.427642345428467,
+            "low": 0,
+            "high": 65.07260131835938,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Hours since latest wage change (log1p)",
+            "value": 720.0000000000002,
+            "median": 340.937871690999,
+            "low": 122.80266287079489,
+            "high": 720.0001622612529,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum identifier reuse",
+            "value": 6,
+            "median": 0,
+            "low": 0,
+            "high": 6,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Cross-source conflicts",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Rule overrides",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Coordinated chain count",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registration-wage-exclusion-SANED chain",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Completed chain span (days)",
+            "value": 30,
+            "median": 30,
+            "low": 21.67193031311035,
+            "high": 30,
+            "outsideReferenceRange": false
+          }
+        ],
+        "algorithm": "Random Forest"
+      },
+      "crossJourneyEvidence": {
+        "id": "CJ-SYN-demo-00003",
+        "synthetic": true,
+        "employerId": "EMP-SYN-demo-00003",
+        "asOf": 1792195200000,
+        "events": [
+          {
+            "eventId": "EVT-CJ-SYN-demo-00003-004",
+            "recordedAt": 1790876056538,
+            "journey": "Benefit Payments",
+            "type": "payment",
+            "subjectId": "CTR-SYN-demo-00003-04",
+            "employerId": "EMP-SYN-demo-00003",
+            "identifierId": "IBAN-SYN-demo-00003",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00003-001",
+            "recordedAt": 1790964704249,
+            "journey": "Benefit Payments",
+            "type": "payment",
+            "subjectId": "CTR-SYN-demo-00003-01",
+            "employerId": "EMP-SYN-demo-00003",
+            "identifierId": "IBAN-SYN-demo-00003",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00003-003",
+            "recordedAt": 1791138704630,
+            "journey": "Benefit Payments",
+            "type": "payment",
+            "subjectId": "CTR-SYN-demo-00003-03",
+            "employerId": "EMP-SYN-demo-00003",
+            "identifierId": "IBAN-SYN-demo-00003",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00003-002",
+            "recordedAt": 1791145222921,
+            "journey": "Benefit Payments",
+            "type": "payment",
+            "subjectId": "CTR-SYN-demo-00003-02",
+            "employerId": "EMP-SYN-demo-00003",
+            "identifierId": "IBAN-SYN-demo-00003",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00003-005",
+            "recordedAt": 1791248233765,
+            "journey": "Benefit Payments",
+            "type": "payment",
+            "subjectId": "CTR-SYN-demo-00003-05",
+            "employerId": "EMP-SYN-demo-00003",
+            "identifierId": "IBAN-SYN-demo-00003",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00003-006",
+            "recordedAt": 1791289616689,
+            "journey": "Benefit Payments",
+            "type": "payment",
+            "subjectId": "CTR-SYN-demo-00003-06",
+            "employerId": "EMP-SYN-demo-00003",
+            "identifierId": "IBAN-SYN-demo-00003",
+            "sourceConflict": false,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00003-007",
+            "recordedAt": 1792195200000,
+            "journey": "SANED",
+            "type": "claim",
+            "subjectId": "CTR-SYN-demo-00003-01",
+            "employerId": "EMP-SYN-demo-00003",
+            "identifierId": "IBAN-SYN-demo-00003",
+            "sourceConflict": false,
+            "ruleOverride": false
+          }
+        ]
+      },
+      "sourceTimeline": [
+        {
+          "eventId": "EVT-CJ-SYN-demo-00003-004",
+          "recordedAt": 1790876056538,
+          "journey": "Benefit Payments",
+          "type": "payment",
+          "subjectId": "CTR-SYN-demo-00003-04",
+          "employerId": "EMP-SYN-demo-00003",
+          "identifierId": "IBAN-SYN-demo-00003",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00003-001",
+          "recordedAt": 1790964704249,
+          "journey": "Benefit Payments",
+          "type": "payment",
+          "subjectId": "CTR-SYN-demo-00003-01",
+          "employerId": "EMP-SYN-demo-00003",
+          "identifierId": "IBAN-SYN-demo-00003",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00003-003",
+          "recordedAt": 1791138704630,
+          "journey": "Benefit Payments",
+          "type": "payment",
+          "subjectId": "CTR-SYN-demo-00003-03",
+          "employerId": "EMP-SYN-demo-00003",
+          "identifierId": "IBAN-SYN-demo-00003",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00003-002",
+          "recordedAt": 1791145222921,
+          "journey": "Benefit Payments",
+          "type": "payment",
+          "subjectId": "CTR-SYN-demo-00003-02",
+          "employerId": "EMP-SYN-demo-00003",
+          "identifierId": "IBAN-SYN-demo-00003",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00003-005",
+          "recordedAt": 1791248233765,
+          "journey": "Benefit Payments",
+          "type": "payment",
+          "subjectId": "CTR-SYN-demo-00003-05",
+          "employerId": "EMP-SYN-demo-00003",
+          "identifierId": "IBAN-SYN-demo-00003",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00003-006",
+          "recordedAt": 1791289616689,
+          "journey": "Benefit Payments",
+          "type": "payment",
+          "subjectId": "CTR-SYN-demo-00003-06",
+          "employerId": "EMP-SYN-demo-00003",
+          "identifierId": "IBAN-SYN-demo-00003",
+          "sourceConflict": false,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00003-007",
+          "recordedAt": 1792195200000,
+          "journey": "SANED",
+          "type": "claim",
+          "subjectId": "CTR-SYN-demo-00003-01",
+          "employerId": "EMP-SYN-demo-00003",
+          "identifierId": "IBAN-SYN-demo-00003",
+          "sourceConflict": false,
+          "ruleOverride": false
+        }
+      ],
+      "events": [
+        [
+          "Benefit Payments · CTR-SYN-demo-00003-04 · payment",
+          "2026-10-01T17:34:16.538Z"
+        ],
+        [
+          "Benefit Payments · CTR-SYN-demo-00003-01 · payment",
+          "2026-10-02T18:11:44.249Z"
+        ],
+        [
+          "Benefit Payments · CTR-SYN-demo-00003-03 · payment",
+          "2026-10-04T18:31:44.630Z"
+        ],
+        [
+          "Benefit Payments · CTR-SYN-demo-00003-02 · payment",
+          "2026-10-04T20:20:22.921Z"
+        ],
+        [
+          "Benefit Payments · CTR-SYN-demo-00003-05 · payment",
+          "2026-10-06T00:57:13.765Z"
+        ],
+        [
+          "Benefit Payments · CTR-SYN-demo-00003-06 · payment",
+          "2026-10-06T12:26:56.689Z"
+        ],
+        [
+          "SANED · CTR-SYN-demo-00003-01 · claim",
+          "2026-10-17T00:00:00.000Z"
+        ]
+      ],
+      "audit": [
+        "Cross-journey model madar-cross-journey-rf-20261017-v1 assessed at 2026-10-19T07:15:36.640Z."
+      ],
+      "paymentStatus": "Pending · simulation",
+      "detectionStage": "Before payment",
+      "transactionAmount": 0,
+      "amountAtRisk": 0,
+      "confirmedFraudAmount": 0,
+      "preventedAmount": 0,
+      "currency": "SAR",
+      "outcome": null,
+      "financialOutcome": null,
+      "reviewHistory": []
+    },
+    "evidenceFingerprint": "5870e13f5bbc6e856e10aad23c3a04834c732099f2d89ddf9e8d33b01447151f",
+    "reviewHistory": []
+  },
+  {
+    "assessmentId": "40c9630e-9132-41e3-812a-9cbab2281d2a",
+    "assessedAt": "2026-10-19T07:15:36.640Z",
+    "caseId": "CJ-SYN-demo-00004",
+    "transactionId": "CJ-SYN-demo-00004",
+    "synthetic": true,
+    "assessmentSource": "cross-journey",
+    "journey": "SANED",
+    "scenario": "Retroactive changes and conflicting evidence",
+    "modelVersion": "madar-cross-journey-rf-20261017-v1",
+    "complete": true,
+    "score": 1,
+    "percentile": 100,
+    "modelFlagged": true,
+    "ruleFlagged": true,
+    "ruleReasons": [
+      "Retroactive change of 30 days or more",
+      "Two or more cross-source conflicts"
+    ],
+    "involvedJourneys": [
+      "Contribution & Wage",
+      "Retirement",
+      "SANED"
+    ],
+    "linkedContributorCount": 2,
+    "route": "Specialist review",
+    "band": "Review",
+    "features": [
+      {
+        "name": "Distinct journeys in 30 days",
+        "value": 3,
+        "median": 3,
+        "low": 2,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Events in 30 days",
+        "value": 4,
+        "median": 6,
+        "low": 3,
+        "high": 12,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Linked contributors in 30 days",
+        "value": 2,
+        "median": 2,
+        "low": 1,
+        "high": 7,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registrations in 30 days",
+        "value": 0,
+        "median": 1,
+        "low": 0,
+        "high": 5,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Wage changes in 30 days",
+        "value": 2,
+        "median": 2,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Exclusions in 30 days",
+        "value": 0,
+        "median": 1,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "SANED requests in 30 days",
+        "value": 1,
+        "median": 1,
+        "low": 1,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum wage change (%)",
+        "value": 54.0775,
+        "median": 15.923583030700684,
+        "low": -1.4243667125701904,
+        "high": 58.49081802368164,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum retroactive days",
+        "value": 78.88695944444444,
+        "median": 5.427642345428467,
+        "low": 0,
+        "high": 65.07260131835938,
+        "outsideReferenceRange": true
+      },
+      {
+        "name": "Hours since latest wage change (log1p)",
+        "value": 150.71551666666673,
+        "median": 340.937871690999,
+        "low": 122.80266287079489,
+        "high": 720.0001622612529,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum identifier reuse",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 6,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Cross-source conflicts",
+        "value": 3,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Rule overrides",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Coordinated chain count",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registration-wage-exclusion-SANED chain",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Completed chain span (days)",
+        "value": 30,
+        "median": 30,
+        "low": 21.67193031311035,
+        "high": 30,
+        "outsideReferenceRange": false
+      }
+    ],
+    "reasons": [
+      "The trained cross-journey model found similarity to provisional review patterns.",
+      "Retroactive change of 30 days or more",
+      "Two or more cross-source conflicts"
+    ],
+    "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+    "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+    "risk": "Medium",
+    "modelResult": {
+      "modelVersion": "madar-cross-journey-rf-20261017-v1",
+      "complete": true,
+      "score": 1,
+      "percentile": 100,
+      "modelFlagged": true,
+      "ruleFlagged": true,
+      "ruleReasons": [
+        "Retroactive change of 30 days or more",
+        "Two or more cross-source conflicts"
+      ],
+      "involvedJourneys": [
+        "Contribution & Wage",
+        "Retirement",
+        "SANED"
+      ],
+      "linkedContributorCount": 2,
+      "route": "Specialist review",
+      "band": "Review",
+      "features": [
+        {
+          "name": "Distinct journeys in 30 days",
+          "value": 3,
+          "median": 3,
+          "low": 2,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Events in 30 days",
+          "value": 4,
+          "median": 6,
+          "low": 3,
+          "high": 12,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Linked contributors in 30 days",
+          "value": 2,
+          "median": 2,
+          "low": 1,
+          "high": 7,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Registrations in 30 days",
+          "value": 0,
+          "median": 1,
+          "low": 0,
+          "high": 5,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Wage changes in 30 days",
+          "value": 2,
+          "median": 2,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Exclusions in 30 days",
+          "value": 0,
+          "median": 1,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "SANED requests in 30 days",
+          "value": 1,
+          "median": 1,
+          "low": 1,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum wage change (%)",
+          "value": 54.0775,
+          "median": 15.923583030700684,
+          "low": -1.4243667125701904,
+          "high": 58.49081802368164,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum retroactive days",
+          "value": 78.88695944444444,
+          "median": 5.427642345428467,
+          "low": 0,
+          "high": 65.07260131835938,
+          "outsideReferenceRange": true
+        },
+        {
+          "name": "Hours since latest wage change (log1p)",
+          "value": 150.71551666666673,
+          "median": 340.937871690999,
+          "low": 122.80266287079489,
+          "high": 720.0001622612529,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Maximum identifier reuse",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 6,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Cross-source conflicts",
+          "value": 3,
+          "median": 0,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Rule overrides",
+          "value": 1,
+          "median": 0,
+          "low": 0,
+          "high": 1,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Coordinated chain count",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 3,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Registration-wage-exclusion-SANED chain",
+          "value": 0,
+          "median": 0,
+          "low": 0,
+          "high": 1,
+          "outsideReferenceRange": false
+        },
+        {
+          "name": "Completed chain span (days)",
+          "value": 30,
+          "median": 30,
+          "low": 21.67193031311035,
+          "high": 30,
+          "outsideReferenceRange": false
+        }
+      ],
+      "reasons": [
+        "The trained cross-journey model found similarity to provisional review patterns.",
+        "Retroactive change of 30 days or more",
+        "Two or more cross-source conflicts"
+      ],
+      "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+      "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+      "assessmentId": "40c9630e-9132-41e3-812a-9cbab2281d2a",
+      "assessedAt": "2026-10-19T07:15:36.640Z",
+      "algorithm": "Random Forest cross-journey pattern classifier"
+    },
+    "caseData": {
+      "id": "CJ-SYN-demo-00004",
+      "transactionId": "CJ-SYN-demo-00004",
+      "synthetic": true,
+      "journey": "SANED",
+      "scenario": "Retroactive changes and conflicting evidence",
+      "assessmentId": "40c9630e-9132-41e3-812a-9cbab2281d2a",
+      "assessedAt": "2026-10-19T07:15:36.640Z",
+      "assessmentSource": "cross-journey",
+      "assessmentMode": "model-separated",
+      "subject": "CTR-SYN-demo-00004-02, CTR-SYN-demo-00004-01",
+      "entity": "EMP-SYN-demo-00004",
+      "customerName": "2 linked contributors",
+      "employerName": "EMP-SYN-demo-00004",
+      "requested": "2026-10-19T07:15:36.640Z",
+      "country": "Saudi Arabia",
+      "region": "Not supplied",
+      "city": "Not supplied",
+      "source": "Synthetic linked event history",
+      "score": null,
+      "ruleScore": 0,
+      "risk": "Medium",
+      "route": "Specialist review",
+      "status": "Awaiting specialist",
+      "comparison": "Rules and AI recommend review",
+      "confidence": "Not calibrated",
+      "confidenceScore": null,
+      "anomalyScore": 100,
+      "interaction": 0,
+      "features": {
+        "velocity": 4,
+        "linkedEntities": 2,
+        "retroDays": 0,
+        "priorRisk": 0,
+        "overrides": 0,
+        "identityReuse": 0,
+        "amountChangePct": 0,
+        "crossSourceConflict": true,
+        "missingData": false,
+        "urgentPriority": 0
+      },
+      "primaryCode": "CROSS_JOURNEY_PATTERN",
+      "primaryReason": "The trained cross-journey model found similarity to provisional review patterns. Retroactive change of 30 days or more Two or more cross-source conflicts",
+      "reasonCodes": [
+        {
+          "code": "CROSS_JOURNEY_PATTERN",
+          "description": "The trained cross-journey model found similarity to provisional review patterns."
+        },
+        {
+          "code": "CROSS_JOURNEY_EVIDENCE_1",
+          "description": "Retroactive change of 30 days or more"
+        },
+        {
+          "code": "CROSS_JOURNEY_EVIDENCE_2",
+          "description": "Two or more cross-source conflicts"
+        }
+      ],
+      "signals": [
+        [
+          "CROSS_JOURNEY_PATTERN",
+          "The trained cross-journey model found similarity to provisional review patterns."
+        ],
+        [
+          "CROSS_JOURNEY_EVIDENCE_1",
+          "Retroactive change of 30 days or more"
+        ],
+        [
+          "CROSS_JOURNEY_EVIDENCE_2",
+          "Two or more cross-source conflicts"
+        ]
+      ],
+      "modelAssessment": {
+        "modelVersion": "madar-cross-journey-rf-20261017-v1",
+        "complete": true,
+        "score": 1,
+        "percentile": 100,
+        "modelFlagged": true,
+        "ruleFlagged": true,
+        "ruleReasons": [
+          "Retroactive change of 30 days or more",
+          "Two or more cross-source conflicts"
+        ],
+        "involvedJourneys": [
+          "Contribution & Wage",
+          "Retirement",
+          "SANED"
+        ],
+        "linkedContributorCount": 2,
+        "route": "Specialist review",
+        "band": "Review",
+        "features": [
+          {
+            "name": "Distinct journeys in 30 days",
+            "value": 3,
+            "median": 3,
+            "low": 2,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Events in 30 days",
+            "value": 4,
+            "median": 6,
+            "low": 3,
+            "high": 12,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Linked contributors in 30 days",
+            "value": 2,
+            "median": 2,
+            "low": 1,
+            "high": 7,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registrations in 30 days",
+            "value": 0,
+            "median": 1,
+            "low": 0,
+            "high": 5,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Wage changes in 30 days",
+            "value": 2,
+            "median": 2,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Exclusions in 30 days",
+            "value": 0,
+            "median": 1,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "SANED requests in 30 days",
+            "value": 1,
+            "median": 1,
+            "low": 1,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum wage change (%)",
+            "value": 54.0775,
+            "median": 15.923583030700684,
+            "low": -1.4243667125701904,
+            "high": 58.49081802368164,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum retroactive days",
+            "value": 78.88695944444444,
+            "median": 5.427642345428467,
+            "low": 0,
+            "high": 65.07260131835938,
+            "outsideReferenceRange": true
+          },
+          {
+            "name": "Hours since latest wage change (log1p)",
+            "value": 150.71551666666673,
+            "median": 340.937871690999,
+            "low": 122.80266287079489,
+            "high": 720.0001622612529,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum identifier reuse",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 6,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Cross-source conflicts",
+            "value": 3,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Rule overrides",
+            "value": 1,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Coordinated chain count",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registration-wage-exclusion-SANED chain",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Completed chain span (days)",
+            "value": 30,
+            "median": 30,
+            "low": 21.67193031311035,
+            "high": 30,
+            "outsideReferenceRange": false
+          }
+        ],
+        "reasons": [
+          "The trained cross-journey model found similarity to provisional review patterns.",
+          "Retroactive change of 30 days or more",
+          "Two or more cross-source conflicts"
+        ],
+        "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+        "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions.",
+        "assessmentId": "40c9630e-9132-41e3-812a-9cbab2281d2a",
+        "assessedAt": "2026-10-19T07:15:36.640Z",
+        "algorithm": "Random Forest cross-journey pattern classifier"
+      },
+      "aiModel": {
+        "version": "madar-cross-journey-rf-20261017-v1",
+        "rawScore": 1,
+        "percentile": 100,
+        "flagged": true,
+        "complete": true,
+        "ruleFlagged": true,
+        "features": [
+          {
+            "name": "Distinct journeys in 30 days",
+            "value": 3,
+            "median": 3,
+            "low": 2,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Events in 30 days",
+            "value": 4,
+            "median": 6,
+            "low": 3,
+            "high": 12,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Linked contributors in 30 days",
+            "value": 2,
+            "median": 2,
+            "low": 1,
+            "high": 7,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registrations in 30 days",
+            "value": 0,
+            "median": 1,
+            "low": 0,
+            "high": 5,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Wage changes in 30 days",
+            "value": 2,
+            "median": 2,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Exclusions in 30 days",
+            "value": 0,
+            "median": 1,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "SANED requests in 30 days",
+            "value": 1,
+            "median": 1,
+            "low": 1,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum wage change (%)",
+            "value": 54.0775,
+            "median": 15.923583030700684,
+            "low": -1.4243667125701904,
+            "high": 58.49081802368164,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum retroactive days",
+            "value": 78.88695944444444,
+            "median": 5.427642345428467,
+            "low": 0,
+            "high": 65.07260131835938,
+            "outsideReferenceRange": true
+          },
+          {
+            "name": "Hours since latest wage change (log1p)",
+            "value": 150.71551666666673,
+            "median": 340.937871690999,
+            "low": 122.80266287079489,
+            "high": 720.0001622612529,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Maximum identifier reuse",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 6,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Cross-source conflicts",
+            "value": 3,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Rule overrides",
+            "value": 1,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Coordinated chain count",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 3,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Registration-wage-exclusion-SANED chain",
+            "value": 0,
+            "median": 0,
+            "low": 0,
+            "high": 1,
+            "outsideReferenceRange": false
+          },
+          {
+            "name": "Completed chain span (days)",
+            "value": 30,
+            "median": 30,
+            "low": 21.67193031311035,
+            "high": 30,
+            "outsideReferenceRange": false
+          }
+        ],
+        "algorithm": "Random Forest"
+      },
+      "crossJourneyEvidence": {
+        "id": "CJ-SYN-demo-00004",
+        "synthetic": true,
+        "employerId": "EMP-SYN-demo-00004",
+        "asOf": 1792195200000,
+        "events": [
+          {
+            "eventId": "EVT-CJ-SYN-demo-00004-002",
+            "recordedAt": 1791518345264,
+            "effectiveAt": 1784702511968,
+            "journey": "Contribution & Wage",
+            "type": "wage",
+            "subjectId": "CTR-SYN-demo-00004-02",
+            "employerId": "EMP-SYN-demo-00004",
+            "amount": 9244.65,
+            "previousAmount": 6000,
+            "sourceConflict": true,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00004-001",
+            "recordedAt": 1791652624140,
+            "effectiveAt": 1788308106134,
+            "journey": "Contribution & Wage",
+            "type": "wage",
+            "subjectId": "CTR-SYN-demo-00004-01",
+            "employerId": "EMP-SYN-demo-00004",
+            "amount": 9152.85,
+            "previousAmount": 6000,
+            "sourceConflict": true,
+            "ruleOverride": true
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00004-003",
+            "recordedAt": 1791936000000,
+            "journey": "Retirement",
+            "type": "retirement",
+            "subjectId": "CTR-SYN-demo-00004-01",
+            "employerId": "EMP-SYN-demo-00004",
+            "sourceConflict": true,
+            "ruleOverride": false
+          },
+          {
+            "eventId": "EVT-CJ-SYN-demo-00004-004",
+            "recordedAt": 1792195200000,
+            "journey": "SANED",
+            "type": "claim",
+            "subjectId": "CTR-SYN-demo-00004-01",
+            "employerId": "EMP-SYN-demo-00004",
+            "sourceConflict": false,
+            "ruleOverride": false
+          }
+        ]
+      },
+      "sourceTimeline": [
+        {
+          "eventId": "EVT-CJ-SYN-demo-00004-002",
+          "recordedAt": 1791518345264,
+          "effectiveAt": 1784702511968,
+          "journey": "Contribution & Wage",
+          "type": "wage",
+          "subjectId": "CTR-SYN-demo-00004-02",
+          "employerId": "EMP-SYN-demo-00004",
+          "amount": 9244.65,
+          "previousAmount": 6000,
+          "sourceConflict": true,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00004-001",
+          "recordedAt": 1791652624140,
+          "effectiveAt": 1788308106134,
+          "journey": "Contribution & Wage",
+          "type": "wage",
+          "subjectId": "CTR-SYN-demo-00004-01",
+          "employerId": "EMP-SYN-demo-00004",
+          "amount": 9152.85,
+          "previousAmount": 6000,
+          "sourceConflict": true,
+          "ruleOverride": true
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00004-003",
+          "recordedAt": 1791936000000,
+          "journey": "Retirement",
+          "type": "retirement",
+          "subjectId": "CTR-SYN-demo-00004-01",
+          "employerId": "EMP-SYN-demo-00004",
+          "sourceConflict": true,
+          "ruleOverride": false
+        },
+        {
+          "eventId": "EVT-CJ-SYN-demo-00004-004",
+          "recordedAt": 1792195200000,
+          "journey": "SANED",
+          "type": "claim",
+          "subjectId": "CTR-SYN-demo-00004-01",
+          "employerId": "EMP-SYN-demo-00004",
+          "sourceConflict": false,
+          "ruleOverride": false
+        }
+      ],
+      "events": [
+        [
+          "Contribution & Wage · CTR-SYN-demo-00004-02 · wage",
+          "2026-10-09T03:59:05.264Z"
+        ],
+        [
+          "Contribution & Wage · CTR-SYN-demo-00004-01 · wage",
+          "2026-10-10T17:17:04.140Z"
+        ],
+        [
+          "Retirement · CTR-SYN-demo-00004-01 · retirement",
+          "2026-10-14T00:00:00.000Z"
+        ],
+        [
+          "SANED · CTR-SYN-demo-00004-01 · claim",
+          "2026-10-17T00:00:00.000Z"
+        ]
+      ],
+      "audit": [
+        "Cross-journey model madar-cross-journey-rf-20261017-v1 assessed at 2026-10-19T07:15:36.640Z."
+      ],
+      "paymentStatus": "Pending · simulation",
+      "detectionStage": "Before payment",
+      "transactionAmount": 0,
+      "amountAtRisk": 0,
+      "confirmedFraudAmount": 0,
+      "preventedAmount": 0,
+      "currency": "SAR",
+      "outcome": null,
+      "financialOutcome": null,
+      "reviewHistory": []
+    },
+    "evidenceFingerprint": "78781649fcb793b97456b5197ba531ef23fe9fa4dbcf215d7d3762b1c87aa77a",
+    "reviewHistory": []
+  },
+  {
+    "assessmentId": "8e89caa1-8646-4b1a-a04d-37fcb89fb5e3",
+    "assessedAt": "2026-10-19T07:15:36.640Z",
+    "caseId": "CJ-SYN-demo-00005",
+    "transactionId": "CJ-SYN-demo-00005",
+    "synthetic": true,
+    "assessmentSource": "cross-journey",
+    "journey": "SANED",
+    "scenario": "Missing employer evidence",
+    "modelVersion": "madar-cross-journey-rf-20261017-v1",
+    "complete": false,
+    "route": "Complete evidence",
+    "band": "Incomplete",
+    "percentile": null,
+    "reasons": [
+      "Required synthetic entity or event evidence is missing. No model score was produced."
+    ],
+    "features": [],
+    "risk": "Incomplete",
+    "modelResult": {
+      "modelVersion": "madar-cross-journey-rf-20261017-v1",
+      "complete": false,
+      "route": "Complete evidence",
+      "band": "Incomplete",
+      "percentile": null,
+      "reasons": [
+        "Required synthetic entity or event evidence is missing. No model score was produced."
+      ],
+      "features": [],
+      "assessmentId": "8e89caa1-8646-4b1a-a04d-37fcb89fb5e3",
+      "assessedAt": "2026-10-19T07:15:36.640Z",
+      "algorithm": "Random Forest cross-journey pattern classifier"
+    },
+    "caseData": {
+      "id": "CJ-SYN-demo-00005",
+      "transactionId": "CJ-SYN-demo-00005",
+      "synthetic": true,
+      "journey": "SANED",
+      "scenario": "Missing employer evidence",
+      "assessmentId": "8e89caa1-8646-4b1a-a04d-37fcb89fb5e3",
+      "assessedAt": "2026-10-19T07:15:36.640Z",
+      "assessmentSource": "cross-journey",
+      "assessmentMode": "model-separated",
+      "subject": "CTR-SYN-demo-00005-01",
+      "entity": "Missing employer",
+      "customerName": "1 linked contributor",
+      "employerName": "Missing employer",
+      "requested": "2026-10-19T07:15:36.640Z",
+      "country": "Saudi Arabia",
+      "region": "Not supplied",
+      "city": "Not supplied",
+      "source": "Synthetic linked event history",
+      "score": null,
+      "ruleScore": 0,
+      "risk": "Incomplete",
+      "route": "Complete evidence",
+      "status": "Complete evidence",
+      "comparison": "Evidence incomplete",
+      "confidence": "Not calibrated",
+      "confidenceScore": null,
+      "anomalyScore": null,
+      "interaction": 0,
+      "features": {
+        "velocity": 1,
+        "linkedEntities": 1,
+        "retroDays": 0,
+        "priorRisk": 0,
+        "overrides": 0,
+        "identityReuse": 0,
+        "amountChangePct": 0,
+        "crossSourceConflict": false,
+        "missingData": true,
+        "urgentPriority": 0
+      },
+      "primaryCode": "EVIDENCE_INCOMPLETE",
+      "primaryReason": "Required synthetic entity or event evidence is missing. No model score was produced.",
+      "reasonCodes": [
+        {
+          "code": "EVIDENCE_INCOMPLETE",
+          "description": "Required synthetic entity or event evidence is missing. No model score was produced."
+        }
+      ],
+      "signals": [
+        [
+          "EVIDENCE_INCOMPLETE",
+          "Required synthetic entity or event evidence is missing. No model score was produced."
+        ]
+      ],
+      "modelAssessment": {
+        "modelVersion": "madar-cross-journey-rf-20261017-v1",
+        "complete": false,
+        "route": "Complete evidence",
+        "band": "Incomplete",
+        "percentile": null,
+        "reasons": [
+          "Required synthetic entity or event evidence is missing. No model score was produced."
+        ],
+        "features": [],
+        "assessmentId": "8e89caa1-8646-4b1a-a04d-37fcb89fb5e3",
+        "assessedAt": "2026-10-19T07:15:36.640Z",
+        "algorithm": "Random Forest cross-journey pattern classifier"
+      },
+      "aiModel": {
+        "version": "madar-cross-journey-rf-20261017-v1",
+        "rawScore": null,
+        "percentile": null,
+        "flagged": null,
+        "complete": false,
+        "ruleFlagged": null,
+        "features": [],
+        "algorithm": "Random Forest"
+      },
+      "crossJourneyEvidence": {
+        "id": "CJ-SYN-demo-00005",
+        "synthetic": true,
+        "employerId": "",
+        "asOf": 1792195200000,
+        "events": [
+          {
+            "eventId": "EVT-CJ-SYN-demo-00005-001",
+            "recordedAt": 1792195200000,
+            "journey": "SANED",
+            "type": "claim",
+            "subjectId": "CTR-SYN-demo-00005-01",
+            "employerId": "",
+            "sourceConflict": false,
+            "ruleOverride": false
+          }
+        ]
+      },
+      "sourceTimeline": [
+        {
+          "eventId": "EVT-CJ-SYN-demo-00005-001",
+          "recordedAt": 1792195200000,
+          "journey": "SANED",
+          "type": "claim",
+          "subjectId": "CTR-SYN-demo-00005-01",
+          "employerId": "",
+          "sourceConflict": false,
+          "ruleOverride": false
+        }
+      ],
+      "events": [
+        [
+          "SANED · CTR-SYN-demo-00005-01 · claim",
+          "2026-10-17T00:00:00.000Z"
+        ]
+      ],
+      "audit": [
+        "Cross-journey model madar-cross-journey-rf-20261017-v1 assessed at 2026-10-19T07:15:36.640Z."
+      ],
+      "paymentStatus": "Pending · simulation",
+      "detectionStage": "Before payment",
+      "transactionAmount": 0,
+      "amountAtRisk": 0,
+      "confirmedFraudAmount": 0,
+      "preventedAmount": 0,
+      "currency": "SAR",
+      "outcome": null,
+      "financialOutcome": null,
+      "reviewHistory": []
+    },
+    "evidenceFingerprint": "3130aa04b6c8cfd5e5ca7b1044439c75c14f8d23a4ca8a8efbcb04d2fca302d0",
+    "reviewHistory": []
+  }
+]

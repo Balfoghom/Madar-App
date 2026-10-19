@@ -1,0 +1,23 @@
+[
+  {
+    "caseId": "CJ-SYN-demo-00001",
+    "assessmentId": "e3411a95-68aa-4165-81f5-6119cca374c3",
+    "actorName": "Manal",
+    "action": "approve",
+    "note": "Evidence and rationale",
+    "type": "decision",
+    "reviewId": "a3142ae8-a62b-4cfc-b08d-2b57cd901574",
+    "recordedAt": "2026-10-19T07:18:21.451Z"
+  },
+  {
+    "caseId": "CJ-SYN-demo-00001",
+    "assessmentId": "e3411a95-68aa-4165-81f5-6119cca374c3",
+    "action": "override",
+    "route": "Data Verification Review",
+    "note": "manal",
+    "type": "decision",
+    "reviewId": "453e0288-9f66-4f65-b903-6a917fb42d54",
+    "recordedAt": "2026-10-19T07:31:27.886Z",
+    "actorName": "Demo specialist"
+  }
+]
