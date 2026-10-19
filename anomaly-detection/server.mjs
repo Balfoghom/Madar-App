@@ -1,3 +1,5 @@
+import {createDemoPortfolio} from './lib/demo-portfolio.mjs';
+import {withDataQuality} from './lib/data-quality.mjs';
 import {llmStatus, explanationEvidence, generateExplanation, PROMPT_VERSION} from './lib/case-explainer.mjs';
 import { createCrossJourneyAssessment, parseEventCSV, demoCases, crossJourneyModel } from './lib/cross-journey-adapter.mjs';
 import { createServer } from "node:http";
@@ -67,7 +69,7 @@ async function readSavedAssessments() {
 
 function writeSavedAssessments(saved) {
   const temporaryPath = assessmentsPath + ".tmp";
-  return writeFile(temporaryPath, JSON.stringify(saved.slice(0, 200), null, 2) + "\n")
+  return writeFile(temporaryPath, JSON.stringify(saved.slice(0, 200).map(withDataQuality), null, 2) + "\n")
     .then(() => rename(temporaryPath, assessmentsPath));
 }
 
@@ -163,13 +165,15 @@ function saveHumanReview(body, type) {
       if (!["Prevented before payment","Partially prevented"].includes(body.financialOutcome) && body.preventedAmount !== 0) throw new InputError("A prevented amount requires a prevention outcome.");
       if (body.financialOutcome === "No financial impact" && [body.amountAtRisk,body.confirmedFraudAmount,body.preventedAmount].some(n=>n>0)) throw new InputError("No financial impact requires zero financial amounts.");
       if (body.outcome === "Legitimate activity" && (body.amountAtRisk > 0 || body.preventedAmount > 0)) throw new InputError("Legitimate activity cannot retain fraud exposure or prevented loss.");
-      Object.assign(data, { outcome: body.outcome, financialOutcome: body.financialOutcome, amountAtRisk: body.amountAtRisk, confirmedFraudAmount: body.confirmedFraudAmount, preventedAmount: body.preventedAmount, decisionDate: review.recordedAt, decisionOwner: review.actorName, status: body.outcome.startsWith("Suspected fraud") ? "Under investigation" : "Outcome recorded" });
-      if (["Prevented before payment", "Partially prevented"].includes(body.financialOutcome)) data.paymentStatus = "Prevented";
+      Object.assign(data, { outcomeProvenance: "Recorded local specialist outcome", outcome: body.outcome, financialOutcome: body.financialOutcome, amountAtRisk: body.amountAtRisk, confirmedFraudAmount: body.confirmedFraudAmount, preventedAmount: body.preventedAmount, decisionDate: review.recordedAt, decisionOwner: review.actorName, status: body.outcome.startsWith("Suspected fraud") ? "Under investigation" : "Outcome recorded" });
+      if (body.financialOutcome === "Prevented before payment") data.paymentStatus = "Prevented";
+      else if (body.financialOutcome === "Partially prevented") data.paymentStatus = "Partially prevented";
       else if (body.financialOutcome === "Paid — post-payment detection") { data.paymentStatus = "Paid"; data.detectionStage = "After payment"; }
       else if (body.financialOutcome === "Proceeded") data.paymentStatus = "Released";
       else if (body.financialOutcome === "No financial impact") data.paymentStatus = "Not applicable";
       if (body.financialOutcome === "Prevented before payment") data.detectionStage = "Before payment";
     } else {
+      if(data.outcome && !/^(Suspected|Inconclusive)/.test(data.outcome)) throw new InputError("This case has a resolved outcome. Update the recorded outcome instead of approving another route.",409);
       if (!["approve", "override", "reject"].includes(body.action)) throw new InputError("Unknown review decision.");
       if (body.action === "override" && (typeof body.route !== "string" || !body.route.trim() || body.route.length > 200)) throw new InputError("Select a proposed alternative route.");
       data.status = { approve: "Route approved", override: "Route overridden", reject: "Recommendation rejected" }[body.action];
@@ -373,6 +377,9 @@ export function createInferenceServer({explain = generateExplanation} = {}) {
     };
 
     const send = (status, data) => {
+      if(Array.isArray(data))data=data.map(withDataQuality);
+      else if(data?.caseData)data=withDataQuality(data);
+      else if(Array.isArray(data?.saved))data={...data,saved:data.saved.map(withDataQuality)};
       res.writeHead(status, {
         ...corsHeaders,
         "Content-Type": "application/json",
@@ -415,6 +422,20 @@ export function createInferenceServer({explain = generateExplanation} = {}) {
         return send(200,{draft,cached:false});
       }catch(error){return send(error.status || (error instanceof SyntaxError?400:500),{error:error instanceof InputError?error.message:'Could not prepare the case explanation.'})}
       finally{if(ownsLock)pendingExplanations.delete(key)}
+    }
+    if(req.method === 'POST' && path === '/demo-portfolio'){
+      try{
+        const operation=assessmentWrites.catch(()=>{}).then(async()=>{
+          const previous=await readSavedAssessments(),known=new Set(previous.map(r=>r.caseId));
+          const added=createDemoPortfolio().filter(r=>!known.has(r.caseId));
+          const reviews=await readJsonFile(humanReviewsPath,[]);
+          await writeJsonFile(humanReviewsPath,[...reviews,...added.flatMap(r=>r.reviewHistory||[])]);
+          await writeSavedAssessments([...added,...previous]);
+          return {saved:[...added,...previous].filter((r,i,a)=>r.caseData&&a.findIndex(x=>x.caseId===r.caseId)===i),added:added.length,syntheticOnly:true};
+        });
+        assessmentWrites=operation;
+        return send(200,await operation);
+      }catch{return send(500,{error:'Could not prepare the synthetic enterprise portfolio.'})}
     }
     if (req.method === "GET" && path === "/health")
       return send(200, {

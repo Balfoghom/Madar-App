@@ -7,7 +7,7 @@
       name="description"
       content="Enterprise multi-journey prototype for explainable behavioral risk assessment, proactive routing, and governed AI-assisted fraud prevention."
     />
-    <title>Madar | مدار — Fraud Operations</title>
+    <title>Madar | مدار — Behavioral Intelligence</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="styles.css?v=1.7.0" />
   <link rel="icon" href="madar-mark.svg" type="image/svg+xml">
@@ -19,12 +19,11 @@
         <div class="brand">
           <img class="madar-mark" src="madar-mark.svg" alt="">
           <div>
-            <strong>Madar <span lang="ar" class="brand-ar">مدار</span></strong><span>Fraud operations</span>
+            <strong>Madar <span lang="ar" class="brand-ar">مدار</span></strong><span>Behavioral intelligence</span>
           </div>
         </div>
 
-        <nav aria-label="Main navigation"><button class="nav-item" data-view="operations"><span>◈</span> Fraud Operations</button>
-<button class="nav-item" data-view="connected"><span>◎</span> Connected Journeys</button>
+        <nav aria-label="Main navigation">
           <button class="nav-item active" data-view="dashboard">
             <span>◫</span> Dashboard
           </button>
@@ -41,19 +40,13 @@
             <span>⇧</span> Data Intake
           </button>
           <button class="nav-item" data-view="simulation">
-            <span>≋</span> Legacy Scoring Sandbox
-          </button>
-          <button class="nav-item" data-view="indicators">
-            <span>⌁</span> Risk Indicators
+            <span>≋</span> Scoring Simulation
           </button>
           <button class="nav-item" data-view="method">
             <span>◎</span> Model & Governance
           </button>
           <button class="nav-item" data-view="appendix">
             <span>≡</span> Appendix: Scoring
-          </button>
-          <button class="nav-item" data-view="ai-demo">
-            <span>✦</span> Model Evidence
           </button>
         </nav>
         <div class="sidebar-note">
@@ -85,8 +78,8 @@
         </header>
 
         <div class="portfolio-bar"><label>Workspace data <select id="portfolio-scope"><option value="assessed">Assessed synthetic cases</option><option value="illustrative">Illustrative portfolio</option></select></label><small id="portfolio-scope-note"></small></div>
-<section id="operations-view" class="view"><div id="operations-workspace"></div></section>
-<section id="connected-view" class="view"><div id="madar-workspace"></div></section>
+
+<section id="connected-view" class="view"><button class="text-btn" data-go-view="intake">← Data Intake</button><div id="madar-workspace"></div></section>
 <section id="dashboard-view" class="view active-view">
           <div class="page-heading">
             <div>
@@ -96,7 +89,7 @@
                 Illustrative portfolio and assessed synthetic cases across benefit, contribution, employer, and payment journeys.
               </p>
             </div>
-            <div class="heading-actions">
+            <div class="heading-actions"><button class="primary-btn" data-load-demo>Load & assess demo cases</button>
               <button class="secondary-btn" id="dashboard-upload-btn">
                 Upload assessment data</button
               ><button class="primary-btn" id="dashboard-assessment-btn">
@@ -470,7 +463,7 @@
                       <th>Subject / Entity</th>
                       <th>Location</th>
                       <th>Assessment</th>
-                      <th>Confidence</th>
+                      <th>Data quality</th>
                       <th>Main reason</th>
                       <th>Recommended route</th>
                       <th>Status</th>
@@ -494,7 +487,7 @@
           <div class="page-actions"><button class="secondary-btn" id="download-template-btn">Download CSV template</button><button class="secondary-btn danger-outline" id="demo-reset-btn" type="button">Demo Reset</button></div>
         </div>
         <p class="session-note">SANED CSV: use a bundled <code>saned_case_id</code>, or provide <code>workforce</code>, <code>as_of</code>, and <code>events_json</code>. Other journeys require <code>journey_features_json</code>. Missing evidence is saved as incomplete. The <code>synthetic</code> flag is a declaration, not a data-provenance check.</p>
-        <div class="intake-grid">
+        <article class="panel demo-intake"><p class="eyebrow">READY-TO-USE DEMO</p><h3>Enterprise demo portfolio</h3><p>Load rules-based examples across all journeys, with the trained SANED and cross-journey models. Madar assesses them together and opens the Intelligence Queue, ready for specialist review. Previously saved demo cases and decisions are retained.</p><button class="primary-btn" data-load-demo>Load & assess demo cases</button><button class="text-btn" data-go-view="connected" data-view="connected">Inspect connected source events</button><p class="demo-load-status" role="status"></p></article><div class="intake-grid">
           <article class="panel upload-card">
             <div class="card-heading"><div><p class="eyebrow">OPTION 1</p><h3>Upload a CSV file</h3></div></div>
             <label class="drop-zone" id="drop-zone" for="csv-file-input">
@@ -535,7 +528,7 @@
           <div class="page-heading">
             <div>
               <p class="eyebrow">CONTROLLED SANDBOX</p>
-              <h2>Legacy Scoring Sandbox</h2>
+              <h2>Scoring Simulation</h2>
               <p>
                 Test weights and thresholds, see how cases move between risk
                 bands, and submit a configuration for governed review.
@@ -560,7 +553,7 @@
                   <p class="eyebrow">MODEL MIX</p>
                   <h3>Assessment weights and thresholds</h3>
                   <p>
-                    These weights apply only to the legacy statistical simulation. Trained model outputs and existing operational controls are displayed separately, without blending.
+                    Explore the proposed behavioral scoring method on the illustrative portfolio. The fitted SANED and cross-journey models retain their own assessment results.
                   </p>
                 </div>
               </div>
@@ -683,7 +676,7 @@
           </article>
         </section>
 
-        <section id="indicators-view" class="view">
+        <section id="indicators-view" class="view"><button class="text-btn" data-go-view="method">← Model &amp; Governance</button>
           <div class="page-heading">
             <div>
               <p class="eyebrow">GOVERNED CONFIGURATION</p>
@@ -702,7 +695,7 @@
           </div>
         </section>
 
-        <section id="method-view" class="view">
+        <section id="method-view" class="view"><div class="page-actions"><button class="secondary-btn" data-go-view="indicators">Risk indicators</button><button class="secondary-btn" data-go-view="ai-demo">Technical model evidence</button></div>
           <div class="page-heading">
             <div>
               <p class="eyebrow">EXPLAINABLE & GOVERNED AI</p>
@@ -767,7 +760,7 @@
           <div class="method-grid">
             <article class="panel formula-card">
               <p class="eyebrow">PROTOTYPE ASSUMPTION</p>
-              <h3>Legacy sandbox methodology</h3>
+              <h3>Proposed scoring methodology</h3>
               <div class="formula" id="method-formula">
                 <b>55%</b> Existing control score <span>+</span
                 ><b>45%</b> Behavioral anomaly score <span>+</span> approved
@@ -779,7 +772,7 @@
                 ><span><i class="high-dot"></i>High 75–100</span>
               </div>
               <p>
-                This formula applies only to illustrative legacy cases. Current fitted models keep their output separate from operational controls. Sandbox drafts cannot change their routing policy.
+                This formula applies only to illustrative cases. Current fitted models keep their output separate from operational controls. Sandbox drafts cannot change their routing policy.
               </p>
             </article>
             <article class="panel governance-card">
@@ -1052,7 +1045,7 @@
             </article>
           </div>
         </section>
-        <section id="ai-demo-view" class="view">
+        <section id="ai-demo-view" class="view"><button class="text-btn" data-go-view="method">← Model &amp; Governance</button>
           <div class="page-heading">
             <div>
               <p class="eyebrow">SYNTHETIC BACKEND DEMO</p>

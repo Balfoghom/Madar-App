@@ -39,7 +39,7 @@ Manal’s earlier checked-in session is preserved under `demo-sessions/manal-202
 
 ## LLM controls
 
-The server sends derived features, reason codes, model/routing context and recorded outcome/amount fields. It omits subject identifiers, names, contact details, event identifiers, reviewer notes and scenario free text. Synthetic flags are an input contract, not a mechanism for anonymizing real records. Only approved synthetic data should be used.
+The server sends derived features, reason codes, model/routing context and recorded outcome/amount fields. For connected evidence it also sends bounded, anonymous contributor histories and relative event timing with explicit omission counts. It omits subject identifiers, names, contact details, event identifiers, reviewer notes and scenario free text. Synthetic flags are an input contract, not a mechanism for anonymizing real records. Only approved synthetic data should be used.
 
 Responses use `store:false` and strict structured outputs. The server validates expected fields, text size and cited evidence IDs. Requests have a 45-second timeout, one in-flight generation per case and a five-generation-per-minute prototype limit. These measures are not an enterprise budget or abuse-control system. Provider retention and processing terms must be checked separately.
 

@@ -16,7 +16,7 @@ const explain=async record=>{
  calls++;
  if(hold)await hold;
  const {facts,fingerprint}=explanationEvidence(record);
- return {id:'test-draft-'+calls,assessmentId:record.assessmentId,caseId:record.caseId,provider:'OpenAI',model:'test-model',promptVersion:PROMPT_VERSION,evidenceFingerprint:fingerprint,facts,generatedAt:new Date().toISOString(),status:'Unreviewed draft',explanation:{overview:{text:'Synthetic evidence needs review.',evidenceIds:['assessment']},findings:[],questions:[],nextSteps:[]}};
+ return {id:'test-draft-'+calls,assessmentId:record.assessmentId,caseId:record.caseId,provider:'OpenAI',model:'test-model',promptVersion:PROMPT_VERSION,evidenceFingerprint:fingerprint,facts,generatedAt:new Date().toISOString(),status:'Unreviewed draft',explanation:{overview:{text:'Synthetic evidence needs review.',evidenceIds:['assessment']},whyItMatters:{text:'The specialist should verify whether the observed activity is supported by service records.',evidenceIds:['assessment']},findings:[],questions:[],nextSteps:[]}};
 };
 test.before(async()=>{server=createInferenceServer({explain});server.listen(0,'127.0.0.1');await once(server,'listening');base='http://127.0.0.1:'+server.address().port});
 test.after(async()=>{await new Promise(r=>server.close(r));await rm(dir,{recursive:true,force:true})});

@@ -27,9 +27,9 @@ test('integration contract: CSV inference, separated scores, abstention and immu
   await post('/save-assessment',{assessment:{...context(0),score:99}},409);
   const review={caseId:before.caseId,assessmentId:before.assessmentId,actorName:'Demo specialist',note:'Reviewed synthetic evidence.'};
   await post('/outcome',{...review,outcome:'unknown',financialOutcome:'Proceeded',amountAtRisk:0,confirmedFraudAmount:0,preventedAmount:0},400);
+  for(const action of ['approve','override','reject']){const result=await post('/decision',{...review,action,route:'Insurance Operations Audit'});assert.deepEqual(result.modelResult,before.modelResult);}
   const recorded=await post('/outcome',{...review,outcome:'Legitimate activity',financialOutcome:'Proceeded',amountAtRisk:0,confirmedFraudAmount:0,preventedAmount:0});
   assert.deepEqual(recorded.modelResult,before.modelResult);
-  for(const action of ['approve','override','reject']){const result=await post('/decision',{...review,action,route:'Insurance Operations Audit'});assert.deepEqual(result.modelResult,before.modelResult);}
   const ledger=JSON.parse(await readFile(join(dir,'human-reviews.json'),'utf8'));assert.equal(ledger.length,4);assert.ok(ledger.every(x=>x.assessmentId===before.assessmentId));
   const newer=await post('/assess',{assessment:context(0)});assert.notEqual(newer.assessmentId,before.assessmentId);
   await post('/decision',{...review,action:'approve'},409);

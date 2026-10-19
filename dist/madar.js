@@ -39,9 +39,9 @@
     finally { busy = false; render(); }
   }
   window.madarImportEvents = async function(csv) {
-    switchView('connected');
     await run({csv});
     if(error) throw new Error(error);
+    useAssessedPortfolio();selectedId=selected;activeFilter='All';activeJourney='All';activeRegion='All';searchQuery='';document.querySelector('#case-search').value='';renderAll();switchView('queue');
   };
   function resultBadge(record) {
     if(!record) return '<span class="cj-badge neutral">Not assessed</span>';
@@ -61,6 +61,7 @@
       return `<tr><td>${esc(date(e.recordedAt))}</td><td>${esc(e.subjectId)}</td><td><strong>${esc(eventNames[e.type]||e.type)}</strong><small>${esc(e.journey)}</small></td><td>${esc(detail.join(' · ')||'Recorded source event')}</td></tr>`;
     }).join('')}</tbody></table></div></details>`;
   }
+  window.madarConnectedEvidence = timeline;
   function detail(record) {
     if(!record) return `<article class="cj-empty"><div class="cj-orbit" aria-hidden="true">◎</div><p class="eyebrow">A SANED DECISION, INFORMED BY CONNECTED JOURNEYS</p><h2>See the pattern behind the request.</h2><p>One employer. Three contributors. Events across registration, wage changes and SANED. Run the model to see whether the combined history requires specialist attention.</p><button class="primary-btn" id="cj-run-selected" ${busy?'disabled':''}>${busy?'Assessing…':'Assess this case →'}</button><small>Real fitted inference on synthetic evidence. No payment action is taken.</small></article>`;
     const r = record.modelResult || record, c=record.caseData, evidence=c.crossJourneyEvidence;

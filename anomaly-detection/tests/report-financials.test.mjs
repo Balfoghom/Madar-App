@@ -15,3 +15,5 @@ test('reports distinguish missing transaction and exposure values from a supplie
  assert.equal(helpers.formatSar(null),'Not supplied');
  assert.equal(helpers.financialPortfolio([]).assessedAmount,0);
 });
+
+test("known financial subtotals disclose missing amounts without discarding known exposure",()=>{const p=helpers.financialPortfolio([{risk:"High",transactionAmount:100,amountAtRisk:60},{risk:"Medium",transactionAmount:null,amountAtRisk:null}]);assert.equal(p.knownAssessedAmount,100);assert.equal(p.knownAmountAtRisk,60);assert.equal(p.missingExposureAmounts,1);assert.equal(p.missingTransactionAmounts,1);});

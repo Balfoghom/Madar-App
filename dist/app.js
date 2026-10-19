@@ -1157,12 +1157,13 @@ function recommendedRoute(journey, risk) {
 }
 
 function routeOwnership(item) {
-  if (item.features.missingData || item.route === "Data Verification Review")
+  if(item.outcome && !/^(Suspected|Inconclusive)/.test(item.outcome))return {owner:item.decisionOwner || 'Recorded specialist',next:'Outcome recorded. Retain the supporting evidence and amend the outcome only if new information changes the finding.'};
+  if (item.features.missingData || ["Data Verification Review","Complete evidence"].includes(item.route))
     return {
       owner: "Data Owner / Data Quality",
       next: "Verify missing or conflicting source data, then return the case for reassessment.",
     };
-  if (item.route === "Straight-through processing")
+  if (["Straight-through processing","Standard review"].includes(item.route))
     return {
       owner: "Service Operations",
       next: "Continue the normal journey while retaining the assessment audit trail.",
@@ -1302,7 +1303,12 @@ async function backendJSON(path, body, timeoutMs = 10000) {
 }
 function renderModelEvidence(item) {
   const model = item.modelAssessment;
-  if (!model) return '<section class="detail-section model-evidence"><h3 class="detail-title">Legacy simulation</h3><p>No complete trained-model response is attached to this case. Its statistical simulation score is not a model percentile or model assessment.</p></section>';
+  if(item.rulesAssessment){
+    const source=item.rulesEvidence;
+    const labels={observedExceptions:'Observed exceptions',sourceRecordDate:'Source record date',referenceRecord:'Reference record',reviewPeriod:'Review period',recordStatus:'Record status',verificationSource:'Verification source'};
+    return '<section class="detail-section model-evidence"><h3>Business control evidence</h3><p>'+escapeHtml(item.primaryReason)+'</p><p>Rules only · no trained model used for this case.</p><table class="model-contract-table"><tbody>'+source.requiredFields.map(field=>'<tr><th>'+escapeHtml(labels[field]||field)+'</th><td>'+escapeHtml(source.fields[field]??'Missing')+'</td></tr>').join('')+'</tbody></table></section>';
+  }
+  if (!model) return '<section class="detail-section model-evidence"><h3 class="detail-title">Scoring simulation</h3><p>No complete trained-model response is attached to this case. Its statistical simulation score is not a model percentile or model assessment.</p></section>';
   const value = (v) => v === null || v === undefined ? "—" : typeof v === "boolean" ? String(v) : String(v);
   const rows = [["modelVersion", model.modelVersion], [item.assessmentSource === "cross-journey" ? "score (synthetic review-pattern similarity)" : "score (raw anomaly score)", model.complete ? model.score : undefined], ["calibration percentile (technical reference rank, not risk %)", model.complete ? model.percentile : null], ["modelFlagged", model.modelFlagged], ["ruleFlagged", model.ruleFlagged], ["complete", model.complete]];
   const features = (model.features || []).map((feature) => `<tr><td>${escapeHtml(feature.name)}</td><td>${escapeHtml(value(feature.value))}</td><td>${escapeHtml(value(feature.median))}</td><td>${escapeHtml(value(feature.low))} – ${escapeHtml(value(feature.high))}</td><td>${escapeHtml(String(feature.unusual ?? feature.outsideReferenceRange ?? false))}</td></tr>`).join("");
@@ -1336,11 +1342,13 @@ document.querySelector("#route-decision-form").addEventListener("submit", async 
 document.querySelector("#close-route-decision").addEventListener("click", () => document.querySelector("#route-decision-dialog").close());
 
 function generateCaseSummary(item) {
-  if (item.assessmentSource === "cross-journey") return item.modelAssessment.reasons.join(" ") + " Recommended route: " + item.route + ". Assessment uses connected synthetic event evidence; no operational control score was supplied.";
+  const recorded=item.outcome ? 'Recorded outcome: '+item.outcome+'. '+(item.outcomeProvenance==='Scripted demo outcome'?'This is a scripted demo outcome. ':'') : '';
+  if(item.rulesAssessment)return recorded + item.primaryReason + ' Recommended route: '+item.route+'. This case uses an illustrative business control, not a trained AI model.';
+  if (item.assessmentSource === "cross-journey") return recorded + item.modelAssessment.reasons.join(" ") + " Recommended route: " + item.route + ". Assessment uses connected synthetic event evidence; no operational control score was supplied.";
   if (item.modelAssessment) {
     const m = item.modelAssessment;
-    if (!m.complete) return "Model evidence is incomplete. Complete the requested evidence before relying on a model recommendation. Existing control score: " + item.ruleScore + "/100. Specialist review is required.";
-    return "Existing control score: " + item.ruleScore + "/100. The model returned an unusualness percentile of " + Number(m.percentile).toFixed(1) + "% against synthetic reference data. " + (m.modelFlagged ? "The model suggests review. " : "The model did not flag the combination at its threshold. ") + "These outputs are separate, not a calibrated fraud probability. Proposed route: " + item.route + ". The specialist retains the final decision.";
+    if (!m.complete) return recorded + "Model evidence is incomplete. Complete the requested evidence before relying on a model recommendation. Existing control score: " + item.ruleScore + "/100. Specialist review is required.";
+    return recorded + "Existing control score: " + item.ruleScore + "/100. The model returned an unusualness percentile of " + Number(m.percentile).toFixed(1) + "% against synthetic reference data. " + (m.modelFlagged ? "The model suggests review. " : "The model did not flag the combination at its threshold. ") + "These outputs are separate, not a calibrated fraud probability. Proposed route: " + item.route + ". The specialist retains the final decision.";
   }
 
   const subject = item.customerName || item.subject;
@@ -1353,7 +1361,7 @@ function generateCaseSummary(item) {
     item.anomalyScore > item.ruleScore + 8
       ? "The behavioral pattern raised the level indicated by existing controls"
       : item.anomalyScore < item.ruleScore - 8
-        ? "The legacy statistical simulation produced a lower anomaly value than the existing control score"
+        ? "The behavioral scoring simulation produced a lower anomaly value than the existing control score"
         : "The behavioral analysis broadly supports the existing control result";
   const decision =
     item.risk === "Low"
@@ -1380,6 +1388,7 @@ function generateCaseSummary(item) {
 }
 
 function generateArabicCaseSummary(item) {
+  if(item.rulesAssessment)return 'تقييم قائم على ضوابط عمل توضيحية ببيانات اصطناعية. '+item.primaryReason;
   if (item.modelAssessment) {
     const m = item.modelAssessment;
     if (!m.complete) return "لم يصدر النموذج درجة بسبب نقص الأدلة. درجة الضوابط القائمة: " + item.ruleScore + "/100. يلزم استكمال الأدلة والمراجعة البشرية.";
@@ -1518,10 +1527,10 @@ function assess(raw, config, anomalyOverride) {
     confidenceScore >= 80 ? "High" : confidenceScore >= 60 ? "Medium" : "Low";
   const comparison =
     anomaly > raw.ruleScore + 8
-      ? "Legacy statistical simulation is above the existing control score"
+      ? "Behavioral scoring simulation is above the existing control score"
       : anomaly < raw.ruleScore - 8
-        ? "Legacy statistical simulation is below the existing control score"
-        : "Legacy statistical simulation and existing controls are broadly aligned";
+        ? "Behavioral scoring simulation is below the existing control score"
+        : "Behavioral scoring simulation and existing controls are broadly aligned";
   const route = f.missingData
     ? "Data Verification Review"
     : recommendedRoute(raw.journey, risk);
@@ -1634,7 +1643,7 @@ let cases = baselineRaw.map(function (item, index) {
   return applySyntheticOutcome(assess(item), index);
 });
 let portfolioScope = 'assessed';
-function portfolioCases() { return cases.filter(item => portfolioScope === 'assessed' ? !!item.modelAssessment : !item.modelAssessment); }
+function portfolioCases() { return cases.filter(item => portfolioScope === 'assessed' ? !!item.assessmentId : !item.assessmentId); }
 function useAssessedPortfolio() { portfolioScope='assessed'; document.querySelector('#portfolio-scope').value='assessed'; }
 let activeFilter = "All";
 let activeJourney = "All";
@@ -1804,6 +1813,11 @@ function financialPortfolio(list) {
     prevented: prevented,
     assessedAmount: list.every(item=>Number.isFinite(item.transactionAmount)) ? list.reduce((sum,item)=>sum+item.transactionAmount,0) : null,
     missingTransactionAmounts:list.filter(item=>!Number.isFinite(item.transactionAmount)).length,
+    knownAssessedAmount:list.reduce((sum,item)=>sum+(Number.isFinite(item.transactionAmount)?item.transactionAmount:0),0),
+    knownAmountAtRisk:detected.reduce((sum,item)=>sum+(Number.isFinite(item.amountAtRisk)?item.amountAtRisk:0),0),
+    missingExposureAmounts:detected.filter(item=>!Number.isFinite(item.amountAtRisk)).length,
+    aiPrevented:prevented.filter(item=>item.modelAssessment?.modelFlagged),
+    scriptedPrevented:prevented.filter(item=>item.outcomeProvenance==='Scripted demo outcome'),
     amountAtRisk: detected.every(item=>Number.isFinite(item.amountAtRisk)) ? detected.reduce((sum,item)=>sum+item.amountAtRisk,0) : null,
     confirmedAmount: confirmed.reduce(function (sum, item) {
       return sum + Number(item.confirmedFraudAmount || 0);
@@ -1826,9 +1840,9 @@ function showToast(message) {
 
 function switchView(name) {
   document.querySelector('.portfolio-bar').hidden = !['dashboard','executive','queue','business-report'].includes(name);
-  if (['operations','connected'].includes(name) && portfolioScope !== 'assessed') { useAssessedPortfolio(); renderAll(); }
+  if (name === 'connected' && portfolioScope !== 'assessed') { useAssessedPortfolio(); renderAll(); }
   document.querySelectorAll(".nav-item").forEach(function (item) {
-    item.classList.toggle("active", item.dataset.view === name);
+    item.classList.toggle("active", item.dataset.view === ({connected:"intake",indicators:"method","ai-demo":"method"}[name] || name));
   });
   document.querySelectorAll(".view").forEach(function (view) {
     view.classList.remove("active-view");
@@ -2030,7 +2044,7 @@ function renderDashboardMetrics() {
     [
       "Awaiting human decision",
       awaiting,
-      "AI has recommended; specialist decides",
+      "Controls and AI recommend; specialist decides",
       "review-stat",
     ],
     [
@@ -2450,7 +2464,7 @@ function renderQueue() {
               "</span></td>",
             '<td><span class="journey-tag">' +
               escapeHtml(item.journey) +
-              "</span></td>",
+              "</span><span class=\"subtext\">" + escapeHtml(item.rulesAssessment ? "Rules only" : item.assessmentSource === "cross-journey" ? "Cross-journey AI" : item.modelAssessment ? "SANED / journey AI" : "Illustrative simulation") + "</span></td>",
             "<td><strong>" +
               escapeHtml(item.customerName || item.subject) +
               '</strong><span class="subtext">' +
@@ -2474,14 +2488,14 @@ function renderQueue() {
               " " +
               (item.score == null ? " —" : " · " + item.score) +
               '</span><span class="subtext">' +
-              (item.assessmentSource === "cross-journey" ? "Pattern model: " + (!item.modelAssessment.complete ? "Incomplete evidence" : item.modelAssessment.modelFlagged ? "Review suggested" : "No model flag") : item.modelAssessment ? "Existing control " + item.ruleScore + " · Reference percentile " + (item.modelAssessment.complete ? Number(item.modelAssessment.percentile).toFixed(1) + "%" : "unavailable") : "Legacy simulation · statistical score " + item.anomalyScore) +
+              (item.assessmentSource === "cross-journey" ? "Pattern model: " + (!item.modelAssessment.complete ? "Incomplete evidence" : item.modelAssessment.modelFlagged ? "Review suggested" : "No model flag") : item.modelAssessment ? "Existing control " + item.ruleScore + " · Reference percentile " + (item.modelAssessment.complete ? Number(item.modelAssessment.percentile).toFixed(1) + "%" : "unavailable") : item.rulesAssessment ? "Business control · no AI model" : "Scoring simulation · behavioral score " + item.anomalyScore) +
               "</span></td>",
             '<td><span class="confidence-chip ' +
               item.confidence +
               '">' +
               item.confidence +
               '</span><span class="subtext">' +
-              (item.modelAssessment ? "Input evidence " + (item.modelAssessment.complete ? "complete" : "incomplete") : item.confidenceScore + "% heuristic data completeness") +
+              (item.dataQuality ? item.dataQuality.score + "% · " + item.dataQuality.passed + "/" + item.dataQuality.total + " field checks" : item.confidenceScore + "% illustrative estimate") +
               "</span></td>",
             '<td class="reason">' + escapeHtml(item.signals[0][1]) + "</td>",
             '<td class="route">' + escapeHtml(item.route) + "</td>",
@@ -2514,7 +2528,7 @@ function renderCase() {
     return;
   }
   const scoreColor = riskColor(item.risk);
-  const dataQuality = item.modelAssessment ? (item.modelAssessment.complete ? "Model evidence structurally complete; source reliability not independently validated" : "Model evidence incomplete; no model score produced") : item.features.missingData
+  const dataQuality = item.dataQuality ? item.dataQuality.passed+" of "+item.dataQuality.total+" required field checks passed. "+(item.dataQuality.criticalMissing ? "Critical information is missing or invalid." : "") : item.modelAssessment ? (item.modelAssessment.complete ? "Model evidence structurally complete; source reliability not independently validated" : "Model evidence incomplete; no model score produced") : item.features.missingData
     ? "Required information missing"
     : item.features.crossSourceConflict
       ? "Conflicting information — verification required"
@@ -2561,7 +2575,7 @@ function renderCase() {
       '"><div><strong>' +
       (item.score == null ? "—" : item.score) +
       "</strong><small>" +
-      (item.modelAssessment ? "Existing control" : "Legacy simulation") +
+      (item.rulesAssessment ? "Control score" : item.assessmentSource === "cross-journey" ? "Pattern review" : item.modelAssessment ? "Existing control" : "Scoring simulation") +
       "</small></div></div></div>",
     item.features.urgentPriority
       ? '<span class="urgent-banner">Urgent operational priority — urgency does not change risk</span>'
@@ -2634,14 +2648,14 @@ function renderCase() {
     '<div class="mini-score"><span>Existing control</span><strong>' +
       (item.ruleScore == null ? "Not supplied" : item.ruleScore) +
       "</strong></div>",
-    '<div class="mini-score"><span>' + (item.assessmentSource === 'cross-journey' ? 'Pattern assessment' : item.modelAssessment ? 'Reference percentile' : 'Legacy statistical score') + '</span><strong>' +
-      (item.assessmentSource === 'cross-journey' ? (!item.modelAssessment.complete ? 'Incomplete' : item.modelAssessment.modelFlagged ? 'Review' : 'Not flagged') : item.anomalyScore == null ? '—' : Number(item.anomalyScore).toFixed(1)) +
+    '<div class="mini-score"><span>' + (item.assessmentSource === 'cross-journey' ? 'Pattern assessment' : item.modelAssessment ? 'Reference percentile' : item.rulesAssessment ? 'AI model' : 'Simulated behavioral score') + '</span><strong>' +
+      (item.assessmentSource === 'cross-journey' ? (!item.modelAssessment.complete ? 'Incomplete' : item.modelAssessment.modelFlagged ? 'Review' : 'Not flagged') : item.rulesAssessment ? 'Not used' : item.anomalyScore == null ? '—' : Number(item.anomalyScore).toFixed(1)) +
       "</strong></div>",
     '<div class="mini-score"><span>Pattern adjustment</span><strong>' +
-      (item.modelAssessment ? 'Not applied' : '+' + item.interaction) +
+      (item.modelAssessment || item.rulesAssessment ? 'Not applied' : '+' + item.interaction) +
       "</strong></div>",
-    '<div class="mini-score"><span>Input completeness</span><strong>' +
-      (item.modelAssessment ? (item.modelAssessment.complete ? 'Complete' : 'Incomplete') : item.confidenceScore + '% heuristic') +
+    '<div class="mini-score"><span>Data quality</span><strong>' +
+      (item.dataQuality ? item.dataQuality.score+'%' : item.confidenceScore + '% illustrative') +
       "</strong></div>",
     '</div><div class="comparison-note">' +
       escapeHtml(item.comparison) +
@@ -2665,7 +2679,7 @@ function renderCase() {
       item.confidence +
       "</span><div><strong>" +
       escapeHtml(dataQuality) +
-      "</strong><small>Assessment confidence is separate from behavioral risk.</small></div></div></section>",
+      "</strong><small>Data quality is separate from risk and model accuracy.</small></div></div>" + (item.dataQuality ? '<details><summary>How this percentage is calculated</summary><p>'+escapeHtml(item.dataQuality.method)+'</p><p>'+item.dataQuality.passed+' / '+item.dataQuality.total+' checks passed.</p><ul>'+item.dataQuality.issues.map(issue=>'<li>'+escapeHtml(issue.field)+(issue.critical?' — required for assessment':'')+'</li>').join('')+'</ul></details>' : '') + "</section>",
     '<section class="detail-section"><h3 class="detail-title">Behavioral timeline</h3><ul class="timeline">' +
       item.events
         .map(function (event) {
@@ -2689,12 +2703,14 @@ function renderCase() {
       "</strong></div><div><span>Business owner</span><strong>" +
       escapeHtml(businessOwnerForJourney(item.journey)) +
       "</strong></div></div>" +
-      (item.confidence === "Low"
-        ? '<div class="warning-note">Low confidence: complete or verify the missing information before relying on this recommendation.</div>'
+      ((item.confidence === "Low" || item.dataQuality?.criticalMissing)
+        ? '<div class="warning-note">Required evidence needs attention: complete or verify the missing information before relying on this recommendation.</div>'
         : "") +
       outcome +
       '<div class="action-row"><button class="approve-btn" id="approve-route">Approve recommended route</button><button class="override-btn" id="override-route-btn">Select different route</button><button class="override-btn" id="reject-route">Reject recommendation</button><button class="outcome-btn" id="record-outcome-btn">Record outcome</button></div></section>',
   ].join("");
+  if(item.outcome && !/^(Suspected|Inconclusive)/.test(item.outcome))panel.querySelectorAll('#approve-route,#override-route-btn,#reject-route').forEach(button=>{button.disabled=true;button.title='An outcome is already recorded. Use Record outcome to amend it.'});
+  if(item.outcomeProvenance || item.financialProvenance)panel.querySelector('.financial-context-section').insertAdjacentHTML('beforeend','<p class="session-note">'+escapeHtml([item.outcomeProvenance,item.financialProvenance].filter(Boolean).join(' · '))+'</p>');
   panel.insertAdjacentHTML("beforeend", renderModelEvidence(item) + renderReviewHistory(item) + renderScenarioGovernance(item));
   panel.querySelectorAll("[data-scenario-action]").forEach((button) => {
     button.addEventListener("click", () => openScenarioReview(item, button.dataset.scenarioAction));
@@ -2707,7 +2723,7 @@ function renderCase() {
     });
   if (!item.assessmentId) {
     panel.querySelectorAll("#approve-route, #override-route-btn, #reject-route, #record-outcome-btn").forEach((button) => { button.disabled = true; });
-    panel.insertAdjacentHTML("beforeend", '<p class="session-note">This is an unsaved legacy simulation. Use New Assessment or import synthetic model evidence to record a persistent specialist review.</p>');
+    panel.insertAdjacentHTML("beforeend", '<p class="session-note">This is an unsaved scoring simulation. Use New Assessment or import synthetic model evidence to record a persistent specialist review.</p>');
   }
   document.querySelector("#approve-route").addEventListener("click", () => openRouteDecision(item, "approve"));
   document.querySelector("#reject-route").addEventListener("click", () => openRouteDecision(item, "reject"));
@@ -2760,7 +2776,7 @@ function renderSimulationResults() {
     draftModelConfig.controlWeight +
     "% existing controls</strong> + <strong>" +
     draftModelConfig.anomalyWeight +
-    "% legacy statistical anomaly</strong> + " +
+    "% simulated behavioral anomaly</strong> + " +
     draftModelConfig.interactionMultiplier +
     "% of approved pattern adjustments. Risk bands: Low 0–" +
     draftModelConfig.lowMax +
@@ -2961,9 +2977,9 @@ function renderModelState() {
       modelConfig.controlWeight +
       "%</b> Existing control score <span>+</span><b>" +
       modelConfig.anomalyWeight +
-      "%</b> Legacy Statistical Score <span>+</span> " +
+      "%</b> Simulated Behavioral Score <span>+</span> " +
       modelConfig.interactionMultiplier +
-      "% of legacy pattern adjustment. Trained model outputs are never blended into this simulation.";
+      "% of simulated pattern adjustment. Trained model outputs are never blended into this simulation.";
   if (thresholds)
     thresholds.innerHTML =
       '<span><i class="low-dot"></i>Low 0–' +
@@ -2981,9 +2997,9 @@ function renderModelState() {
       modelConfig.controlWeight +
       "%</b> Existing Control Score <span>+</span><b>" +
       modelConfig.anomalyWeight +
-      "%</b> Legacy Statistical Score <span>+</span> " +
+      "%</b> Simulated Behavioral Score <span>+</span> " +
       modelConfig.interactionMultiplier +
-      "% of legacy Pattern Adjustment. This formula applies only to the legacy statistical demo.";
+      "% of simulated Pattern Adjustment. This formula applies only to the illustrative scoring simulation.";
 }
 
 const scenarioReviewStages = ["Specialist Review", "Testing", "GM Approval", "Approved", "Active"];
@@ -3225,12 +3241,11 @@ function renderExecutiveDashboard() {
     return item.outcome;
   });
   const dq = cases.filter(function (item) {
-    return item.features.missingData || item.features.crossSourceConflict;
+    return item.dataQuality ? item.dataQuality.issues.length > 0 : item.features.missingData || item.features.crossSourceConflict;
   });
   const decisions = cases.filter(function (item) {
     return (
-      item.status !== "Awaiting specialist" &&
-      item.status !== "Ready to proceed"
+      !!item.decisionDate || (item.reviewHistory || []).some(review=>review.type === "decision" || review.type === "outcome")
     );
   });
   const financial = financialPortfolio(cases);
@@ -3249,14 +3264,14 @@ function renderExecutiveDashboard() {
     ],
     [
       "Potential amount at risk",
-      formatSar(financial.amountAtRisk),
-      "Supplied exposure; unavailable if evidence is missing",
+      formatSar(financial.knownAmountAtRisk),
+      financial.missingExposureAmounts + " risk cases have no supplied amount; shown total excludes them",
       "medium-stat",
     ],
     [
       "Cases prevented",
       financial.prevented.length,
-      "Recorded synthetic interventions",
+      financial.aiPrevented.length + " linked to AI flags · " + financial.scriptedPrevented.length + " scripted demo outcomes",
       "low-stat",
     ],
     [
@@ -3310,7 +3325,7 @@ function renderExecutiveDashboard() {
     [
       "Prevented before payment",
       financial.prevented.length,
-      "Recorded synthetic intervention",
+      financial.aiPrevented.length + " AI-flagged · synthetic demo outcomes",
     ],
   ];
   document.querySelector("#executive-funnel").innerHTML = funnel
@@ -3379,7 +3394,7 @@ function renderExecutiveDashboard() {
   const topSignals = {};
   cases.forEach(function (item) {
     item.signals.forEach(function (signal) {
-      if (!["MODEL_NOT_FLAGGED","LOWER_BEHAVIORAL_DEVIATION","NO_MATERIAL_ANOMALY","EVIDENCE_INCOMPLETE","COMBINED_PATTERN"].includes(signal[0])) topSignals[signal[0]] = (topSignals[signal[0]] || 0) + 1;
+      if (!["MODEL_NOT_FLAGGED","LOWER_BEHAVIORAL_DEVIATION","NO_MATERIAL_ANOMALY","NO_RULE_TRIGGER","CROSS_JOURNEY_PATTERN","MODEL_UNUSUAL_COMBINATION","EVIDENCE_INCOMPLETE","COMBINED_PATTERN"].includes(signal[0])) topSignals[signal[0]] = (topSignals[signal[0]] || 0) + 1;
     });
   });
   const leadingSignal = topEntry(topSignals);
@@ -3446,11 +3461,11 @@ function renderExecutiveDashboard() {
 
   const realization = [
     [
-      formatSar(financial.assessedAmount),
+      formatSar(financial.knownAssessedAmount),
       "Total synthetic transaction value assessed",
     ],
     [
-      formatSar(financial.amountAtRisk),
+      formatSar(financial.knownAmountAtRisk),
       "Potential exposure detected for review",
     ],
     [
@@ -3523,7 +3538,7 @@ function renderBusinessReport() {
     return item.status === "Route overridden";
   });
   const dq = list.filter(function (item) {
-    return item.features.missingData || item.features.crossSourceConflict;
+    return item.dataQuality ? item.dataQuality.issues.length > 0 : item.features.missingData || item.features.crossSourceConflict;
   });
   const financial = financialPortfolio(list);
   const metrics = [
@@ -3535,8 +3550,8 @@ function renderBusinessReport() {
     ],
     [
       "Potential amount at risk",
-      formatSar(financial.amountAtRisk),
-      "Supplied exposure; unavailable if evidence is missing",
+      formatSar(financial.knownAmountAtRisk),
+      financial.missingExposureAmounts + " risk cases have no supplied amount; shown total excludes them",
       "medium-stat",
     ],
     [
@@ -3554,7 +3569,7 @@ function renderBusinessReport() {
     [
       "Cases prevented",
       financial.prevented.length,
-      "Recorded synthetic intervention",
+      financial.aiPrevented.length + " AI-flagged · synthetic demo outcomes",
       "low-stat",
     ],
     [
@@ -3583,7 +3598,7 @@ function renderBusinessReport() {
   const signalCounts = {};
   list.forEach(function (item) {
     item.signals.forEach(function (signal) {
-      if (!["COMBINED_PATTERN", "MODEL_NOT_FLAGGED", "LOWER_BEHAVIORAL_DEVIATION", "NO_MATERIAL_ANOMALY", "EVIDENCE_INCOMPLETE", "REQUIRED_INFORMATION_MISSING"].includes(signal[0]))
+      if (!["COMBINED_PATTERN", "MODEL_NOT_FLAGGED", "LOWER_BEHAVIORAL_DEVIATION", "NO_MATERIAL_ANOMALY", "NO_RULE_TRIGGER", "CROSS_JOURNEY_PATTERN", "MODEL_UNUSUAL_COMBINATION", "EVIDENCE_INCOMPLETE", "REQUIRED_INFORMATION_MISSING"].includes(signal[0]))
         signalCounts[signal[0]] = (signalCounts[signal[0]] || 0) + 1;
     });
   });
@@ -3599,12 +3614,12 @@ function renderBusinessReport() {
     ? "<p><strong>" +
       total +
       " cases</strong> were assessed. Total supplied transaction value: <strong>" +
-      formatSar(financial.assessedAmount) +
+      formatSar(financial.knownAssessedAmount) +
       "</strong>. The model or control policy flagged <strong>" +
       financial.detected.length +
       " cases for review</strong>. Supplied potential exposure: <strong>" +
-      formatSar(financial.amountAtRisk) +
-      "</strong>. Specialists classified <strong>" +
+      formatSar(financial.knownAmountAtRisk) +
+      "</strong>. Recorded demo outcomes classified <strong>" +
       financial.suspected.length +
       "</strong> as suspected fraud and <strong>" +
       financial.confirmed.length +
@@ -3622,7 +3637,7 @@ function renderBusinessReport() {
       escapeHtml(leadSignal.replace(/_/g, " ")) +
       "</strong>.</p>"
     : '<div class="empty-state"><strong>No cases match the selected report scope.</strong><p>Choose another journey or owner to generate the report.</p></div>';
-  document.querySelector("#monthly-ai-summary").innerHTML = summary + (list.some(item => item.assessmentSource === "cross-journey") ? '<p class="session-note"><strong>Financial evidence:</strong> connected-journey examples do not supply transaction amounts. They contribute case counts, but no quantified exposure or savings. Financial totals only reflect supplied amounts.</p>' : "");
+  document.querySelector("#monthly-ai-summary").innerHTML = summary + '<p class="session-note"><strong>Synthetic demonstration:</strong> '+financial.scriptedPrevented.length+' prevention outcomes are scripted examples; '+financial.aiPrevented.length+' prevention cases are linked to actual synthetic model flags. These are not measured savings. Known totals exclude '+financial.missingTransactionAmounts+' missing transaction amounts and '+financial.missingExposureAmounts+' missing exposure amounts.</p>';
 
   const journeyRows = Object.keys(journeyCounts)
     .sort(function (a, b) {
@@ -3643,7 +3658,7 @@ function renderBusinessReport() {
         "</td><td>" +
         values.detected.length +
         "</td><td>" +
-        formatSar(values.amountAtRisk) +
+        formatSar(values.knownAmountAtRisk) +
         "</td><td>" +
         values.suspected.length +
         "</td><td>" +
@@ -3664,12 +3679,10 @@ function renderBusinessReport() {
     return item.outcome;
   });
   const distributionGroups = [
-    ["Risk", { High: high.length, Medium: medium.length, Low: low.length }],
+    ["Risk", { High: high.length, Medium: medium.length, Low: low.length, Incomplete:list.filter(item=>item.risk==="Incomplete").length }],
     [
       "Review feedback",
-      Object.keys(outcomeCounts).length
-        ? outcomeCounts
-        : { "Not yet recorded": Math.max(0, total - outcomes.length) },
+      {...outcomeCounts,"Not yet recorded": Math.max(0, total - outcomes.length)},
     ],
   ];
   document.querySelector("#report-distributions").innerHTML = distributionGroups
@@ -3734,7 +3747,7 @@ function renderBusinessReport() {
 
   const actionRows = [
     [
-      pendingHigh + " high-risk cases without recorded outcomes",
+      pendingHigh + " medium- and high-risk cases without recorded outcomes",
       "Complete specialist review and capture the validated outcome",
       "Fraud Prevention, Detection & Inspection",
       pendingHigh ? "High" : "Low",
@@ -3806,7 +3819,7 @@ function renderAll() {
   renderExecutiveDashboard();
   renderBusinessReport();
   renderModelState();
-  document.querySelector('#portfolio-scope-note').textContent = portfolioScope === 'assessed' ? 'Saved synthetic assessments only · no live enterprise connections' : 'Illustrative portfolio only · seeded outcomes and amounts, not model results';
+  document.querySelector('#portfolio-scope-note').textContent = portfolioScope === 'assessed' ? 'Synthetic enterprise demo · other journeys use rules; SANED and connected histories use AI · amounts and scripted outcomes are illustrative' : 'Illustrative portfolio only · seeded outcomes and amounts, not model results';
   document.querySelector("#last-updated").textContent =
     "Synthetic feed · updated " +
     new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -4662,7 +4675,7 @@ async function restoreSavedJourneyAssessments() {
     saved
       .filter(
         (entry) =>
-          ["journey-prototype", "csv-upload", "cross-journey"].includes(entry.assessmentSource) &&
+          ["journey-prototype", "csv-upload", "cross-journey", "rules-demo"].includes(entry.assessmentSource) &&
           entry.caseData &&
           entry.caseData.synthetic === true,
       )
@@ -4696,7 +4709,7 @@ function renderPrototypeSavedAssessment(result) {
       <span class="backend-status-badge">Saved journey assessment</span>
       <h3>${escapeHtml(result.journey || "—")} · ${escapeHtml(result.risk || "—")}</h3>
       <p class="backend-assessment-id">Transaction / case: ${escapeHtml(result.transactionId || result.caseId || "—")} · Assessment: ${escapeHtml(result.assessmentId || "—")}</p>
-      <p>Legacy score: ${escapeHtml(result.score ?? "—")}/100</p>
+      <p>Simulation score: ${escapeHtml(result.score ?? "—")}/100</p>
       ${result.modelVersion ? `<p>Journey model: ${escapeHtml(result.modelVersion)} · Synthetic reference percentile: ${escapeHtml(result.modelPercentile ?? "—")}%</p>` : ""}
       <p>Recommended route: ${escapeHtml(result.route || "—")}</p>
       <p>${escapeHtml(result.validation || "Prototype result; business validation is required.")}</p>
@@ -4881,4 +4894,4 @@ restoreSavedJourneyAssessments();
 
 loadScenarioProposals().catch(() => { /* The review form reports backend errors when used. */ });
 
-backendJSON("/health").then((health) => { document.querySelector("#engine-status").textContent = health.contractVersion === "integration-v0.2-separated" ? "Model services ready" : "Restart backend · older integration running"; }).catch(() => { document.querySelector("#engine-status").textContent = "AI service unavailable · legacy demo only"; });
+backendJSON("/health").then((health) => { document.querySelector("#engine-status").textContent = health.contractVersion === "integration-v0.2-separated" ? "Model services ready" : "Restart backend · older integration running"; }).catch(() => { document.querySelector("#engine-status").textContent = "AI service unavailable · illustrative demo only"; });
