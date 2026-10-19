@@ -21,3 +21,5 @@ anomaly-detection/data/*.tmp
 
 # Local Madar demo records
 .madar-data/
+
+.railway/
