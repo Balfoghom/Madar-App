@@ -73,7 +73,9 @@
               </div>
             </div>
             <span class="model-pill" id="model-state-pill">Madar demo</span>
-            <div class="avatar" aria-label="Fraud specialist">FS</div>
+            <button type="button" class="avatar team-trigger" id="team-button" aria-label="Madar Team" title="Madar Team" aria-haspopup="dialog" aria-controls="team-dialog">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6M21 20v-2a6 6 0 0 0-4-5.65"/></svg>
+            </button>
           </div>
         </header>
 
@@ -496,7 +498,7 @@
             </label>
             <div class="import-mode-row">
               <label>Import mode<select id="file-import-mode"><option value="append">Append to current data</option><option value="replace">Replace CSV-imported cases</option></select></label>
-              <button class="primary-btn" id="import-file-btn" disabled>Validate & assess file</button>
+              <div class="sample-import-actions"><button type="button" class="secondary-btn" id="import-sample-btn">Load sample data</button><button class="primary-btn" id="import-file-btn" disabled>Validate &amp; assess file</button></div>
             </div>
             <div id="selected-file" class="selected-file empty">No file selected</div>
           </article>
@@ -1098,6 +1100,17 @@
       </main>
     </div>
 
+    <dialog id="team-dialog" class="team-dialog" aria-labelledby="team-title" aria-describedby="team-description">
+      <div class="team-dialog-content">
+        <div class="dialog-head"><div><h2 id="team-title">Madar Team</h2><p id="team-description">People behind Madar</p></div><button type="button" class="icon-button" aria-label="Close">×</button></div>
+        <div class="team-grid">
+        <article class="team-card"><span class="team-initials" aria-hidden="true">HA</span><h3>HAITHAM M. ALMUTAIRI</h3><p class="team-position">Senior Insurance Fraud Prevention Lead</p><p class="team-department">Fraud Prevention</p><a class="team-email" href="mailto:halmutairi1@gosi.gov.sa">halmutairi1@gosi.gov.sa</a></article>
+        <article class="team-card"><span class="team-initials" aria-hidden="true">BA</span><h3>BASHA A. ALFOGHOM</h3><p class="team-position">Data Scientist lead</p><p class="team-department">AI Development Department</p><a class="team-email" href="mailto:BALFOGHOM@GOSI.GOV.SA">BALFOGHOM@GOSI.GOV.SA</a></article>
+        <article class="team-card"><span class="team-initials" aria-hidden="true">MA</span><h3>Manal alotaibi</h3><p class="team-position">Senior Software QA</p><p class="team-department">Onboarding & Registration</p><a class="team-email" href="mailto:MSALOTAIBI@GOSI.GOV.SA">MSALOTAIBI@GOSI.GOV.SA</a></article>
+        </div>
+      </div>
+    </dialog>
+
     <dialog id="override-dialog">
       <form method="dialog" id="override-form">
         <div class="dialog-head">
@@ -1105,7 +1118,7 @@
             <p class="eyebrow">HUMAN OVERRIDE</p>
             <h2>Select a different route</h2>
           </div>
-          <button value="cancel" class="icon-button" aria-label="Close">
+          <button type="button" value="cancel" class="icon-button" aria-label="Close">
             ×
           </button>
         </div>
@@ -1130,7 +1143,7 @@
           ></textarea>
         </label>
         <div class="dialog-actions">
-          <button value="cancel" class="secondary">Cancel</button
+          <button type="button" value="cancel" class="secondary">Cancel</button
           ><button value="confirm" id="confirm-override">Save decision</button>
         </div>
       </form>
@@ -1164,7 +1177,7 @@
             <p class="eyebrow">OUTCOME FEEDBACK</p>
             <h2>Record specialist outcome</h2>
           </div>
-          <button value="cancel" class="icon-button" aria-label="Close">
+          <button type="button" value="cancel" class="icon-button" aria-label="Close">
             ×
           </button>
         </div>
@@ -1229,7 +1242,7 @@
           ></textarea>
         </label>
         <div class="dialog-actions">
-          <button value="cancel" class="secondary">Cancel</button
+          <button type="button" value="cancel" class="secondary">Cancel</button
           ><button value="confirm" id="confirm-outcome">Record outcome</button>
         </div>
       </form>

@@ -1339,7 +1339,7 @@ document.querySelector("#route-decision-form").addEventListener("submit", async 
   } catch (error) { document.querySelector("#route-decision-error").textContent = error.message; }
   finally { button.disabled = false; }
 });
-document.querySelector("#close-route-decision").addEventListener("click", () => document.querySelector("#route-decision-dialog").close());
+
 
 function generateCaseSummary(item) {
   const recorded=item.outcome ? 'Recorded outcome: '+item.outcome+'. '+(item.outcomeProvenance==='Scripted demo outcome'?'This is a scripted demo outcome. ':'') : '';
@@ -1764,10 +1764,10 @@ function escapeHtml(value) {
 function riskColor(risk) {
   if (risk === "Incomplete") return "#a87519";
   return risk === "High"
-    ? "#d94b51"
+    ? "#d74b52"
     : risk === "Medium"
-      ? "#df9118"
-      : "#21ad72";
+      ? "#dc9017"
+      : "#00bf00";
 }
 
 function riskOrder(risk) {
@@ -1839,6 +1839,10 @@ function showToast(message) {
 }
 
 function switchView(name) {
+  document.querySelector("#team-button").hidden = name !== "dashboard";
+  if (name !== "dashboard" && document.querySelector("#team-dialog").open) {
+    document.querySelector("#team-dialog").close();
+  }
   document.querySelector('.portfolio-bar').hidden = !['dashboard','executive','queue','business-report'].includes(name);
   if (name === 'connected' && portfolioScope !== 'assessed') { useAssessedPortfolio(); renderAll(); }
   document.querySelectorAll(".nav-item").forEach(function (item) {
@@ -2709,6 +2713,7 @@ function renderCase() {
       outcome +
       '<div class="action-row"><button class="approve-btn" id="approve-route">Approve recommended route</button><button class="override-btn" id="override-route-btn">Select different route</button><button class="override-btn" id="reject-route">Reject recommendation</button><button class="outcome-btn" id="record-outcome-btn">Record outcome</button></div></section>',
   ].join("");
+
   if(item.outcome && !/^(Suspected|Inconclusive)/.test(item.outcome))panel.querySelectorAll('#approve-route,#override-route-btn,#reject-route').forEach(button=>{button.disabled=true;button.title='An outcome is already recorded. Use Record outcome to amend it.'});
   if(item.outcomeProvenance || item.financialProvenance)panel.querySelector('.financial-context-section').insertAdjacentHTML('beforeend','<p class="session-note">'+escapeHtml([item.outcomeProvenance,item.financialProvenance].filter(Boolean).join(' · '))+'</p>');
   panel.insertAdjacentHTML("beforeend", renderModelEvidence(item) + renderReviewHistory(item) + renderScenarioGovernance(item));
@@ -3068,7 +3073,7 @@ document.querySelector("#scenario-review-form").addEventListener("submit", async
   } catch (error) { document.querySelector("#scenario-review-error").textContent = error.message; }
   finally { button.disabled = false; }
 });
-["#close-scenario-review", "#cancel-scenario-review"].forEach((selector) => document.querySelector(selector).addEventListener("click", () => document.querySelector("#scenario-review-dialog").close()));
+
 document.querySelector("#assessment-approved-scenario").addEventListener("change", (event) => {
   const proposal = scenarioProposals.find((entry) => entry.id === event.target.value && entry.status === "Active");
   if (!proposal) return;
@@ -3968,7 +3973,7 @@ function csvEscape(value) {
 async function importCSVText(text, mode, label) {
   const started = performance.now();
   useAssessedPortfolio();
-  const controls = [document.querySelector("#import-file-btn"), document.querySelector("#import-paste-btn")];
+  const controls = [document.querySelector("#import-file-btn"), document.querySelector("#import-paste-btn"), document.querySelector("#import-sample-btn")];
   controls.forEach((button) => button.disabled = true);
   try {
     const matrix = parseCSV(text.trim());
@@ -4020,7 +4025,7 @@ async function importCSVText(text, mode, label) {
     renderAll(); loadBackendHistory();
     showToast(accepted.length + " cases saved with actual model responses.");
   } catch (error) { showImportError(error.message); }
-  finally { document.querySelector("#import-paste-btn").disabled = false; document.querySelector("#import-file-btn").disabled = !pendingFile; }
+  finally { document.querySelector("#import-sample-btn").disabled = false; document.querySelector("#import-paste-btn").disabled = false; document.querySelector("#import-file-btn").disabled = !pendingFile; }
 }
 
 function showImportError(message) {
@@ -4344,16 +4349,8 @@ document
   .addEventListener("click", function () {
     switchView("intake");
   });
-document
-  .querySelector("#close-assessment")
-  .addEventListener("click", function () {
-    document.querySelector("#new-assessment-dialog").close();
-  });
-document
-  .querySelector("#cancel-assessment")
-  .addEventListener("click", function () {
-    document.querySelector("#new-assessment-dialog").close();
-  });
+
+
 document
   .querySelector("#new-assessment-form")
   .addEventListener("submit", runNewAssessment);
@@ -4459,6 +4456,41 @@ document
     );
   });
 
+document.querySelector("#team-button").addEventListener("click", () => {
+  if (document.querySelector("#dashboard-view").classList.contains("active-view")) {
+    document.querySelector("#team-dialog").showModal();
+  }
+});
+document.querySelector("#team-dialog").addEventListener("click", (event) => {
+  const dialog = event.currentTarget;
+  const bounds = dialog.getBoundingClientRect();
+  if (event.target === dialog && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) {
+    discardDialog(dialog);
+  }
+});
+
+function discardDialog(dialog) {
+  dialog.querySelectorAll("form").forEach((form) => {
+    form.reset();
+    form.querySelectorAll("input, select, textarea").forEach((field) => field.setCustomValidity(""));
+  });
+  dialog.querySelectorAll('[role="alert"], #new-assessment-error').forEach((error) => {
+    error.textContent = "";
+  });
+  dialog.close("cancel");
+}
+
+document.querySelectorAll("dialog").forEach((dialog) => {
+  dialog.querySelectorAll('button[aria-label="Close"], button[value="cancel"], #cancel-assessment, #cancel-scenario-review').forEach((button) => {
+    button.type = "button";
+    button.addEventListener("click", () => discardDialog(dialog));
+  });
+  dialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    discardDialog(dialog);
+  });
+});
+
 document.querySelector("#confirm-override").addEventListener("click", async (event) => {
   event.preventDefault();
   const item = cases.find((entry) => entry.id === selectedId);
@@ -4522,6 +4554,24 @@ document.querySelector("#import-file-btn").addEventListener("click", async funct
     showImportError("The selected file could not be read. Choose a valid UTF-8 CSV file.");
   }
 });
+document.querySelector("#import-sample-btn").addEventListener("click", async function () {
+  this.disabled = true;
+  this.textContent = "Loading sample data…";
+  try {
+    const response = await fetch("/synthetic-model-evidence.csv", { cache: "no-store" });
+    if (!response.ok) throw new Error(response.status === 404
+      ? "Sample CSV not found. Restart the app server (Ctrl+C, then npm start) and refresh the page. If this persists, check that synthetic-model-evidence.csv is included in the deployment."
+      : "The sample CSV could not be loaded (HTTP " + response.status + "). Please try again.");
+    const text = await response.text();
+    await importCSVText(text, document.querySelector("#file-import-mode").value, "synthetic-model-evidence.csv");
+  } catch (error) {
+    showImportError(error.message);
+  } finally {
+    this.disabled = false;
+    this.textContent = "Load sample data";
+  }
+});
+
 document.querySelector("#import-paste-btn").addEventListener("click", function(){
   const text = document.querySelector("#csv-paste").value.trim();
   if (!text) { showImportError("Paste a header row and at least one data row before running the assessment."); return; }
