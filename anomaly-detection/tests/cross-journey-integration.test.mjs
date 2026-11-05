@@ -45,7 +45,7 @@ test('connected import is idempotent, decisions persist, changed evidence requir
  const restored=(await(await fetch(base+'/assessments')).json()).find(r=>r.caseId===proof.caseId);assert.equal(restored.reviewHistory.length,1);assert.equal(restored.caseData.status,'Route approved');
  const changed=csv.replaceAll('1792195200000','1792195200001');const updated=await(await post('/cross-journey/assess',{csv:changed})).json();const next=updated.saved.find(r=>r.caseId===proof.caseId);assert.notEqual(next.assessmentId,proof.assessmentId);assert.equal(next.reviewHistory.length,1);assert.equal(next.caseData.status,'Awaiting specialist');
  assert.equal((await post('/decision',{caseId:proof.caseId,assessmentId:proof.assessmentId,action:'approve',note:'Stale review',actorName:'Test'})).status,409);
- const health=await(await fetch(base+'/health')).json();assert.equal(health.crossJourneyModelVersion,'madar-cross-journey-rf-20261017-v1');
+ const health=await(await fetch(base+'/health')).json();assert.equal(health.crossJourneyModelVersion,'madar-cross-journey-rf-20261019-v2');
 });
 
 test('reported source conflicts require verification without changing the model flag',()=>{

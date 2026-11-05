@@ -1157,12 +1157,13 @@ function recommendedRoute(journey, risk) {
 }
 
 function routeOwnership(item) {
-  if (item.features.missingData || item.route === "Data Verification Review")
+  if(item.outcome && !/^(Suspected|Inconclusive)/.test(item.outcome))return {owner:item.decisionOwner || 'Recorded specialist',next:'Outcome recorded. Retain the supporting evidence and amend the outcome only if new information changes the finding.'};
+  if (item.features.missingData || ["Data Verification Review","Complete evidence"].includes(item.route))
     return {
       owner: "Data Owner / Data Quality",
       next: "Verify missing or conflicting source data, then return the case for reassessment.",
     };
-  if (item.route === "Straight-through processing")
+  if (["Straight-through processing","Standard review"].includes(item.route))
     return {
       owner: "Service Operations",
       next: "Continue the normal journey while retaining the assessment audit trail.",
@@ -1302,21 +1303,27 @@ async function backendJSON(path, body, timeoutMs = 10000) {
 }
 function renderModelEvidence(item) {
   const model = item.modelAssessment;
-  if (!model) return '<section class="detail-section model-evidence"><h3 class="detail-title">Legacy simulation</h3><p>No complete trained-model response is attached to this case. Its statistical simulation score is not a model percentile or model assessment.</p></section>';
+  if(item.rulesAssessment){
+    const source=item.rulesEvidence;
+    const labels={observedExceptions:'Observed exceptions',sourceRecordDate:'Source record date',referenceRecord:'Reference record',reviewPeriod:'Review period',recordStatus:'Record status',verificationSource:'Verification source'};
+    return '<section class="detail-section model-evidence"><h3>Business control evidence</h3><p>'+escapeHtml(item.primaryReason)+'</p><p>Rules only · no trained model used for this case.</p><table class="model-contract-table"><tbody>'+source.requiredFields.map(field=>'<tr><th>'+escapeHtml(labels[field]||field)+'</th><td>'+escapeHtml(source.fields[field]??'Missing')+'</td></tr>').join('')+'</tbody></table></section>';
+  }
+  if (!model) return '<section class="detail-section model-evidence"><h3 class="detail-title">Scoring simulation</h3><p>No complete trained-model response is attached to this case. Its statistical simulation score is not a model percentile or model assessment.</p></section>';
   const value = (v) => v === null || v === undefined ? "—" : typeof v === "boolean" ? String(v) : String(v);
-  const rows = [["modelVersion", model.modelVersion], [item.assessmentSource === "cross-journey" ? "score (synthetic review-pattern similarity)" : "score (raw anomaly score)", model.complete ? model.score : undefined], ["percentile (unusualness)", model.complete ? model.percentile : null], ["modelFlagged", model.modelFlagged], ["ruleFlagged", model.ruleFlagged], ["complete", model.complete]];
+  const rows = [["modelVersion", model.modelVersion], [item.assessmentSource === "cross-journey" ? "score (synthetic review-pattern similarity)" : "score (raw anomaly score)", model.complete ? model.score : undefined], ["calibration percentile (technical reference rank, not risk %)", model.complete ? model.percentile : null], ["modelFlagged", model.modelFlagged], ["ruleFlagged", model.ruleFlagged], ["complete", model.complete]];
   const features = (model.features || []).map((feature) => `<tr><td>${escapeHtml(feature.name)}</td><td>${escapeHtml(value(feature.value))}</td><td>${escapeHtml(value(feature.median))}</td><td>${escapeHtml(value(feature.low))} – ${escapeHtml(value(feature.high))}</td><td>${escapeHtml(String(feature.unusual ?? feature.outsideReferenceRange ?? false))}</td></tr>`).join("");
-  return `<section class="detail-section model-evidence"><h3 class="detail-title">Trained model result · نتيجة النموذج</h3><p>${model.complete ? "Unusualness percentile is relative to synthetic reference data, not fraud probability." : "Complete evidence · استكمال الأدلة. No model score or low-risk classification was produced."}</p><table class="model-contract-table"><tbody>${rows.map(([field, v]) => `<tr><th>${escapeHtml(field)}</th><td>${escapeHtml(value(v))}</td></tr>`).join("")}</tbody></table>${model.comparatorRulesAvailable === false ? '<p>ruleFlagged is not applicable: this journey has no configured provisional comparator rule engine.</p>' : ""}<h4>features · خصائص النموذج</h4><div class="model-feature-scroll"><table class="model-contract-table"><thead><tr><th>Feature</th><th>Value</th><th>Median</th><th>Reference range</th><th>Unusual</th></tr></thead><tbody>${features || '<tr><td colspan="5">No complete model features.</td></tr>'}</tbody></table></div><h4>Model reasons</h4><ul>${(model.reasons || []).map((reason) => `<li>${escapeHtml(reason)}</li>`).join("")}</ul><p class="session-note">${escapeHtml(model.explanationBoundary || "Reference ranges provide context, not exact causal attribution.")}</p><small>${escapeHtml(model.assessmentId || item.assessmentId || "")} · ${escapeHtml(model.assessedAt || item.assessedAt || "")}</small></section>`;
+  return `<section class="detail-section model-evidence"><h3 class="detail-title">Trained model result</h3><p>${model.complete ? "Unusualness percentile is relative to synthetic reference data, not fraud probability." : "Complete evidence · استكمال الأدلة. No model score or low-risk classification was produced."}</p><table class="model-contract-table"><tbody>${rows.map(([field, v]) => `<tr><th>${escapeHtml(field)}</th><td>${escapeHtml(value(v))}</td></tr>`).join("")}</tbody></table>${model.comparatorRulesAvailable === false ? '<p>ruleFlagged is not applicable: this journey has no configured provisional comparator rule engine.</p>' : ""}<h4>Model features</h4><div class="model-feature-scroll"><table class="model-contract-table"><thead><tr><th>Feature</th><th>Value</th><th>Median</th><th>Reference range</th><th>Unusual</th></tr></thead><tbody>${features || '<tr><td colspan="5">No complete model features.</td></tr>'}</tbody></table></div><h4>Model reasons</h4><ul>${(model.reasons || []).map((reason) => `<li>${escapeHtml(reason)}</li>`).join("")}</ul><p class="session-note">${escapeHtml(model.explanationBoundary || "Reference ranges provide context, not exact causal attribution.")}</p><small>${escapeHtml(model.assessmentId || item.assessmentId || "")} · ${escapeHtml(model.assessedAt || item.assessedAt || "")}</small></section>`;
 }
 function renderReviewHistory(item) {
   if (!(item.reviewHistory || []).length) return "";
-  return `<section class="detail-section"><h3 class="detail-title">Human review history · سجل المختص</h3><ol class="scenario-review-history">${item.reviewHistory.map((review) => `<li><strong>${escapeHtml(review.outcome || review.action)}</strong><span>${escapeHtml(review.actorName)} · ${escapeHtml(review.recordedAt)}</span><p>${escapeHtml(review.note)}</p><small>Assessment: ${escapeHtml(review.assessmentId)}</small></li>`).join("")}</ol></section>`;
+  return `<section class="detail-section"><h3 class="detail-title">Human review history</h3><ol class="scenario-review-history">${item.reviewHistory.map((review) => `<li><strong>${escapeHtml(review.outcome || review.action || review.workflowStage || review.type)}</strong><span>${escapeHtml(review.actorName)} · ${escapeHtml(review.recordedAt)}</span><p>${escapeHtml(review.note)}</p><small>Assessment: ${escapeHtml(review.assessmentId)}</small></li>`).join("")}</ol></section>`;
 }
 let routeDecisionAction = null;
 function openRouteDecision(item, action) {
   routeDecisionAction = { caseId: item.id, assessmentId: item.assessmentId, action };
   document.querySelector("#route-decision-title").textContent = action === "approve" ? "Approve recommended route" : "Reject recommendation";
   document.querySelector("#route-decision-note").value = "";
+  document.querySelector('#route-decision-context').textContent = action === 'approve' ? 'Approve the original recommended route: ' + (item.recommendedRoute || item.modelAssessment?.route || item.route) : 'Return this recommendation for specialist review.';
   document.querySelector("#route-decision-error").textContent = "";
   document.querySelector("#route-decision-dialog").showModal();
 }
@@ -1332,14 +1339,16 @@ document.querySelector("#route-decision-form").addEventListener("submit", async 
   } catch (error) { document.querySelector("#route-decision-error").textContent = error.message; }
   finally { button.disabled = false; }
 });
-document.querySelector("#close-route-decision").addEventListener("click", () => document.querySelector("#route-decision-dialog").close());
+
 
 function generateCaseSummary(item) {
-  if (item.assessmentSource === "cross-journey") return item.modelAssessment.reasons.join(" ") + " Recommended route: " + item.route + ". Assessment uses connected synthetic event evidence; no operational control score was supplied.";
+  const recorded=item.outcome ? 'Recorded outcome: '+item.outcome+'. '+(item.outcomeProvenance==='Scripted demo outcome'?'This is a scripted demo outcome. ':'') : '';
+  if(item.rulesAssessment)return recorded + item.primaryReason + ' Recommended route: '+item.route+'. This case uses an illustrative business control, not a trained AI model.';
+  if (item.assessmentSource === "cross-journey") return recorded + item.modelAssessment.reasons.join(" ") + " Recommended route: " + item.route + ". Assessment uses connected synthetic event evidence; no operational control score was supplied.";
   if (item.modelAssessment) {
     const m = item.modelAssessment;
-    if (!m.complete) return "Model evidence is incomplete. Complete the requested evidence before relying on a model recommendation. Existing control score: " + item.ruleScore + "/100. Specialist review is required.";
-    return "Existing control score: " + item.ruleScore + "/100. The model returned an unusualness percentile of " + Number(m.percentile).toFixed(1) + "% against synthetic reference data. " + (m.modelFlagged ? "The model suggests review. " : "The model did not flag the combination at its threshold. ") + "These outputs are separate, not a calibrated fraud probability. Proposed route: " + item.route + ". The specialist retains the final decision.";
+    if (!m.complete) return recorded + "Model evidence is incomplete. Complete the requested evidence before relying on a model recommendation. Existing control score: " + item.ruleScore + "/100. Specialist review is required.";
+    return recorded + "Existing control score: " + item.ruleScore + "/100. The model returned an unusualness percentile of " + Number(m.percentile).toFixed(1) + "% against synthetic reference data. " + (m.modelFlagged ? "The model suggests review. " : "The model did not flag the combination at its threshold. ") + "These outputs are separate, not a calibrated fraud probability. Proposed route: " + item.route + ". The specialist retains the final decision.";
   }
 
   const subject = item.customerName || item.subject;
@@ -1352,7 +1361,7 @@ function generateCaseSummary(item) {
     item.anomalyScore > item.ruleScore + 8
       ? "The behavioral pattern raised the level indicated by existing controls"
       : item.anomalyScore < item.ruleScore - 8
-        ? "The legacy statistical simulation produced a lower anomaly value than the existing control score"
+        ? "The behavioral scoring simulation produced a lower anomaly value than the existing control score"
         : "The behavioral analysis broadly supports the existing control result";
   const decision =
     item.risk === "Low"
@@ -1379,6 +1388,7 @@ function generateCaseSummary(item) {
 }
 
 function generateArabicCaseSummary(item) {
+  if(item.rulesAssessment)return 'تقييم قائم على ضوابط عمل توضيحية ببيانات اصطناعية. '+item.primaryReason;
   if (item.modelAssessment) {
     const m = item.modelAssessment;
     if (!m.complete) return "لم يصدر النموذج درجة بسبب نقص الأدلة. درجة الضوابط القائمة: " + item.ruleScore + "/100. يلزم استكمال الأدلة والمراجعة البشرية.";
@@ -1517,10 +1527,10 @@ function assess(raw, config, anomalyOverride) {
     confidenceScore >= 80 ? "High" : confidenceScore >= 60 ? "Medium" : "Low";
   const comparison =
     anomaly > raw.ruleScore + 8
-      ? "Legacy statistical simulation is above the existing control score"
+      ? "Behavioral scoring simulation is above the existing control score"
       : anomaly < raw.ruleScore - 8
-        ? "Legacy statistical simulation is below the existing control score"
-        : "Legacy statistical simulation and existing controls are broadly aligned";
+        ? "Behavioral scoring simulation is below the existing control score"
+        : "Behavioral scoring simulation and existing controls are broadly aligned";
   const route = f.missingData
     ? "Data Verification Review"
     : recommendedRoute(raw.journey, risk);
@@ -1632,6 +1642,9 @@ function applySyntheticOutcome(item, index) {
 let cases = baselineRaw.map(function (item, index) {
   return applySyntheticOutcome(assess(item), index);
 });
+let portfolioScope = 'assessed';
+function portfolioCases() { return cases.filter(item => portfolioScope === 'assessed' ? !!item.assessmentId : !item.assessmentId); }
+function useAssessedPortfolio() { portfolioScope='assessed'; document.querySelector('#portfolio-scope').value='assessed'; }
 let activeFilter = "All";
 let activeJourney = "All";
 let activeRegion = "All";
@@ -1751,10 +1764,10 @@ function escapeHtml(value) {
 function riskColor(risk) {
   if (risk === "Incomplete") return "#a87519";
   return risk === "High"
-    ? "#d94b51"
+    ? "#d74b52"
     : risk === "Medium"
-      ? "#df9118"
-      : "#21ad72";
+      ? "#dc9017"
+      : "#00bf00";
 }
 
 function riskOrder(risk) {
@@ -1762,6 +1775,7 @@ function riskOrder(risk) {
 }
 
 function formatSar(value) {
+  if (value == null || !Number.isFinite(Number(value))) return "Not supplied";
   return new Intl.NumberFormat("en-SA", {
     style: "currency",
     currency: "SAR",
@@ -1797,12 +1811,14 @@ function financialPortfolio(list) {
     suspected: suspected,
     confirmed: confirmed,
     prevented: prevented,
-    assessedAmount: list.reduce(function (sum, item) {
-      return sum + Number(item.transactionAmount || 0);
-    }, 0),
-    amountAtRisk: detected.reduce(function (sum, item) {
-      return sum + Number(item.amountAtRisk || 0);
-    }, 0),
+    assessedAmount: list.every(item=>Number.isFinite(item.transactionAmount)) ? list.reduce((sum,item)=>sum+item.transactionAmount,0) : null,
+    missingTransactionAmounts:list.filter(item=>!Number.isFinite(item.transactionAmount)).length,
+    knownAssessedAmount:list.reduce((sum,item)=>sum+(Number.isFinite(item.transactionAmount)?item.transactionAmount:0),0),
+    knownAmountAtRisk:detected.reduce((sum,item)=>sum+(Number.isFinite(item.amountAtRisk)?item.amountAtRisk:0),0),
+    missingExposureAmounts:detected.filter(item=>!Number.isFinite(item.amountAtRisk)).length,
+    aiPrevented:prevented.filter(item=>item.modelAssessment?.modelFlagged),
+    scriptedPrevented:prevented.filter(item=>item.outcomeProvenance==='Scripted demo outcome'),
+    amountAtRisk: detected.every(item=>Number.isFinite(item.amountAtRisk)) ? detected.reduce((sum,item)=>sum+item.amountAtRisk,0) : null,
     confirmedAmount: confirmed.reduce(function (sum, item) {
       return sum + Number(item.confirmedFraudAmount || 0);
     }, 0),
@@ -1823,8 +1839,14 @@ function showToast(message) {
 }
 
 function switchView(name) {
+  document.querySelector("#team-button").hidden = name !== "dashboard";
+  if (name !== "dashboard" && document.querySelector("#team-dialog").open) {
+    document.querySelector("#team-dialog").close();
+  }
+  document.querySelector('.portfolio-bar').hidden = !['dashboard','executive','queue','business-report'].includes(name);
+  if (name === 'connected' && portfolioScope !== 'assessed') { useAssessedPortfolio(); renderAll(); }
   document.querySelectorAll(".nav-item").forEach(function (item) {
-    item.classList.toggle("active", item.dataset.view === name);
+    item.classList.toggle("active", item.dataset.view === ({connected:"intake",indicators:"method","ai-demo":"method"}[name] || name));
   });
   document.querySelectorAll(".view").forEach(function (view) {
     view.classList.remove("active-view");
@@ -1835,6 +1857,7 @@ function switchView(name) {
 }
 
 function filteredCases() {
+  const cases = portfolioCases();
   const query = searchQuery.trim().toLowerCase();
   return cases
     .filter(function (item) {
@@ -1990,6 +2013,7 @@ function populateSelects() {
 }
 
 function renderDashboardMetrics() {
+  const cases = portfolioCases();
   const high = cases.filter(function (item) {
     return item.risk === "High";
   }).length;
@@ -2024,7 +2048,7 @@ function renderDashboardMetrics() {
     [
       "Awaiting human decision",
       awaiting,
-      "AI has recommended; specialist decides",
+      "Controls and AI recommend; specialist decides",
       "review-stat",
     ],
     [
@@ -2057,6 +2081,7 @@ function renderDashboardMetrics() {
 }
 
 function renderRiskDistribution() {
+  const cases = portfolioCases();
   const total = Math.max(1, cases.length);
   const counts = {
     High: cases.filter(function (item) {
@@ -2123,6 +2148,7 @@ function renderRiskDistribution() {
 }
 
 function renderJourneyChart() {
+  const cases = portfolioCases();
   const counts = {};
   cases.forEach(function (item) {
     counts[item.journey] = (counts[item.journey] || 0) + 1;
@@ -2162,6 +2188,7 @@ function renderJourneyChart() {
 }
 
 function regionStats() {
+  const cases = portfolioCases();
   const stats = {};
   cases
     .filter(function (item) {
@@ -2305,6 +2332,7 @@ function renderMap() {
 }
 
 function renderOutsideList() {
+  const cases = portfolioCases();
   const outside = cases
     .filter(function (item) {
       return !isSaudi(item.country);
@@ -2345,6 +2373,7 @@ function renderOutsideList() {
 }
 
 function renderLatestActivity() {
+  const cases = portfolioCases();
   const latest = cases
     .slice()
     .sort(function (a, b) {
@@ -2402,6 +2431,7 @@ function renderDashboard() {
 }
 
 function renderQueue() {
+  const cases = portfolioCases();
   const visible = filteredCases();
   if (!visible.length) selectedId = null;
   if (
@@ -2438,7 +2468,7 @@ function renderQueue() {
               "</span></td>",
             '<td><span class="journey-tag">' +
               escapeHtml(item.journey) +
-              "</span></td>",
+              "</span><span class=\"subtext\">" + escapeHtml(item.rulesAssessment ? "Rules only" : item.assessmentSource === "cross-journey" ? "Cross-journey AI" : item.modelAssessment ? "SANED / journey AI" : "Illustrative simulation") + "</span></td>",
             "<td><strong>" +
               escapeHtml(item.customerName || item.subject) +
               '</strong><span class="subtext">' +
@@ -2462,14 +2492,14 @@ function renderQueue() {
               " " +
               (item.score == null ? " —" : " · " + item.score) +
               '</span><span class="subtext">' +
-              (item.modelAssessment ? "Existing control " + item.ruleScore + " · Unusualness percentile " + (item.modelAssessment.complete ? Number(item.modelAssessment.percentile).toFixed(1) + "%" : "unavailable") : "Legacy simulation · statistical score " + item.anomalyScore) +
+              (item.assessmentSource === "cross-journey" ? "Pattern model: " + (!item.modelAssessment.complete ? "Incomplete evidence" : item.modelAssessment.modelFlagged ? "Review suggested" : "No model flag") : item.modelAssessment ? "Existing control " + item.ruleScore + " · Reference percentile " + (item.modelAssessment.complete ? Number(item.modelAssessment.percentile).toFixed(1) + "%" : "unavailable") : item.rulesAssessment ? "Business control · no AI model" : "Scoring simulation · behavioral score " + item.anomalyScore) +
               "</span></td>",
             '<td><span class="confidence-chip ' +
               item.confidence +
               '">' +
               item.confidence +
               '</span><span class="subtext">' +
-              (item.modelAssessment ? "Input evidence " + (item.modelAssessment.complete ? "complete" : "incomplete") : item.confidenceScore + "% heuristic data completeness") +
+              (item.dataQuality ? item.dataQuality.score + "% · " + item.dataQuality.passed + "/" + item.dataQuality.total + " field checks" : item.confidenceScore + "% illustrative estimate") +
               "</span></td>",
             '<td class="reason">' + escapeHtml(item.signals[0][1]) + "</td>",
             '<td class="route">' + escapeHtml(item.route) + "</td>",
@@ -2491,6 +2521,7 @@ function renderQueue() {
 }
 
 function renderCase() {
+  const cases = portfolioCases();
   const item = cases.find(function (entry) {
     return entry.id === selectedId;
   });
@@ -2501,7 +2532,7 @@ function renderCase() {
     return;
   }
   const scoreColor = riskColor(item.risk);
-  const dataQuality = item.modelAssessment ? (item.modelAssessment.complete ? "Model evidence structurally complete; source reliability not independently validated" : "Model evidence incomplete; no model score produced") : item.features.missingData
+  const dataQuality = item.dataQuality ? item.dataQuality.passed+" of "+item.dataQuality.total+" required field checks passed. "+(item.dataQuality.criticalMissing ? "Critical information is missing or invalid." : "") : item.modelAssessment ? (item.modelAssessment.complete ? "Model evidence structurally complete; source reliability not independently validated" : "Model evidence incomplete; no model score produced") : item.features.missingData
     ? "Required information missing"
     : item.features.crossSourceConflict
       ? "Conflicting information — verification required"
@@ -2548,7 +2579,7 @@ function renderCase() {
       '"><div><strong>' +
       (item.score == null ? "—" : item.score) +
       "</strong><small>" +
-      (item.modelAssessment ? "Existing control" : "Legacy simulation") +
+      (item.rulesAssessment ? "Control score" : item.assessmentSource === "cross-journey" ? "Pattern review" : item.modelAssessment ? "Existing control" : "Scoring simulation") +
       "</small></div></div></div>",
     item.features.urgentPriority
       ? '<span class="urgent-banner">Urgent operational priority — urgency does not change risk</span>'
@@ -2556,12 +2587,12 @@ function renderCase() {
     "</div>",
     '<section class="detail-section identity-section"><h3 class="detail-title">Customer, employer &amp; operator context</h3><div class="identity-grid">',
     "<div><span>Customer / beneficiary</span><strong>" +
-      escapeHtml(item.customerName || "Synthetic customer") +
+      escapeHtml(item.customerName || "Not supplied") +
       "</strong><small>" +
       escapeHtml(
         (item.nationalIdMasked || item.subject) +
           " · " +
-          (item.mobileMasked || "050***0000"),
+          (item.mobileMasked || "Not supplied"),
       ) +
       "</small></div>",
     "<div><span>Employer</span><strong>" +
@@ -2570,12 +2601,12 @@ function renderCase() {
       escapeHtml((item.employerNumber || item.entity) + " · " + item.entity) +
       "</small></div>",
     "<div><span>Employer supervisor / operator</span><strong>" +
-      escapeHtml(item.supervisorName || "Synthetic operator") +
+      escapeHtml(item.supervisorName || "Not supplied") +
       "</strong><small>" +
       escapeHtml(
-        (item.supervisorUserId || "USR-000") +
+        (item.supervisorUserId || "Not supplied") +
           " · " +
-          (item.supervisorMobileMasked || "050***0000"),
+          (item.supervisorMobileMasked || "Not supplied"),
       ) +
       "</small></div>",
     "<div><span>Privacy status</span><strong>Masked synthetic data</strong><small>No real personal data is used in this prototype.</small></div>",
@@ -2619,16 +2650,16 @@ function renderCase() {
       "</small></section>",
     '<section class="detail-section"><h3 class="detail-title">Assessment components</h3><div class="score-split four">',
     '<div class="mini-score"><span>Existing control</span><strong>' +
-      item.ruleScore +
+      (item.ruleScore == null ? "Not supplied" : item.ruleScore) +
       "</strong></div>",
-    '<div class="mini-score"><span>' + (item.modelAssessment ? 'Unusualness percentile' : 'Legacy statistical score') + '</span><strong>' +
-      (item.anomalyScore == null ? '—' : Number(item.anomalyScore).toFixed(1)) +
+    '<div class="mini-score"><span>' + (item.assessmentSource === 'cross-journey' ? 'Pattern assessment' : item.modelAssessment ? 'Reference percentile' : item.rulesAssessment ? 'AI model' : 'Simulated behavioral score') + '</span><strong>' +
+      (item.assessmentSource === 'cross-journey' ? (!item.modelAssessment.complete ? 'Incomplete' : item.modelAssessment.modelFlagged ? 'Review' : 'Not flagged') : item.rulesAssessment ? 'Not used' : item.anomalyScore == null ? '—' : Number(item.anomalyScore).toFixed(1)) +
       "</strong></div>",
-    '<div class="mini-score"><span>Pattern adjustment</span><strong>+' +
-      item.interaction +
+    '<div class="mini-score"><span>Pattern adjustment</span><strong>' +
+      (item.modelAssessment || item.rulesAssessment ? 'Not applied' : '+' + item.interaction) +
       "</strong></div>",
-    '<div class="mini-score"><span>Input completeness</span><strong>' +
-      (item.modelAssessment ? (item.modelAssessment.complete ? 'Complete' : 'Incomplete') : item.confidenceScore + '% heuristic') +
+    '<div class="mini-score"><span>Data quality</span><strong>' +
+      (item.dataQuality ? item.dataQuality.score+'%' : item.confidenceScore + '% illustrative') +
       "</strong></div>",
     '</div><div class="comparison-note">' +
       escapeHtml(item.comparison) +
@@ -2652,7 +2683,7 @@ function renderCase() {
       item.confidence +
       "</span><div><strong>" +
       escapeHtml(dataQuality) +
-      "</strong><small>Assessment confidence is separate from behavioral risk.</small></div></div></section>",
+      "</strong><small>Data quality is separate from risk and model accuracy.</small></div></div>" + (item.dataQuality ? '<details><summary>How this percentage is calculated</summary><p>'+escapeHtml(item.dataQuality.method)+'</p><p>'+item.dataQuality.passed+' / '+item.dataQuality.total+' checks passed.</p><ul>'+item.dataQuality.issues.map(issue=>'<li>'+escapeHtml(issue.field)+(issue.critical?' — required for assessment':'')+'</li>').join('')+'</ul></details>' : '') + "</section>",
     '<section class="detail-section"><h3 class="detail-title">Behavioral timeline</h3><ul class="timeline">' +
       item.events
         .map(function (event) {
@@ -2666,7 +2697,7 @@ function renderCase() {
         })
         .join("") +
       "</ul></section>",
-    '<section class="detail-section"><h3 class="detail-title">AI agent activity</h3><ol class="agent-trace"><li><span>1</span><div><strong>Context assembled</strong><small>Approved synthetic events and existing control results loaded.</small></div></li><li><span>2</span><div><strong>Anomaly assessed</strong><small>Behavior compared with the prototype baseline.</small></div></li><li><span>3</span><div><strong>Reasons generated</strong><small>Contributing evidence retained for specialist review.</small></div></li><li><span>4</span><div><strong>Route recommended</strong><small>No adverse action executed automatically.</small></div></li></ol></section>',
+    '<section class="detail-section"><h3 class="detail-title">Assessment processing steps</h3><ol class="agent-trace"><li><span>1</span><div><strong>Context assembled</strong><small>Supplied synthetic evidence loaded for assessment.</small></div></li><li><span>2</span><div><strong>Anomaly assessed</strong><small>Behavior compared with the prototype baseline.</small></div></li><li><span>3</span><div><strong>Reasons generated</strong><small>Contributing evidence retained for specialist review.</small></div></li><li><span>4</span><div><strong>Route recommended</strong><small>No adverse action executed automatically.</small></div></li></ol></section>',
     '<section class="detail-section"><h3 class="detail-title">Recommended proportionate action</h3><div class="recommendation">' +
       escapeHtml(item.route) +
       '</div><div class="ownership-card"><div><span>Action owner</span><strong>' +
@@ -2676,12 +2707,15 @@ function renderCase() {
       "</strong></div><div><span>Business owner</span><strong>" +
       escapeHtml(businessOwnerForJourney(item.journey)) +
       "</strong></div></div>" +
-      (item.confidence === "Low"
-        ? '<div class="warning-note">Low confidence: complete or verify the missing information before relying on this recommendation.</div>'
+      ((item.confidence === "Low" || item.dataQuality?.criticalMissing)
+        ? '<div class="warning-note">Required evidence needs attention: complete or verify the missing information before relying on this recommendation.</div>'
         : "") +
       outcome +
       '<div class="action-row"><button class="approve-btn" id="approve-route">Approve recommended route</button><button class="override-btn" id="override-route-btn">Select different route</button><button class="override-btn" id="reject-route">Reject recommendation</button><button class="outcome-btn" id="record-outcome-btn">Record outcome</button></div></section>',
   ].join("");
+
+  if(item.outcome && !/^(Suspected|Inconclusive)/.test(item.outcome))panel.querySelectorAll('#approve-route,#override-route-btn,#reject-route').forEach(button=>{button.disabled=true;button.title='An outcome is already recorded. Use Record outcome to amend it.'});
+  if(item.outcomeProvenance || item.financialProvenance)panel.querySelector('.financial-context-section').insertAdjacentHTML('beforeend','<p class="session-note">'+escapeHtml([item.outcomeProvenance,item.financialProvenance].filter(Boolean).join(' · '))+'</p>');
   panel.insertAdjacentHTML("beforeend", renderModelEvidence(item) + renderReviewHistory(item) + renderScenarioGovernance(item));
   panel.querySelectorAll("[data-scenario-action]").forEach((button) => {
     button.addEventListener("click", () => openScenarioReview(item, button.dataset.scenarioAction));
@@ -2694,7 +2728,7 @@ function renderCase() {
     });
   if (!item.assessmentId) {
     panel.querySelectorAll("#approve-route, #override-route-btn, #reject-route, #record-outcome-btn").forEach((button) => { button.disabled = true; });
-    panel.insertAdjacentHTML("beforeend", '<p class="session-note">This is an unsaved legacy simulation. Use New Assessment or import synthetic model evidence to record a persistent specialist review.</p>');
+    panel.insertAdjacentHTML("beforeend", '<p class="session-note">This is an unsaved scoring simulation. Use New Assessment or import synthetic model evidence to record a persistent specialist review.</p>');
   }
   document.querySelector("#approve-route").addEventListener("click", () => openRouteDecision(item, "approve"));
   document.querySelector("#reject-route").addEventListener("click", () => openRouteDecision(item, "reject"));
@@ -2747,7 +2781,7 @@ function renderSimulationResults() {
     draftModelConfig.controlWeight +
     "% existing controls</strong> + <strong>" +
     draftModelConfig.anomalyWeight +
-    "% legacy statistical anomaly</strong> + " +
+    "% simulated behavioral anomaly</strong> + " +
     draftModelConfig.interactionMultiplier +
     "% of approved pattern adjustments. Risk bands: Low 0–" +
     draftModelConfig.lowMax +
@@ -2948,9 +2982,9 @@ function renderModelState() {
       modelConfig.controlWeight +
       "%</b> Existing control score <span>+</span><b>" +
       modelConfig.anomalyWeight +
-      "%</b> Legacy Statistical Score <span>+</span> " +
+      "%</b> Simulated Behavioral Score <span>+</span> " +
       modelConfig.interactionMultiplier +
-      "% of legacy pattern adjustment. Trained model outputs are never blended into this simulation.";
+      "% of simulated pattern adjustment. Trained model outputs are never blended into this simulation.";
   if (thresholds)
     thresholds.innerHTML =
       '<span><i class="low-dot"></i>Low 0–' +
@@ -2968,9 +3002,9 @@ function renderModelState() {
       modelConfig.controlWeight +
       "%</b> Existing Control Score <span>+</span><b>" +
       modelConfig.anomalyWeight +
-      "%</b> Legacy Statistical Score <span>+</span> " +
+      "%</b> Simulated Behavioral Score <span>+</span> " +
       modelConfig.interactionMultiplier +
-      "% of legacy Pattern Adjustment. This formula applies only to the legacy statistical demo.";
+      "% of simulated Pattern Adjustment. This formula applies only to the illustrative scoring simulation.";
 }
 
 const scenarioReviewStages = ["Specialist Review", "Testing", "GM Approval", "Approved", "Active"];
@@ -3039,7 +3073,7 @@ document.querySelector("#scenario-review-form").addEventListener("submit", async
   } catch (error) { document.querySelector("#scenario-review-error").textContent = error.message; }
   finally { button.disabled = false; }
 });
-["#close-scenario-review", "#cancel-scenario-review"].forEach((selector) => document.querySelector(selector).addEventListener("click", () => document.querySelector("#scenario-review-dialog").close()));
+
 document.querySelector("#assessment-approved-scenario").addEventListener("change", (event) => {
   const proposal = scenarioProposals.find((entry) => entry.id === event.target.value && entry.status === "Active");
   if (!proposal) return;
@@ -3194,6 +3228,7 @@ function topEntry(counts) {
 }
 
 function renderExecutiveDashboard() {
+  const cases = portfolioCases();
   const total = cases.length;
   const high = cases.filter(function (item) {
     return item.risk === "High";
@@ -3211,12 +3246,11 @@ function renderExecutiveDashboard() {
     return item.outcome;
   });
   const dq = cases.filter(function (item) {
-    return item.features.missingData || item.features.crossSourceConflict;
+    return item.dataQuality ? item.dataQuality.issues.length > 0 : item.features.missingData || item.features.crossSourceConflict;
   });
   const decisions = cases.filter(function (item) {
     return (
-      item.status !== "Awaiting specialist" &&
-      item.status !== "Ready to proceed"
+      !!item.decisionDate || (item.reviewHistory || []).some(review=>review.type === "decision" || review.type === "outcome")
     );
   });
   const financial = financialPortfolio(cases);
@@ -3235,26 +3269,26 @@ function renderExecutiveDashboard() {
     ],
     [
       "Potential amount at risk",
-      formatSar(financial.amountAtRisk),
-      "Exposure identified for proportionate review",
+      formatSar(financial.knownAmountAtRisk),
+      financial.missingExposureAmounts + " risk cases have no supplied amount; shown total excludes them",
       "medium-stat",
     ],
     [
       "Cases prevented",
       financial.prevented.length,
-      "Verified pre-payment or partial interventions",
+      financial.aiPrevented.length + " linked to AI flags · " + financial.scriptedPrevented.length + " scripted demo outcomes",
       "low-stat",
     ],
     [
       "Amount prevented",
       formatSar(financial.preventedAmount),
-      "Synthetic verified intervention value",
+      "Recorded synthetic value; not realised savings",
       "low-stat",
     ],
     [
       "Suspected fraud",
       financial.suspected.length,
-      "Classified by an authorized specialist",
+      "Recorded specialist classification",
       "review-stat",
     ],
     [
@@ -3296,7 +3330,7 @@ function renderExecutiveDashboard() {
     [
       "Prevented before payment",
       financial.prevented.length,
-      "Verified financial intervention",
+      financial.aiPrevented.length + " AI-flagged · synthetic demo outcomes",
     ],
   ];
   document.querySelector("#executive-funnel").innerHTML = funnel
@@ -3365,7 +3399,7 @@ function renderExecutiveDashboard() {
   const topSignals = {};
   cases.forEach(function (item) {
     item.signals.forEach(function (signal) {
-      topSignals[signal[0]] = (topSignals[signal[0]] || 0) + 1;
+      if (!["MODEL_NOT_FLAGGED","LOWER_BEHAVIORAL_DEVIATION","NO_MATERIAL_ANOMALY","NO_RULE_TRIGGER","CROSS_JOURNEY_PATTERN","MODEL_UNUSUAL_COMBINATION","EVIDENCE_INCOMPLETE","COMBINED_PATTERN"].includes(signal[0])) topSignals[signal[0]] = (topSignals[signal[0]] || 0) + 1;
     });
   });
   const leadingSignal = topEntry(topSignals);
@@ -3432,11 +3466,11 @@ function renderExecutiveDashboard() {
 
   const realization = [
     [
-      formatSar(financial.assessedAmount),
+      formatSar(financial.knownAssessedAmount),
       "Total synthetic transaction value assessed",
     ],
     [
-      formatSar(financial.amountAtRisk),
+      formatSar(financial.knownAmountAtRisk),
       "Potential exposure detected for review",
     ],
     [
@@ -3473,6 +3507,7 @@ function renderExecutiveDashboard() {
 }
 
 function reportCases() {
+  const cases = portfolioCases();
   const journey = document.querySelector("#report-journey")
     ? document.querySelector("#report-journey").value
     : "All";
@@ -3508,7 +3543,7 @@ function renderBusinessReport() {
     return item.status === "Route overridden";
   });
   const dq = list.filter(function (item) {
-    return item.features.missingData || item.features.crossSourceConflict;
+    return item.dataQuality ? item.dataQuality.issues.length > 0 : item.features.missingData || item.features.crossSourceConflict;
   });
   const financial = financialPortfolio(list);
   const metrics = [
@@ -3520,8 +3555,8 @@ function renderBusinessReport() {
     ],
     [
       "Potential amount at risk",
-      formatSar(financial.amountAtRisk),
-      "Detected exposure for review",
+      formatSar(financial.knownAmountAtRisk),
+      financial.missingExposureAmounts + " risk cases have no supplied amount; shown total excludes them",
       "medium-stat",
     ],
     [
@@ -3539,7 +3574,7 @@ function renderBusinessReport() {
     [
       "Cases prevented",
       financial.prevented.length,
-      "Verified financial intervention",
+      financial.aiPrevented.length + " AI-flagged · synthetic demo outcomes",
       "low-stat",
     ],
     [
@@ -3568,7 +3603,7 @@ function renderBusinessReport() {
   const signalCounts = {};
   list.forEach(function (item) {
     item.signals.forEach(function (signal) {
-      if (!["COMBINED_PATTERN", "MODEL_NOT_FLAGGED", "LOWER_BEHAVIORAL_DEVIATION", "NO_MATERIAL_ANOMALY", "EVIDENCE_INCOMPLETE", "REQUIRED_INFORMATION_MISSING"].includes(signal[0]))
+      if (!["COMBINED_PATTERN", "MODEL_NOT_FLAGGED", "LOWER_BEHAVIORAL_DEVIATION", "NO_MATERIAL_ANOMALY", "NO_RULE_TRIGGER", "CROSS_JOURNEY_PATTERN", "MODEL_UNUSUAL_COMBINATION", "EVIDENCE_INCOMPLETE", "REQUIRED_INFORMATION_MISSING"].includes(signal[0]))
         signalCounts[signal[0]] = (signalCounts[signal[0]] || 0) + 1;
     });
   });
@@ -3583,13 +3618,13 @@ function renderBusinessReport() {
   const summary = total
     ? "<p><strong>" +
       total +
-      " cases</strong> with a total synthetic transaction value of <strong>" +
-      formatSar(financial.assessedAmount) +
-      "</strong> were assessed in the selected scope. The capability detected <strong>" +
+      " cases</strong> were assessed. Total supplied transaction value: <strong>" +
+      formatSar(financial.knownAssessedAmount) +
+      "</strong>. The model or control policy flagged <strong>" +
       financial.detected.length +
-      " elevated-risk cases</strong> representing <strong>" +
-      formatSar(financial.amountAtRisk) +
-      "</strong> in potential exposure. Specialists classified <strong>" +
+      " cases for review</strong>. Supplied potential exposure: <strong>" +
+      formatSar(financial.knownAmountAtRisk) +
+      "</strong>. Recorded demo outcomes classified <strong>" +
       financial.suspected.length +
       "</strong> as suspected fraud and <strong>" +
       financial.confirmed.length +
@@ -3607,7 +3642,7 @@ function renderBusinessReport() {
       escapeHtml(leadSignal.replace(/_/g, " ")) +
       "</strong>.</p>"
     : '<div class="empty-state"><strong>No cases match the selected report scope.</strong><p>Choose another journey or owner to generate the report.</p></div>';
-  document.querySelector("#monthly-ai-summary").innerHTML = summary + (list.some(item => item.assessmentSource === "cross-journey") ? '<p class="session-note"><strong>Financial evidence:</strong> connected-journey examples do not supply transaction amounts. They contribute case counts, but no quantified exposure or savings. Financial totals only reflect supplied amounts.</p>' : "");
+  document.querySelector("#monthly-ai-summary").innerHTML = summary + '<p class="session-note"><strong>Synthetic demonstration:</strong> '+financial.scriptedPrevented.length+' prevention outcomes are scripted examples; '+financial.aiPrevented.length+' prevention cases are linked to actual synthetic model flags. These are not measured savings. Known totals exclude '+financial.missingTransactionAmounts+' missing transaction amounts and '+financial.missingExposureAmounts+' missing exposure amounts.</p>';
 
   const journeyRows = Object.keys(journeyCounts)
     .sort(function (a, b) {
@@ -3628,7 +3663,7 @@ function renderBusinessReport() {
         "</td><td>" +
         values.detected.length +
         "</td><td>" +
-        formatSar(values.amountAtRisk) +
+        formatSar(values.knownAmountAtRisk) +
         "</td><td>" +
         values.suspected.length +
         "</td><td>" +
@@ -3649,12 +3684,10 @@ function renderBusinessReport() {
     return item.outcome;
   });
   const distributionGroups = [
-    ["Risk", { High: high.length, Medium: medium.length, Low: low.length }],
+    ["Risk", { High: high.length, Medium: medium.length, Low: low.length, Incomplete:list.filter(item=>item.risk==="Incomplete").length }],
     [
       "Review feedback",
-      Object.keys(outcomeCounts).length
-        ? outcomeCounts
-        : { "Not yet recorded": Math.max(0, total - outcomes.length) },
+      {...outcomeCounts,"Not yet recorded": Math.max(0, total - outcomes.length)},
     ],
   ];
   document.querySelector("#report-distributions").innerHTML = distributionGroups
@@ -3719,7 +3752,7 @@ function renderBusinessReport() {
 
   const actionRows = [
     [
-      pendingHigh + " high-risk cases without recorded outcomes",
+      pendingHigh + " medium- and high-risk cases without recorded outcomes",
       "Complete specialist review and capture the validated outcome",
       "Fraud Prevention, Detection & Inspection",
       pendingHigh ? "High" : "Low",
@@ -3791,6 +3824,7 @@ function renderAll() {
   renderExecutiveDashboard();
   renderBusinessReport();
   renderModelState();
+  document.querySelector('#portfolio-scope-note').textContent = portfolioScope === 'assessed' ? 'Synthetic enterprise demo · other journeys use rules; SANED and connected histories use AI · amounts and scripted outcomes are illustrative' : 'Illustrative portfolio only · seeded outcomes and amounts, not model results';
   document.querySelector("#last-updated").textContent =
     "Synthetic feed · updated " +
     new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -3938,16 +3972,18 @@ function csvEscape(value) {
 
 async function importCSVText(text, mode, label) {
   const started = performance.now();
-  const controls = [document.querySelector("#import-file-btn"), document.querySelector("#import-paste-btn")];
+  useAssessedPortfolio();
+  const controls = [document.querySelector("#import-file-btn"), document.querySelector("#import-paste-btn"), document.querySelector("#import-sample-btn")];
   controls.forEach((button) => button.disabled = true);
   try {
     const matrix = parseCSV(text.trim());
     if (matrix.length < 2) throw new Error("CSV needs a header and at least one evidence row.");
-    if (matrix.length - 1 > 200) throw new Error("Import at most 200 synthetic rows per batch.");
+
     const headers = matrix[0].map(normalizeHeader);
     if (headers.includes("case_id") && headers.includes("event_id")) {
       await window.madarImportEvents(text); return;
     }
+    if (matrix.length - 1 > 200) throw new Error("Import at most 200 synthetic cases per batch.");
     const required = ["synthetic", "journey", "scenario", "subject_id", "existing_control_score"];
     const missing = required.filter((key) => !headers.includes(key));
     if (missing.length) throw new Error("Missing columns: " + missing.join(", ") + ". Download the current evidence template.");
@@ -3963,7 +3999,7 @@ async function importCSVText(text, mode, label) {
         if (row.transaction_id && rows.some(item => item.transactionId === row.transaction_id)) throw new Error("Duplicate transaction in this file.");
         const existing = row.transaction_id && cases.find(item => item.assessmentSource === "csv-upload" && item.transactionId === row.transaction_id);
         const id = existing?.id || "UPL-" + crypto.randomUUID().slice(0, 8).toUpperCase();
-        const raw = { customerName: row.subject_id, employerName: row.related_entity || "Not supplied", nationalIdMasked: "Not supplied", mobileMasked: "Not supplied", employerNumber: row.related_entity || "Not supplied", supervisorName: "Not supplied", supervisorUserId: "Not supplied", supervisorMobileMasked: "Not supplied", id, synthetic: true, transactionId: row.transaction_id || "TX-" + id, journey: row.journey, scenario: row.scenario, subject: row.subject_id, entity: row.related_entity || "—", source: "Imported · " + label, requested: row.requested_at || new Date().toISOString(), country: row.country || "Saudi Arabia", region: row.region || "Riyadh", city: row.city || "Riyadh", ruleScore: controlScore, transactionAmount: row.transaction_amount === "" || row.transaction_amount == null ? 0 : finite(row.transaction_amount, "transaction_amount"), amountAtRisk: row.amount_at_risk === "" || row.amount_at_risk == null ? 0 : finite(row.amount_at_risk, "amount_at_risk"), currency: "SAR", paymentStatus: row.payment_status || "Pending", detectionStage: row.detection_stage || "Before payment", features: { missingData: parseBoolean(row.required_information_missing), crossSourceConflict: parseBoolean(row.cross_source_conflict) } };
+        const raw = { customerName: row.subject_id, employerName: row.related_entity || "Not supplied", nationalIdMasked: "Not supplied", mobileMasked: "Not supplied", employerNumber: row.related_entity || "Not supplied", supervisorName: "Not supplied", supervisorUserId: "Not supplied", supervisorMobileMasked: "Not supplied", id, synthetic: true, transactionId: row.transaction_id || "TX-" + id, journey: row.journey, scenario: row.scenario, subject: row.subject_id, entity: row.related_entity || "—", source: "Imported · " + label, requested: row.requested_at || new Date().toISOString(), country: row.country || "Saudi Arabia", region: row.region || "Riyadh", city: row.city || "Riyadh", ruleScore: controlScore, transactionAmount: row.transaction_amount === "" || row.transaction_amount == null ? null : finite(row.transaction_amount, "transaction_amount"), amountAtRisk: row.amount_at_risk === "" || row.amount_at_risk == null ? null : finite(row.amount_at_risk, "amount_at_risk"), currency: "SAR", paymentStatus: row.payment_status || "Pending", detectionStage: row.detection_stage || "Before payment", features: { missingData: parseBoolean(row.required_information_missing), crossSourceConflict: parseBoolean(row.cross_source_conflict) } };
         if (row.journey === "SANED") {
           if (row.saned_case_id) raw.modelInput = { case_id: row.saned_case_id };
           else if (row.events_json) {
@@ -3976,6 +4012,7 @@ async function importCSVText(text, mode, label) {
     });
     if (!rows.length) throw new Error("No valid rows. " + errors.join(" "));
     const result = await backendJSON("/upload", { csv: text, mode, rows }, 30000);
+    useAssessedPortfolio();
     const accepted = result.saved.map((entry) => entry.caseData);
     if (mode === "replace") cases = cases.filter((item) => item.assessmentSource !== "csv-upload" && !String(item.source || "").startsWith("Imported · ")).concat(accepted); else cases = cases.filter(item => !accepted.some(next => next.id === item.id)).concat(accepted);
     importedCount = mode === "replace" ? accepted.length : importedCount + accepted.length;
@@ -3988,7 +4025,7 @@ async function importCSVText(text, mode, label) {
     renderAll(); loadBackendHistory();
     showToast(accepted.length + " cases saved with actual model responses.");
   } catch (error) { showImportError(error.message); }
-  finally { document.querySelector("#import-paste-btn").disabled = false; document.querySelector("#import-file-btn").disabled = !pendingFile; }
+  finally { document.querySelector("#import-sample-btn").disabled = false; document.querySelector("#import-paste-btn").disabled = false; document.querySelector("#import-file-btn").disabled = !pendingFile; }
 }
 
 function showImportError(message) {
@@ -4143,7 +4180,7 @@ async function runNewAssessment(event) {
       financialOutcome: null,
       outcome: null,
     },
-    syntheticIdentity(cases.length),
+    {customerName:document.querySelector('#assessment-subject').value.trim(),employerName:document.querySelector('#assessment-entity').value.trim() || 'Not supplied',nationalIdMasked:document.querySelector('#assessment-subject').value.trim(),mobileMasked:'Not supplied',employerNumber:document.querySelector('#assessment-entity').value.trim() || 'Not supplied',supervisorName:'Not supplied',supervisorUserId:'Not supplied',supervisorMobileMasked:'Not supplied'},
   );
   const submit = document.querySelector("#new-assessment-form button[type=submit]");
   submit.disabled = true;
@@ -4160,6 +4197,7 @@ async function runNewAssessment(event) {
     document.querySelector("#new-assessment-error").textContent = error.message + " No local substitute assessment was created.";
     return;
   } finally { submit.disabled = false; }
+  useAssessedPortfolio();
   const item = backendResult.caseData;
   cases.push(item);
   newAssessmentCount += 1;
@@ -4311,16 +4349,8 @@ document
   .addEventListener("click", function () {
     switchView("intake");
   });
-document
-  .querySelector("#close-assessment")
-  .addEventListener("click", function () {
-    document.querySelector("#new-assessment-dialog").close();
-  });
-document
-  .querySelector("#cancel-assessment")
-  .addEventListener("click", function () {
-    document.querySelector("#new-assessment-dialog").close();
-  });
+
+
 document
   .querySelector("#new-assessment-form")
   .addEventListener("submit", runNewAssessment);
@@ -4426,6 +4456,41 @@ document
     );
   });
 
+document.querySelector("#team-button").addEventListener("click", () => {
+  if (document.querySelector("#dashboard-view").classList.contains("active-view")) {
+    document.querySelector("#team-dialog").showModal();
+  }
+});
+document.querySelector("#team-dialog").addEventListener("click", (event) => {
+  const dialog = event.currentTarget;
+  const bounds = dialog.getBoundingClientRect();
+  if (event.target === dialog && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) {
+    discardDialog(dialog);
+  }
+});
+
+function discardDialog(dialog) {
+  dialog.querySelectorAll("form").forEach((form) => {
+    form.reset();
+    form.querySelectorAll("input, select, textarea").forEach((field) => field.setCustomValidity(""));
+  });
+  dialog.querySelectorAll('[role="alert"], #new-assessment-error').forEach((error) => {
+    error.textContent = "";
+  });
+  dialog.close("cancel");
+}
+
+document.querySelectorAll("dialog").forEach((dialog) => {
+  dialog.querySelectorAll('button[aria-label="Close"], button[value="cancel"], #cancel-assessment, #cancel-scenario-review').forEach((button) => {
+    button.type = "button";
+    button.addEventListener("click", () => discardDialog(dialog));
+  });
+  dialog.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    discardDialog(dialog);
+  });
+});
+
 document.querySelector("#confirm-override").addEventListener("click", async (event) => {
   event.preventDefault();
   const item = cases.find((entry) => entry.id === selectedId);
@@ -4433,7 +4498,7 @@ document.querySelector("#confirm-override").addEventListener("click", async (eve
   if (!item?.assessmentId || !reason) { showToast("A saved assessment and evidence note are required."); return; }
   event.currentTarget.disabled = true;
   try {
-    const saved = await backendJSON("/decision", { caseId: item.id, assessmentId: item.assessmentId, action: "override", route: document.querySelector("#override-route").value, note: reason });
+    const saved = await backendJSON("/decision", { caseId: item.id, assessmentId: item.assessmentId, action: "override", route: document.querySelector("#override-route").value, actorName:document.querySelector("#override-reviewer").value.trim(), note: reason });
     Object.assign(item, saved.caseData);document.querySelector("#override-dialog").close();renderAll();showToast("Human override saved; original model output preserved.");
   } catch (error) { showToast(error.message); }
   finally { document.querySelector("#confirm-override").disabled = false; }
@@ -4446,7 +4511,7 @@ document.querySelector("#confirm-outcome").addEventListener("click", async (even
   if (!item?.assessmentId) { document.querySelector("#outcome-save-error").textContent = "Assess and save the case first."; return; }
   button.disabled = true;
   try {
-    const saved = await backendJSON("/outcome", { caseId: item.id, assessmentId: item.assessmentId, outcome: document.querySelector("#outcome-value").value, financialOutcome: document.querySelector("#financial-outcome-value").value, amountAtRisk: Number(document.querySelector("#outcome-amount-at-risk").value), confirmedFraudAmount: Number(document.querySelector("#outcome-confirmed-amount").value), preventedAmount: Number(document.querySelector("#outcome-prevented-amount").value), note: document.querySelector("#outcome-note").value.trim() });
+    const saved = await backendJSON("/outcome", { caseId: item.id, assessmentId: item.assessmentId, actorName:document.querySelector("#outcome-reviewer").value.trim(), outcome: document.querySelector("#outcome-value").value, financialOutcome: document.querySelector("#financial-outcome-value").value, amountAtRisk: Number(document.querySelector("#outcome-amount-at-risk").value), confirmedFraudAmount: Number(document.querySelector("#outcome-confirmed-amount").value), preventedAmount: Number(document.querySelector("#outcome-prevented-amount").value), note: document.querySelector("#outcome-note").value.trim() });
     Object.assign(item, saved.caseData);document.querySelector("#outcome-dialog").close();renderAll();showToast("Specialist outcome saved separately from model inference.");
   } catch (error) { document.querySelector("#outcome-save-error").textContent = error.message; }
   finally { button.disabled = false; }
@@ -4489,6 +4554,24 @@ document.querySelector("#import-file-btn").addEventListener("click", async funct
     showImportError("The selected file could not be read. Choose a valid UTF-8 CSV file.");
   }
 });
+document.querySelector("#import-sample-btn").addEventListener("click", async function () {
+  this.disabled = true;
+  this.textContent = "Loading sample data…";
+  try {
+    const response = await fetch("/synthetic-model-evidence.csv", { cache: "no-store" });
+    if (!response.ok) throw new Error(response.status === 404
+      ? "Sample CSV not found. Restart the app server (Ctrl+C, then npm start) and refresh the page. If this persists, check that synthetic-model-evidence.csv is included in the deployment."
+      : "The sample CSV could not be loaded (HTTP " + response.status + "). Please try again.");
+    const text = await response.text();
+    await importCSVText(text, document.querySelector("#file-import-mode").value, "synthetic-model-evidence.csv");
+  } catch (error) {
+    showImportError(error.message);
+  } finally {
+    this.disabled = false;
+    this.textContent = "Load sample data";
+  }
+});
+
 document.querySelector("#import-paste-btn").addEventListener("click", function(){
   const text = document.querySelector("#csv-paste").value.trim();
   if (!text) { showImportError("Paste a header row and at least one data row before running the assessment."); return; }
@@ -4642,7 +4725,7 @@ async function restoreSavedJourneyAssessments() {
     saved
       .filter(
         (entry) =>
-          ["journey-prototype", "csv-upload", "cross-journey"].includes(entry.assessmentSource) &&
+          ["journey-prototype", "csv-upload", "cross-journey", "rules-demo"].includes(entry.assessmentSource) &&
           entry.caseData &&
           entry.caseData.synthetic === true,
       )
@@ -4664,115 +4747,7 @@ async function restoreSavedJourneyAssessments() {
   }
 }
 function renderBackendAssessment(result) {
-  const box = document.querySelector("#backend-result");
-  const complete = result.complete === true;
-
-  const reasons = (result.reasons || [])
-    .map(function (reason) {
-      return "<li>" + escapeHtml(reason) + "</li>";
-    })
-    .join("");
-  const identity = `<p class="backend-assessment-id">رقم المعاملة أو الحالة: ${escapeHtml(result.transactionId || result.caseId || "—")} · رقم التقييم: ${escapeHtml(result.assessmentId || "—")}</p>`;
-
-  // الحالة الناقصة لا تحصل على درجة؛ نعرض طلب استكمال الأدلة فقط.
-  if (!complete) {
-    box.innerHTML = `
-      <article class="backend-result-card incomplete">
-        <span class="backend-status-badge">استكمال الأدلة</span>
-        <h3>لم يصدر النموذج درجة لهذه الحالة</h3>
-        ${identity}
-        <p>السبب: الأدلة المطلوبة غير مكتملة. أكملوا البيانات ثم أعيدوا التقييم.</p>
-        <ul>${reasons}</ul>
-        <small>مسار الحالة: ${escapeHtml(result.route || "Complete evidence")}</small>
-      </article>
-    `;
-    box.insertAdjacentHTML("beforeend", renderModelEvidence({ modelAssessment: result }));
-    return;
-  }
-
-  const needsReview = Boolean(result.modelFlagged || result.ruleFlagged);
-  const title = needsReview
-    ? "تحتاج الحالة إلى مراجعة مختص"
-    : "لم يطلب النموذج مراجعة إضافية";
-
-  const score = Number(result.score);
-  const percentile = Number(result.percentile);
-
-  const featureRows = (result.features || [])
-    .map(function (feature) {
-      const value = Number(feature.value);
-      const median = Number(feature.median);
-
-      return `
-        <tr>
-          <td>${escapeHtml(feature.name)}</td>
-          <td>${Number.isFinite(value) ? value.toFixed(2) : "—"}</td>
-          <td>${Number.isFinite(median) ? median.toFixed(2) : "—"}</td>
-          <td>${feature.unusual ? "خارج النطاق المرجعي" : "ضمن النطاق المرجعي"}</td>
-        </tr>
-      `;
-    })
-    .join("");
-
-  box.innerHTML = `
-    <article class="backend-result-card ${needsReview ? "review" : "standard"}">
-      <div class="backend-result-heading">
-        <div>
-          <span class="backend-status-badge">
-            ${needsReview ? "مراجعة مختص" : "مراجعة اعتيادية"}
-          </span>
-          <h3>${title}</h3>
-          ${identity}
-        </div>
-        <span class="backend-band">${escapeHtml(result.band || "—")}</span>
-      </div>
-
-      <div class="backend-metrics">
-        <div>
-          <span>درجة الشذوذ الخام</span>
-          <strong>${Number.isFinite(score) ? score.toFixed(3) : "—"}</strong>
-        </div>
-        <div>
-          <span>مئين غرابة النمط</span>
-          <strong>${Number.isFinite(percentile) ? percentile.toFixed(1) + "%" : "—"}</strong>
-        </div>
-        <div>
-          <span>المسار المقترح</span>
-          <strong>${escapeHtml(result.route || "—")}</strong>
-        </div>
-      </div>
-
-      <p class="backend-explanation">
-        المئين يقارن النمط بحالات مرجعية اصطناعية؛ لا يعني احتمال احتيال.
-      </p>
-
-      <h4>الأسباب</h4>
-      <ul>${reasons || "<li>لم يذكر النموذج أسبابًا إضافية.</li>"}</ul>
-
-      <h4>الميزات مقارنةً بالمرجع</h4>
-      <div class="backend-table-wrap">
-        <table class="backend-feature-table">
-          <thead>
-            <tr>
-              <th>الميزة</th>
-              <th>القيمة</th>
-              <th>القيمة الوسطية</th>
-              <th>المقارنة</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${featureRows || '<tr><td colspan="4">لا توجد ميزات لعرضها.</td></tr>'}
-          </tbody>
-        </table>
-      </div>
-
-      <small>
-        إصدار النموذج: ${escapeHtml(result.modelVersion || "—")} ·
-        بيانات اصطناعية
-      </small>
-    </article>
-  `;
-  box.insertAdjacentHTML("beforeend", renderModelEvidence({ modelAssessment: result }));
+  document.querySelector('#backend-result').innerHTML = '<h3>'+escapeHtml(result.caseId || result.transactionId || 'Saved assessment')+'</h3>' + renderModelEvidence({modelAssessment:result.modelResult || result,assessmentSource:result.assessmentSource});
 }
 
 function renderPrototypeSavedAssessment(result) {
@@ -4781,14 +4756,14 @@ function renderPrototypeSavedAssessment(result) {
     .join("");
   document.querySelector("#backend-result").innerHTML = `
     <article class="backend-result-card standard">
-      <span class="backend-status-badge">تقييم رحلة محفوظ</span>
+      <span class="backend-status-badge">Saved journey assessment</span>
       <h3>${escapeHtml(result.journey || "—")} · ${escapeHtml(result.risk || "—")}</h3>
-      <p class="backend-assessment-id">رقم المعاملة أو الحالة: ${escapeHtml(result.transactionId || result.caseId || "—")} · رقم التقييم: ${escapeHtml(result.assessmentId || "—")}</p>
-      <p>درجة المخاطر في النموذج الأولي: ${escapeHtml(result.score ?? "—")}/100</p>
-      ${result.modelVersion ? `<p>نموذج الرحلة: ${escapeHtml(result.modelVersion)} · مئين غرابة اصطناعي: ${escapeHtml(result.modelPercentile ?? "—")}%</p>` : ""}
-      <p>المسار المقترح: ${escapeHtml(result.route || "—")}</p>
-      <p>${escapeHtml(result.validation || "النتيجة تجريبية وتحتاج تحققًا ببيانات أعمال معتمدة.")}</p>
-      <ul>${reasons || "<li>لا توجد أسباب إضافية.</li>"}</ul>
+      <p class="backend-assessment-id">Transaction / case: ${escapeHtml(result.transactionId || result.caseId || "—")} · Assessment: ${escapeHtml(result.assessmentId || "—")}</p>
+      <p>Simulation score: ${escapeHtml(result.score ?? "—")}/100</p>
+      ${result.modelVersion ? `<p>Journey model: ${escapeHtml(result.modelVersion)} · Synthetic reference percentile: ${escapeHtml(result.modelPercentile ?? "—")}%</p>` : ""}
+      <p>Recommended route: ${escapeHtml(result.route || "—")}</p>
+      <p>${escapeHtml(result.validation || "Prototype result; business validation is required.")}</p>
+      <ul>${reasons || "<li>No additional reasons.</li>"}</ul>
     </article>`;
 }
 
@@ -4796,32 +4771,32 @@ function renderBackendHistory(assessments) {
   const list = document.querySelector("#backend-history-list");
   if (!assessments.length) {
     list.innerHTML =
-      '<p class="backend-placeholder">ما فيه تقييمات محفوظة حتى الآن.</p>';
+      '<p class="backend-placeholder">No saved assessments yet.</p>';
     return;
   }
 
   list.innerHTML = assessments
     .map(function (item) {
-      const label = item.transactionId || item.caseId || "حالة بلا رقم";
+      const label = item.transactionId || item.caseId || "Case without identifier";
       const isJourneyAssessment = item.assessmentSource === "journey-prototype" && !item.modelResult;
       const state = isJourneyAssessment
-        ? item.risk + " · " + (item.journey || "تقييم رحلة")
+        ? item.risk + " · " + (item.journey || "Journey assessment")
         : item.complete !== true
-          ? "استكمال الأدلة"
+          ? "Complete evidence"
           : item.modelFlagged || item.ruleFlagged
-            ? "مراجعة مختص"
-            : "مراجعة اعتيادية";
+            ? "Specialist review"
+            : "Standard review";
       const date = item.assessedAt
         ? new Date(item.assessedAt).toLocaleString()
-        : "وقت غير متاح";
+        : "Time unavailable";
       const score =
         Number.isFinite(Number(item.score))
           ? isJourneyAssessment
             ? Number(item.score).toFixed(0) + "/100"
             : item.complete === true
           ? Number(item.score).toFixed(3)
-              : "بدون درجة"
-          : "بدون درجة";
+              : "No score"
+          : "No score";
 
       return `
         <article class="backend-history-item">
@@ -4831,7 +4806,7 @@ function renderBackendHistory(assessments) {
           </div>
           <span>${escapeHtml(state)} · ${escapeHtml(score)}</span>
           <button class="secondary-btn" data-assessment-id="${escapeHtml(item.assessmentId || "")}">
-            عرض النتيجة
+            View assessment
           </button>
         </article>
       `;
@@ -4841,20 +4816,20 @@ function renderBackendHistory(assessments) {
 
 async function loadBackendHistory() {
   const status = document.querySelector("#backend-history-status");
-  status.textContent = "جارٍ تحميل التقييمات المحفوظة...";
+  status.textContent = "Loading saved assessments…";
 
   try {
     const response = await fetch(backendBaseUrl + "/assessments");
     const assessments = await response.json();
     if (!response.ok) {
-      throw new Error(assessments.error || "تعذر تحميل السجل");
+      throw new Error(assessments.error || "Could not load history");
     }
 
     backendSavedAssessments = assessments;
     renderBackendHistory(assessments);
-    status.textContent = "عدد التقييمات المحفوظة: " + assessments.length;
+    status.textContent = "Saved assessments: " + assessments.length;
   } catch (error) {
-    status.textContent = "تعذر تحميل السجل: " + error.message;
+    status.textContent = "Could not load history: " + error.message;
   }
 }
 
@@ -4889,11 +4864,11 @@ document
     const status = document.querySelector("#backend-status");
     const select = document.querySelector("#backend-case-select");
 
-    status.textContent = "جارٍ تحميل الحالات...";
+    status.textContent = "Loading cases…";
 
     try {
       const response = await fetch(backendBaseUrl + "/cases");
-      if (!response.ok) throw new Error("تعذر تحميل الحالات من الباكند");
+      if (!response.ok) throw new Error("Could not load model cases");
 
       const backendCases = await response.json();
 
@@ -4910,12 +4885,12 @@ document
         .join("");
 
       status.textContent =
-        "تم تحميل " + backendCases.length + " حالة اصطناعية.";
+        "Loaded " + backendCases.length + " synthetic cases.";
     } catch (error) {
       status.textContent =
-        "فشل الاتصال: " +
+        "Connection failed: " +
         error.message +
-        ". تأكدي أن الباكند يعمل وأن إعداد CORS صحيح.";
+        ". Check that the backend is running and the connection is configured.";
     }
   });
 
@@ -4927,11 +4902,11 @@ document
     const caseId = document.querySelector("#backend-case-select").value;
 
     if (!caseId) {
-      status.textContent = "اضغطي «تحميل الحالات» واختاري حالة أولًا.";
+      status.textContent = "Load cases and select one first.";
       return;
     }
 
-    status.textContent = "جارٍ تقييم " + caseId + "...";
+    status.textContent = "Assessing " + caseId + "...";
     resultBox.textContent = "";
 
     try {
@@ -4942,12 +4917,12 @@ document
       });
 
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "فشل التقييم");
+      if (!response.ok) throw new Error(result.error || "Assessment failed");
 
-      status.textContent = "اكتمل التقييم. الإصدار: " + result.modelVersion;
+      status.textContent = "Assessment complete. Version: " + result.modelVersion;
       renderBackendAssessment(result);
     } catch (error) {
-      status.textContent = "فشل التقييم: " + error.message;
+      status.textContent = "Assessment failed: " + error.message;
     }
   });
 const reportMonth = document.querySelector("#report-month");
@@ -4958,6 +4933,7 @@ if (reportMonth) {
     now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0");
 }
 
+document.querySelector('#portfolio-scope').addEventListener('change', event=>{portfolioScope=event.target.value;selectedId=null;resetVisibleSelection();renderAll();});
 populateSelects();
 syncAssessmentLocationFields();
 renderAll();
@@ -4968,4 +4944,4 @@ restoreSavedJourneyAssessments();
 
 loadScenarioProposals().catch(() => { /* The review form reports backend errors when used. */ });
 
-backendJSON("/health").then((health) => { document.querySelector("#engine-status").textContent = health.contractVersion === "integration-v0.2-separated" ? "Model services ready" : "Restart backend · older integration running"; }).catch(() => { document.querySelector("#engine-status").textContent = "AI service unavailable · legacy demo only"; });
+backendJSON("/health").then((health) => { document.querySelector("#engine-status").textContent = health.contractVersion === "integration-v0.2-separated" ? "Model services ready" : "Restart backend · older integration running"; }).catch(() => { document.querySelector("#engine-status").textContent = "AI service unavailable · illustrative demo only"; });

@@ -7,3 +7,7 @@ node_modules
 **/risk-config.json
 **/indicator-suggestions.json
 **/scenario-proposals.json
+
+.env
+.env.*
+**/case-explanations.json

@@ -14,6 +14,8 @@ const ALLOWED_TYPES = new Set([
   "maternity",
 ]);
 
+const JOURNEY_FOR_TYPE = {registration:'Employer Registration', wage:'Contribution & Wage', exclusion:'Employer Registration', claim:'SANED', payment:'Benefit Payments', retirement:'Retirement', maternity:'Maternity Benefit'};
+
 // Named positions keep rule logic readable while preserving the model's fixed feature order.
 const FEATURE = Object.freeze({
   distinctJourneys: 0,
@@ -41,7 +43,7 @@ function validSyntheticId(value, prefix) {
 
 /**
  * Search timestamps for registration → wage → exclusion → SANED in that order.
- * The events may belong to several linked contributors within the same case.
+ * Call this only with one contributor’s events; employer-level counts are separate.
  */
 function findOrderedChain(events) {
   const times = Object.fromEntries(
@@ -93,7 +95,7 @@ export function extractFeatures(caseRecord) {
         !Number.isFinite(event.recordedAt) ||
         !validSyntheticId(event.subjectId, "CTR-SYN-") ||
         event.employerId !== caseRecord.employerId ||
-        typeof event.journey !== "string",
+        event.journey !== JOURNEY_FOR_TYPE[event.type],
     )
   ) {
     return null;
@@ -111,7 +113,7 @@ export function extractFeatures(caseRecord) {
   if (
     wages.some(
       (event) =>
-        !Number.isFinite(event.amount) ||
+        !Number.isFinite(event.amount) || event.amount <= 0 ||
         !Number.isFinite(event.previousAmount) ||
         event.previousAmount <= 0,
     ) ||
@@ -133,11 +135,12 @@ export function extractFeatures(caseRecord) {
     identifierSubjects.get(event.identifierId).add(event.subjectId);
   }
 
-  const chain = findOrderedChain(events);
+  const chains = [...new Set(events.map(event => event.subjectId))]
+    .map(subject => findOrderedChain(events.filter(event => event.subjectId === subject)))
+    .filter(chain => chain.found);
+  const chainCount = chains.length;
+  const chain = {found: chainCount > 0, spanDays: chains.length ? Math.min(...chains.map(chain => chain.spanDays)) : 30};
   const count = (type) => events.filter((event) => event.type === type).length;
-  const chainCount = chain.found
-    ? Math.min(count("registration"), wages.length, exclusions.length, claims.length)
-    : 0;
   const latestWageHours = wages.length
     ? (caseRecord.asOf - Math.max(...wages.map((event) => event.recordedAt))) / HOUR
     : 30 * 24;
@@ -230,11 +233,12 @@ function contextualFeatures(vector) {
     const recency = index === 9;
     const display = (value) => recency ? Math.expm1(value) : value;
     return {
-      name: model.features[index],
+      name: recency ? "Hours since latest wage change" : model.features[index],
       value: display(internalValue),
       median: display(model.referenceMedian[index]),
       low: display(model.referenceP05[index]),
       high: display(model.referenceP95[index]),
+      unusual: internalValue < model.referenceP05[index] || internalValue > model.referenceP95[index],
       outsideReferenceRange:
         internalValue < model.referenceP05[index] ||
         internalValue > model.referenceP95[index],
@@ -270,7 +274,7 @@ export function assess(caseRecord) {
   const involvedJourneys = [
     ...new Set(
       caseRecord.events
-        .filter((event) => event.recordedAt <= caseRecord.asOf)
+        .filter((event) => event.recordedAt <= caseRecord.asOf && event.recordedAt >= caseRecord.asOf - 30 * DAY)
         .map((event) => event.journey),
     ),
   ];
@@ -282,7 +286,7 @@ export function assess(caseRecord) {
   ];
   if (chainCount >= 2) {
     reasons.push(
-      `${chainCount} linked contributors participate in a registration → wage → exclusion → SANED sequence.`,
+      `${chainCount} linked contributors each complete a registration → wage → exclusion → SANED sequence.`,
     );
   }
   reasons.push(...ruleReasons);
@@ -295,6 +299,16 @@ export function assess(caseRecord) {
     modelFlagged,
     ruleFlagged: ruleReasons.length > 0,
     ruleReasons,
+    ruleFindings: ruleReasons.map(description => ({code: ({
+      "Eight or more registrations in 30 days":"CJ_REGISTRATION_VOLUME",
+      "Five or more SANED requests in 30 days":"CJ_CLAIM_VOLUME",
+      "Wage increase of 80% or more":"CJ_WAGE_INCREASE",
+      "Retroactive change of 30 days or more":"CJ_RETROACTIVE_CHANGE",
+      "Identifier shared by four or more contributors":"CJ_IDENTIFIER_REUSE",
+      "Two or more cross-source conflicts":"CJ_SOURCE_CONFLICT",
+      "Three or more rule overrides":"CJ_RULE_OVERRIDES",
+    })[description], description})),
+    completedContributorChains: chainCount,
     involvedJourneys,
     linkedContributorCount: vector[FEATURE.linkedContributors],
     route: modelFlagged || ruleReasons.length ? "Specialist review" : "Standard review",

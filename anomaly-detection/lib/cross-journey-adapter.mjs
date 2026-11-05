@@ -64,14 +64,16 @@ export function createCrossJourneyAssessment(evidence) {
   const risk = !result.complete ? 'Incomplete' : review ? 'Medium' : 'Low';
   const events = evidence.events.filter(e => e.recordedAt <= evidence.asOf && e.recordedAt >= evidence.asOf - 30 * 86400000).sort((a,b) => a.recordedAt - b.recordedAt);
   const subjects = [...new Set(events.map(e => e.subjectId))];
-  const reasonCodes = result.reasons.map((description,i) => ({code:!result.complete ? 'EVIDENCE_INCOMPLETE' : i === 0 ? (result.modelFlagged ? 'CROSS_JOURNEY_PATTERN' : 'MODEL_NOT_FLAGGED') : `CROSS_JOURNEY_EVIDENCE_${i}`,description}));
+  const reasonCodes = [{code: !result.complete ? 'EVIDENCE_INCOMPLETE' : result.modelFlagged ? 'CROSS_JOURNEY_PATTERN' : 'MODEL_NOT_FLAGGED', description:result.reasons[0]}];
+  if (result.completedContributorChains >= 2) reasonCodes.push({code:'CJ_COMPLETED_CONTRIBUTOR_SEQUENCE',description:result.reasons[1]});
+  reasonCodes.push(...(result.ruleFindings || []));
   const caseData = {
     id:evidence.id,transactionId:evidence.id,synthetic:true,journey:'SANED',scenario,
     assessmentId,assessedAt,assessmentSource:'cross-journey',assessmentMode:'model-separated',
     subject:subjects.join(', '),entity:evidence.employerId || 'Missing employer',customerName:subjects.length + ' linked contributor' + (subjects.length === 1 ? '' : 's'),employerName:evidence.employerId || 'Missing employer',
     requested:assessedAt,country:'Saudi Arabia',region:'Not supplied',city:'Not supplied',source:'Synthetic linked event history',
-    score:null,ruleScore:0,risk,route:result.route,status:!result.complete?'Complete evidence':review?'Awaiting specialist':'Standard review',
-    comparison:!result.complete?'Evidence incomplete':result.modelFlagged && !result.ruleFlagged?'AI-only detection across connected journeys':result.modelFlagged?'Rules and AI recommend review':'No review threshold crossed',
+    score:null,ruleScore:null,risk,route:result.route,status:!result.complete?'Complete evidence':review?'Awaiting specialist':'Standard review',
+    comparison:!result.complete?'Evidence incomplete':result.modelFlagged && !result.ruleFlagged?'Model recommends review; included comparator rules remain quiet':result.modelFlagged?'Rules and AI recommend review':'No review threshold crossed',
     confidence:'Not calibrated',confidenceScore:null,anomalyScore:result.percentile ?? null,interaction:0,
     features:{velocity:events.length,linkedEntities:subjects.length,retroDays:0,priorRisk:0,overrides:0,identityReuse:0,amountChangePct:0,crossSourceConflict:events.some(e=>e.sourceConflict),missingData:!result.complete,urgentPriority:0},
     primaryCode:reasonCodes[0].code,primaryReason:result.reasons.join(' '),reasonCodes,signals:reasonCodes.map(r=>[r.code,r.description]),
@@ -80,7 +82,7 @@ export function createCrossJourneyAssessment(evidence) {
     crossJourneyEvidence:structuredClone(evidence),sourceTimeline:events,
     events:events.map(e=>[`${e.journey} · ${e.subjectId} · ${e.type}`,new Date(e.recordedAt).toISOString()]),
     audit:[`Cross-journey model ${result.modelVersion} assessed at ${assessedAt}.`],
-    paymentStatus:'Pending · simulation',detectionStage:'Before payment',transactionAmount:0,amountAtRisk:0,confirmedFraudAmount:0,preventedAmount:0,currency:'SAR',outcome:null,financialOutcome:null,
+    paymentStatus:'Pending · simulation',detectionStage:'Before payment',transactionAmount:null,amountAtRisk:null,confirmedFraudAmount:0,preventedAmount:0,currency:'SAR',outcome:null,financialOutcome:null,
   };
   const keys=['eventId','recordedAt','effectiveAt','journey','type','subjectId','employerId','identifierId','amount','previousAmount','sourceConflict','ruleOverride'];
   const canonical={id:evidence.id,employerId:evidence.employerId || '',asOf:evidence.asOf,events:[...evidence.events].sort((a,b)=>a.eventId.localeCompare(b.eventId)).map(e=>Object.fromEntries(keys.map(key=>[key,e[key] === "" ? null : e[key] ?? null])))};

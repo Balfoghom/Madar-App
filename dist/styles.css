@@ -1,23 +1,23 @@
 :root {
-  --navy: #0d2b52;
-  --navy-2: #173e6f;
-  --ink: #17253a;
-  --muted: #68778d;
-  --line: #dce5ed;
-  --bg: #f2f6f8;
+  --navy: #00004e;
+  --navy-2: #00122d;
+  --ink: #00122d;
+  --muted: #5d6880;
+  --line: #dfe3ef;
+  --bg: #f5f7fb;
   --white: #ffffff;
-  --green: #20ad71;
-  --green-dark: #11784b;
-  --green-soft: #e5f7ee;
+  --green: #00bf00;
+  --green-dark: #007a00;
+  --green-soft: #e6f9e6;
   --amber: #dc9017;
   --amber-soft: #fff3dc;
   --red: #d74b52;
   --red-soft: #fdebed;
-  --blue: #3f6eb0;
-  --blue-soft: #eaf1fb;
-  --violet: #6365a8;
-  --violet-soft: #eeeeff;
-  --shadow: 0 12px 34px rgba(16, 43, 82, 0.08);
+  --blue: #0064ff;
+  --blue-soft: #eaf2ff;
+  --violet: #a37dfc;
+  --violet-soft: #f1edff;
+  --shadow: 0 12px 34px rgba(0, 0, 78, .08);
 }
 
 * {
@@ -48,7 +48,7 @@ select:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-  outline: 3px solid rgba(32, 173, 113, 0.3);
+  outline: 3px solid rgba(0, 100, 255, .28);
   outline-offset: 2px;
 }
 
@@ -63,7 +63,7 @@ textarea:focus-visible,
   height: 100vh;
   padding: 26px 18px 20px;
   color: #fff;
-  background: linear-gradient(180deg, #0a274b 0%, #10365f 100%);
+  background: linear-gradient(180deg, #00004e 0%, #00122d 100%);
   display: flex;
   flex-direction: column;
   z-index: 10;
@@ -84,7 +84,7 @@ textarea:focus-visible,
   place-items: center;
   font-weight: 900;
   background: var(--green);
-  box-shadow: 0 9px 24px rgba(32, 173, 113, 0.3);
+  box-shadow: 0 9px 24px rgba(0,191,0,.22);
 }
 .brand strong,
 .brand span {
@@ -120,10 +120,10 @@ nav {
 .nav-item:hover,
 .nav-item.active {
   color: #fff;
-  background: rgba(255, 255, 255, 0.11);
+  background: rgba(255,255,255,.11);
 }
 .nav-item span {
-  color: #63d7a1;
+  color: var(--green);
   font-size: 1.12rem;
   width: 20px;
   text-align: center;
@@ -154,9 +154,9 @@ nav {
 .pulse-dot {
   width: 9px;
   height: 9px;
-  background: #5fdfaa;
+  background: var(--green);
   border-radius: 50%;
-  box-shadow: 0 0 0 4px rgba(95, 223, 170, 0.13);
+  box-shadow: 0 0 0 4px rgba(0,191,0,.13);
   margin-top: 3px;
   flex: 0 0 auto;
 }
@@ -221,10 +221,10 @@ main {
 @keyframes pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 4px rgba(95, 223, 170, 0.13);
+    box-shadow: 0 0 0 4px rgba(0, 191, 0, 0.13);
   }
   50% {
-    box-shadow: 0 0 0 8px rgba(95, 223, 170, 0.03);
+    box-shadow: 0 0 0 8px rgba(0, 191, 0, 0.03);
   }
 }
 .model-pill,
@@ -306,12 +306,12 @@ main {
 .primary-btn {
   border: 0;
   color: #fff;
-  background: var(--green);
+  background: var(--navy);
   padding: 10px 13px;
-  box-shadow: 0 5px 14px rgba(32, 173, 113, 0.2);
+  box-shadow: 0 5px 14px rgba(0,0,78,.18);
 }
 .primary-btn:hover {
-  background: #18965f;
+  background: var(--blue);
 }
 .primary-btn:disabled {
   cursor: not-allowed;
@@ -450,7 +450,7 @@ main {
     var(--green) var(--medium) 100%
   );
   position: relative;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.04);
 }
 .donut::after {
   content: "";
@@ -594,7 +594,7 @@ main {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--green), #5fcf9d);
+  background: linear-gradient(90deg, var(--green), var(--blue));
 }
 .journey-bar b {
   font-size: 0.75rem;
@@ -628,11 +628,11 @@ main {
   stroke: #527c70;
   stroke-width: 2.8;
   stroke-linejoin: round;
-  filter: drop-shadow(0 8px 10px rgba(31, 78, 69, 0.12));
+  filter: drop-shadow(0 8px 10px rgba(31,78,69,.12));
 }
 .map-grid {
   fill: none;
-  stroke: rgba(91, 133, 145, 0.15);
+  stroke: rgba(91,133,145,.15);
   stroke-width: 1;
   stroke-dasharray: 3 8;
 }
@@ -651,7 +651,7 @@ main {
 }
 .map-divider {
   fill: none;
-  stroke: rgba(82, 124, 112, 0.24);
+  stroke: rgba(82,124,112,.24);
   stroke-width: 1.2;
   stroke-dasharray: 4 6;
 }
@@ -1011,7 +1011,7 @@ main {
 .filter.active {
   background: #fff;
   color: var(--navy);
-  box-shadow: 0 2px 6px rgba(24, 44, 72, 0.12);
+  box-shadow: 0 2px 6px rgba(24,44,72,.12);
 }
 .table-wrap {
   overflow-x: auto;
@@ -1163,7 +1163,7 @@ tbody tr.selected {
 .case-hero {
   padding: 18px;
   color: #fff;
-  background: linear-gradient(135deg, var(--navy), #1a4d7b);
+  background: linear-gradient(135deg, var(--navy), var(--blue));
 }
 .case-hero-top {
   display: flex;
@@ -1190,7 +1190,7 @@ tbody tr.selected {
   place-items: center;
   background: conic-gradient(
     var(--score-color) var(--score),
-    rgba(255, 255, 255, 0.16) 0
+    rgba(255,255,255,.16) 0
   );
   position: relative;
 }
@@ -1220,7 +1220,7 @@ tbody tr.selected {
   padding: 7px 9px;
   border-radius: 7px;
   color: #ffedee;
-  background: rgba(217, 75, 82, 0.25);
+  background: rgba(217,75,82,.25);
   font-size: 0.62rem;
   font-weight: 800;
 }
@@ -1536,7 +1536,7 @@ tbody tr.selected {
 }
 .approve-btn,
 .dialog-actions button:not(.secondary) {
-  background: var(--green);
+  background: var(--navy);
   color: #fff;
 }
 .override-btn,
@@ -2406,7 +2406,7 @@ tbody tr.selected {
 }
 .appendix-worked-example small {
   margin-top: 7px;
-  color: rgba(255, 255, 255, 0.68);
+  color: rgba(255,255,255,.68);
   font-size: 0.65rem;
   line-height: 1.45;
 }
@@ -2496,10 +2496,10 @@ dialog {
   border: 0;
   border-radius: 16px;
   padding: 0;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 24px 80px rgba(0,0,0,.28);
 }
 dialog::backdrop {
-  background: rgba(8, 24, 45, 0.58);
+  background: rgba(8,24,45,.58);
   backdrop-filter: blur(3px);
 }
 dialog form {
@@ -2616,7 +2616,7 @@ dialog label.check-field {
   color: #fff;
   padding: 12px 15px;
   border-radius: 10px;
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 14px 34px rgba(0,0,0,.2);
   font-size: 0.75rem;
   transition: 0.25s ease;
   z-index: 50;
@@ -2644,7 +2644,7 @@ dialog label.check-field {
 }
 .executive-banner span {
   display: block;
-  color: #79e0ad;
+  color: #7cff7c;
   font-size: 0.62rem;
   font-weight: 900;
   letter-spacing: 0.12em;
@@ -2663,11 +2663,11 @@ dialog label.check-field {
 }
 .executive-principles span {
   padding: 7px 9px;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255,255,255,.22);
   border-radius: 999px;
   color: #fff;
   letter-spacing: 0;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255,255,255,.08);
 }
 .executive-grid,
 .report-grid {
@@ -3342,10 +3342,10 @@ dialog label.check-field {
   .indicator-row {
     grid-template-columns: 1.5fr 0.8fr 0.7fr;
   }
-  .indicator-row > :nth-child(4),
-  .indicator-row > :nth-child(5) {
-    display: none;
-  }
+    .indicator-row > :nth-child(4),
+  .indicator-row > :nth-child(5) { display: block; }
+  .indicator-row:not(.header) > :nth-child(4)::before { content: 'Status: '; }
+  .indicator-row > :nth-child(5) { grid-column: 2 / -1; }
   .pipeline {
     grid-template-columns: 1fr;
   }

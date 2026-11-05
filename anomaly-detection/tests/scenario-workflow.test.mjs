@@ -39,7 +39,7 @@ try{
  await post('/save-assessment',{assessmentId:model.assessmentId});
  const review={caseId:item.id,role:'Specialist',actorName:'Demo specialist',note:'Evidence reviewed; useful synthetic example.'};
  await post('/scenario-proposals',{...review,action:'submit'},409);
- await post('/outcome',{caseId:item.id,outcome:'Legitimate activity',financialOutcome:'Proceeded',amountAtRisk:0,confirmedFraudAmount:0,preventedAmount:0,note:'Evidence consistent.'});
+ await post('/outcome',{caseId:item.id,assessmentId:model.assessmentId,actorName:'Demo specialist',outcome:'Legitimate activity',financialOutcome:'Proceeded',amountAtRisk:0,confirmedFraudAmount:0,preventedAmount:0,note:'Evidence consistent.'});
  let {proposal}=await post('/scenario-proposals',{...review,action:'submit'});assert.equal(proposal.status,'Specialist Review');
  await post('/scenario-proposals',{...review,action:'submit'},409);
  await post('/scenario-proposals',{...review,action:'approve',expectedStatus:'Specialist Review',role:'GM'},409);

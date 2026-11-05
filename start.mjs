@@ -4,12 +4,13 @@ import { fileURLToPath } from 'node:url';
 import { join, extname } from 'node:path';
 import { timingSafeEqual } from 'node:crypto';
 const root = fileURLToPath(new URL('.', import.meta.url));
+try { process.loadEnvFile(join(root, '.env')); } catch (error) { if (error.code !== 'ENOENT') throw error; }
 process.env.ASSESSMENT_DATA_DIR ||= join(root, '.madar-data');
 await mkdir(process.env.ASSESSMENT_DATA_DIR, {recursive:true});
 const { createInferenceServer } = await import('./anomaly-detection/server.mjs');
 const api = createInferenceServer();
 const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.csv':'text/csv; charset=utf-8'};
-const allowed = new Set(['index.html','app.js','styles.css','madar.js','madar.css','madar-mark.svg']);
+const allowed = new Set(['index.html','app.js','styles.css','madar.js','madar.css','madar-mark.svg','favicon.svg','operations.js','synthetic-model-evidence.csv']);
 const server = createServer(async(req,res)=>{
   if (process.env.MADAR_DEMO_PASSWORD) {
     const expected = Buffer.from('Basic '+Buffer.from('madar:'+process.env.MADAR_DEMO_PASSWORD).toString('base64'));
@@ -26,7 +27,8 @@ const server = createServer(async(req,res)=>{
   const file = url.pathname === '/' ? 'index.html' : url.pathname.slice(1);
   if (!['GET','HEAD'].includes(req.method) || !allowed.has(file)) { res.writeHead(404); return res.end('Not found'); }
   try {
-    let body = await readFile(join(root,'dist',file));
+    const assetPath = file === 'synthetic-model-evidence.csv' ? join(root,'anomaly-detection','examples',file) : join(root,'dist',file);
+    let body = await readFile(assetPath);
     if (file === 'index.html') body = Buffer.from(body.toString().replace('<head>', '<head><script>window.MADAR_API_BASE="/api";</script>')); 
     res.writeHead(200,{'Content-Type':types[extname(file)] || 'application/octet-stream','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Referrer-Policy':'same-origin'});
     res.end(req.method === 'HEAD' ? undefined : body);

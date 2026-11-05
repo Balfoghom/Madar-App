@@ -15,6 +15,7 @@ export function validateContext(input) {
       !Number.isFinite(input.ruleScore) || input.ruleScore < 0 || input.ruleScore > 100) {
     throw new InputError('Expected a synthetic case ID, transaction, supported journey, scenario, and existing control score between 0 and 100.');
   }
+  if (Number.isFinite(input.transactionAmount) && Number.isFinite(input.amountAtRisk) && input.amountAtRisk > input.transactionAmount) throw new InputError('Amount at risk cannot exceed the transaction amount.');
   if (input.features != null && (typeof input.features !== 'object' || Array.isArray(input.features))) throw new InputError('Invalid contextual features.');
   for (const field of ['transactionAmount', 'amountAtRisk']) if (input[field] != null && (!Number.isFinite(input[field]) || input[field] < 0)) throw new InputError('Financial values must be finite and nonnegative.');
 }
@@ -34,8 +35,9 @@ export function separatedPolicy(context, result, config = {}) {
 function explain(result, context) {
   if (!result.complete) return [{ code: 'EVIDENCE_INCOMPLETE', description: result.reasons?.join(' ') || 'Required model evidence is incomplete.' }];
   const reasons = [{ code: result.modelFlagged ? 'MODEL_UNUSUAL_COMBINATION' : 'MODEL_NOT_FLAGGED', description: result.reasons?.[0] || 'Synthetic model result.' }];
-  (result.ruleReasons || []).forEach((description, index) => reasons.push({ code: 'SANED_COMPARATOR_' + (index + 1), description }));
-  (result.features || []).forEach((feature, index) => { if (feature.unusual) reasons.push({ code: 'MODEL_FEATURE_' + index, description: `${feature.name} is outside its synthetic reference range (context, not causal attribution).` }); });
+  (result.ruleReasons || []).forEach(description => reasons.push({ code: 'SANED_RULE_' + description.toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/_$/,''), description }));
+  const evidenceKey = value => value.toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/_$/,'');
+  (result.features || []).forEach(feature => { if (feature.unusual) reasons.push({ code: 'MODEL_FEATURE_' + evidenceKey(context.journey) + '_' + evidenceKey(feature.name), description: `${feature.name} is outside its synthetic reference range (context, not causal attribution).` }); });
   if (context.ruleScore >= 35) reasons.push({ code: 'EXISTING_CONTROL_RESULT', description: `Existing operational control score: ${context.ruleScore}/100. These are separate from the model's provisional comparator rules.` });
   if (context.features?.crossSourceConflict) reasons.push({ code: 'SOURCE_CONFLICT', description: 'Reported source conflict requires additional verification; the model result remains separate.' });
   return reasons;
@@ -67,9 +69,10 @@ export function createApplicationAssessment(context, options = {}) {
   const modelSnapshot = { ...modelResult, assessmentId, assessedAt };
   const clean = { ...context };
   // Review decisions are written through /outcome or /decision, never imported as model evidence.
-  for (const key of ['outcome', 'financialOutcome', 'decisionDate', 'decisionOwner', 'confirmedFraudAmount', 'preventedAmount', 'aiModel', 'modelAssessment', 'reviewHistory', 'humanDecision', 'score', 'risk']) delete clean[key];
+  for (const key of ['outcome', 'financialOutcome', 'decisionDate', 'decisionOwner', 'confirmedFraudAmount', 'preventedAmount', 'aiModel', 'modelAssessment', 'reviewHistory', 'humanDecision', 'workflow', 'audit', 'score', 'risk']) delete clean[key];
   const caseData = {
     ...clean, ...policy, assessmentId, assessedAt, synthetic: true, assessmentMode: 'model-separated', assessmentSource: options.source || 'journey-prototype',
+    recommendedRoute:policy.route,
     features: { velocity: 0, retroDays: 0, linkedEntities: 0, priorRisk: 0, overrides: 0, identityReuse: 0, amountChangePct: 0, crossSourceConflict: 0, missingData: 0, urgentPriority: 0, ...context.features },
     anomalyScore: modelResult.complete ? modelResult.percentile : null,
     interaction: 0, confidence: 'Not calibrated', confidenceScore: null,

@@ -24,7 +24,6 @@
         </div>
 
         <nav aria-label="Main navigation">
-<button class="nav-item" data-view="connected"><span>◎</span> Connected Journeys</button>
           <button class="nav-item active" data-view="dashboard">
             <span>◫</span> Dashboard
           </button>
@@ -41,19 +40,13 @@
             <span>⇧</span> Data Intake
           </button>
           <button class="nav-item" data-view="simulation">
-            <span>≋</span> Legacy Scoring Sandbox
-          </button>
-          <button class="nav-item" data-view="indicators">
-            <span>⌁</span> Risk Indicators
+            <span>≋</span> Scoring Simulation
           </button>
           <button class="nav-item" data-view="method">
             <span>◎</span> Model & Governance
           </button>
           <button class="nav-item" data-view="appendix">
             <span>≡</span> Appendix: Scoring
-          </button>
-          <button class="nav-item" data-view="ai-demo">
-            <span>✦</span> Model Evidence
           </button>
         </nav>
         <div class="sidebar-note">
@@ -80,11 +73,15 @@
               </div>
             </div>
             <span class="model-pill" id="model-state-pill">Madar demo</span>
-            <div class="avatar" aria-label="Fraud specialist">FS</div>
+            <button type="button" class="avatar team-trigger" id="team-button" aria-label="Madar Team" title="Madar Team" aria-haspopup="dialog" aria-controls="team-dialog">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6M21 20v-2a6 6 0 0 0-4-5.65"/></svg>
+            </button>
           </div>
         </header>
 
-        <section id="connected-view" class="view"><div id="madar-workspace"></div></section>
+        <div class="portfolio-bar"><label>Workspace data <select id="portfolio-scope"><option value="assessed">Assessed synthetic cases</option><option value="illustrative">Illustrative portfolio</option></select></label><small id="portfolio-scope-note"></small></div>
+
+<section id="connected-view" class="view"><button class="text-btn" data-go-view="intake">← Data Intake</button><div id="madar-workspace"></div></section>
 <section id="dashboard-view" class="view active-view">
           <div class="page-heading">
             <div>
@@ -94,7 +91,7 @@
                 Illustrative portfolio and assessed synthetic cases across benefit, contribution, employer, and payment journeys.
               </p>
             </div>
-            <div class="heading-actions">
+            <div class="heading-actions"><button class="primary-btn" data-load-demo>Load & assess demo cases</button>
               <button class="secondary-btn" id="dashboard-upload-btn">
                 Upload assessment data</button
               ><button class="primary-btn" id="dashboard-assessment-btn">
@@ -223,8 +220,8 @@
             <article class="panel">
               <div class="card-heading">
                 <div>
-                  <p class="eyebrow">DECISION FUNNEL</p>
-                  <h3>Proportionate treatment of assessed activity</h3>
+                  <p class="eyebrow">OUTCOME CATEGORIES</p>
+                  <h3>Review and intervention outcomes</h3>
                 </div>
               </div>
               <div id="executive-funnel" class="executive-funnel"></div>
@@ -313,7 +310,7 @@
             <article class="panel report-summary">
               <div class="card-heading">
                 <div>
-                  <p class="eyebrow">AI MANAGEMENT SUMMARY</p>
+                  <p class="eyebrow">MANAGEMENT OVERVIEW</p>
                   <h3>What the business owner needs to know</h3>
                 </div>
                 <span class="status-chip approved">Prototype-generated</span>
@@ -468,7 +465,7 @@
                       <th>Subject / Entity</th>
                       <th>Location</th>
                       <th>Assessment</th>
-                      <th>Confidence</th>
+                      <th>Data quality</th>
                       <th>Main reason</th>
                       <th>Recommended route</th>
                       <th>Status</th>
@@ -492,7 +489,7 @@
           <div class="page-actions"><button class="secondary-btn" id="download-template-btn">Download CSV template</button><button class="secondary-btn danger-outline" id="demo-reset-btn" type="button">Demo Reset</button></div>
         </div>
         <p class="session-note">SANED CSV: use a bundled <code>saned_case_id</code>, or provide <code>workforce</code>, <code>as_of</code>, and <code>events_json</code>. Other journeys require <code>journey_features_json</code>. Missing evidence is saved as incomplete. The <code>synthetic</code> flag is a declaration, not a data-provenance check.</p>
-        <div class="intake-grid">
+        <article class="panel demo-intake"><p class="eyebrow">READY-TO-USE DEMO</p><h3>Enterprise demo portfolio</h3><p>Load rules-based examples across all journeys, with the trained SANED and cross-journey models. Madar assesses them together and opens the Intelligence Queue, ready for specialist review. Previously saved demo cases and decisions are retained.</p><button class="primary-btn" data-load-demo>Load & assess demo cases</button><button class="text-btn" data-go-view="connected" data-view="connected">Inspect connected source events</button><p class="demo-load-status" role="status"></p></article><div class="intake-grid">
           <article class="panel upload-card">
             <div class="card-heading"><div><p class="eyebrow">OPTION 1</p><h3>Upload a CSV file</h3></div></div>
             <label class="drop-zone" id="drop-zone" for="csv-file-input">
@@ -501,7 +498,7 @@
             </label>
             <div class="import-mode-row">
               <label>Import mode<select id="file-import-mode"><option value="append">Append to current data</option><option value="replace">Replace CSV-imported cases</option></select></label>
-              <button class="primary-btn" id="import-file-btn" disabled>Validate & assess file</button>
+              <div class="sample-import-actions"><button type="button" class="secondary-btn" id="import-sample-btn">Load sample data</button><button class="primary-btn" id="import-file-btn" disabled>Validate &amp; assess file</button></div>
             </div>
             <div id="selected-file" class="selected-file empty">No file selected</div>
           </article>
@@ -533,7 +530,7 @@
           <div class="page-heading">
             <div>
               <p class="eyebrow">CONTROLLED SANDBOX</p>
-              <h2>Legacy Scoring Sandbox</h2>
+              <h2>Scoring Simulation</h2>
               <p>
                 Test weights and thresholds, see how cases move between risk
                 bands, and submit a configuration for governed review.
@@ -558,7 +555,7 @@
                   <p class="eyebrow">MODEL MIX</p>
                   <h3>Assessment weights and thresholds</h3>
                   <p>
-                    These weights apply only to the legacy statistical simulation. Trained model outputs and existing operational controls are displayed separately, without blending.
+                    Explore the proposed behavioral scoring method on the illustrative portfolio. The fitted SANED and cross-journey models retain their own assessment results.
                   </p>
                 </div>
               </div>
@@ -681,7 +678,7 @@
           </article>
         </section>
 
-        <section id="indicators-view" class="view">
+        <section id="indicators-view" class="view"><button class="text-btn" data-go-view="method">← Model &amp; Governance</button>
           <div class="page-heading">
             <div>
               <p class="eyebrow">GOVERNED CONFIGURATION</p>
@@ -700,7 +697,7 @@
           </div>
         </section>
 
-        <section id="method-view" class="view">
+        <section id="method-view" class="view"><div class="page-actions"><button class="secondary-btn" data-go-view="indicators">Risk indicators</button><button class="secondary-btn" data-go-view="ai-demo">Technical model evidence</button></div>
           <div class="page-heading">
             <div>
               <p class="eyebrow">EXPLAINABLE & GOVERNED AI</p>
@@ -741,8 +738,7 @@
               <span>4</span>
               <h3>Explain & recommend</h3>
               <p>
-                Generate a behavioral risk score, confidence, reason codes, and
-                a recommended route for specialist approval.
+                Keep detector outputs and operational policy separate; assemble evidence and recommend a route for specialist review.
               </p>
             </article>
           </div>
@@ -750,7 +746,7 @@
             <div class="card-heading">
               <div>
                 <p class="eyebrow">SYNTHETIC MODEL REGISTRY</p>
-                <h3>Models for every service journey</h3>
+                <h3>Prototype capability registry</h3>
                 <p>Saved synthetic model artifacts are loaded for inference only. Training for the other journeys is owned by the team; this integration does not train or modify them.</p>
               </div>
               <div class="model-registry-actions">
@@ -766,7 +762,7 @@
           <div class="method-grid">
             <article class="panel formula-card">
               <p class="eyebrow">PROTOTYPE ASSUMPTION</p>
-              <h3>Behavioral Risk Assessment</h3>
+              <h3>Proposed scoring methodology</h3>
               <div class="formula" id="method-formula">
                 <b>55%</b> Existing control score <span>+</span
                 ><b>45%</b> Behavioral anomaly score <span>+</span> approved
@@ -778,10 +774,7 @@
                 ><span><i class="high-dot"></i>High 75–100</span>
               </div>
               <p>
-                Weights and thresholds are configurable test assumptions. A
-                critical approved control can establish a minimum review floor.
-                Production values require approved historical validation and
-                domain ownership.
+                This formula applies only to illustrative cases. Current fitted models keep their output separate from operational controls. Sandbox drafts cannot change their routing policy.
               </p>
             </article>
             <article class="panel governance-card">
@@ -1054,13 +1047,13 @@
             </article>
           </div>
         </section>
-        <section id="ai-demo-view" class="view">
+        <section id="ai-demo-view" class="view"><button class="text-btn" data-go-view="method">← Model &amp; Governance</button>
           <div class="page-heading">
             <div>
               <p class="eyebrow">SYNTHETIC BACKEND DEMO</p>
-              <h2>اختبار نموذج الذكاء الاصطناعي</h2>
+              <h2>Inspect saved model evidence</h2>
               <p>
-                اختاري حالة اصطناعية يوفّرها الباكند، ثم اعرضي نتيجة النموذج.
+                Select a bundled synthetic SANED case to inspect its model output. Use the case workspace for cross-journey evidence.
               </p>
             </div>
           </div>
@@ -1068,44 +1061,55 @@
           <article class="panel">
             <div class="backend-controls">
               <label>
-                الحالة الاصطناعية
+                Synthetic case
                 <select id="backend-case-select">
-                  <option value="">حمّلي الحالات أولًا</option>
+                  <option value="">Load cases first</option>
                 </select>
               </label>
               <button class="secondary-btn" id="backend-load-cases">
-                تحميل الحالات
+                Load cases
               </button>
               <button class="primary-btn" id="backend-assess-btn">
-                تقييم الحالة
+                Assess case
               </button>
             </div>
 
             <p id="backend-status" role="status">
-              الخدمة تعمل على 127.0.0.1:8787
+              Uses the Madar model service
             </p>
             <div id="backend-result">
-              <p class="backend-placeholder">ستظهر نتيجة التقييم هنا.</p>
+              <p class="backend-placeholder">Assessment results appear here.</p>
             </div>
             <section class="backend-history" aria-labelledby="backend-history-title">
               <div class="backend-history-heading">
                 <div>
-                  <h3 id="backend-history-title">سجل تقييمات الباكند المحفوظة</h3>
-                  <p>تُحفظ النتائج الاصطناعية محليًا في ملف داخل مجلد الباكند.</p>
+                  <h3 id="backend-history-title">Saved assessment history</h3>
+                  <p>Synthetic assessments are saved in the local demo data directory.</p>
                 </div>
                 <button class="secondary-btn" id="backend-load-history">
-                  تحميل السجل
+                  Load history
                 </button>
               </div>
               <p id="backend-history-status" role="status"></p>
               <div id="backend-history-list">
-                <p class="backend-placeholder">اضغطي «تحميل السجل» لعرض التقييمات المحفوظة.</p>
+                <p class="backend-placeholder">Select Load history to view saved assessments.</p>
               </div>
             </section>
           </article>
         </section>
       </main>
     </div>
+
+    <dialog id="team-dialog" class="team-dialog" aria-labelledby="team-title" aria-describedby="team-description">
+      <div class="team-dialog-content">
+        <div class="dialog-head"><div><h2 id="team-title">Madar Team</h2><p id="team-description">People behind Madar</p></div><button type="button" class="icon-button" aria-label="Close">×</button></div>
+        <div class="team-grid">
+        <article class="team-card"><span class="team-initials" aria-hidden="true">HA</span><h3>HAITHAM M. ALMUTAIRI</h3><p class="team-position">Senior Insurance Fraud Prevention Lead</p><p class="team-department">Fraud Prevention</p><a class="team-email" href="mailto:halmutairi1@gosi.gov.sa">halmutairi1@gosi.gov.sa</a></article>
+        <article class="team-card"><span class="team-initials" aria-hidden="true">BA</span><h3>BASHA A. ALFOGHOM</h3><p class="team-position">Data Scientist lead</p><p class="team-department">AI Development Department</p><a class="team-email" href="mailto:BALFOGHOM@GOSI.GOV.SA">BALFOGHOM@GOSI.GOV.SA</a></article>
+        <article class="team-card"><span class="team-initials" aria-hidden="true">MA</span><h3>Manal alotaibi</h3><p class="team-position">Senior Software QA</p><p class="team-department">Onboarding & Registration</p><a class="team-email" href="mailto:MSALOTAIBI@GOSI.GOV.SA">MSALOTAIBI@GOSI.GOV.SA</a></article>
+        </div>
+      </div>
+    </dialog>
 
     <dialog id="override-dialog">
       <form method="dialog" id="override-form">
@@ -1114,7 +1118,7 @@
             <p class="eyebrow">HUMAN OVERRIDE</p>
             <h2>Select a different route</h2>
           </div>
-          <button value="cancel" class="icon-button" aria-label="Close">
+          <button type="button" value="cancel" class="icon-button" aria-label="Close">
             ×
           </button>
         </div>
@@ -1129,6 +1133,7 @@
             <option>Fraud Prevention & Inspection Review</option>
           </select></label
         >
+        <label>Reviewer name<input id="override-reviewer" maxlength="120" required placeholder="Enter your name"></label>
         <label
           >Reason for override<textarea
             id="override-reason"
@@ -1138,7 +1143,7 @@
           ></textarea>
         </label>
         <div class="dialog-actions">
-          <button value="cancel" class="secondary">Cancel</button
+          <button type="button" value="cancel" class="secondary">Cancel</button
           ><button value="confirm" id="confirm-override">Save decision</button>
         </div>
       </form>
@@ -1146,7 +1151,7 @@
 
     <dialog id="route-decision-dialog">
       <form id="route-decision-form"><div class="dialog-head"><h2 id="route-decision-title">Review recommendation</h2><button type="button" class="icon-button" id="close-route-decision" aria-label="Close">×</button></div>
-      <label>Demo reviewer name<input id="route-decision-name" required maxlength="120" value="Demo specialist" /></label>
+      <p id="route-decision-context"></p><label>Reviewer name<input id="route-decision-name" required maxlength="120" value="" /></label>
       <label>Evidence and rationale<textarea id="route-decision-note" required maxlength="2000"></textarea></label>
       <p id="route-decision-error" role="alert"></p><div class="dialog-actions"><button type="submit" id="save-route-decision">Save human decision</button></div></form>
     </dialog>
@@ -1172,10 +1177,11 @@
             <p class="eyebrow">OUTCOME FEEDBACK</p>
             <h2>Record specialist outcome</h2>
           </div>
-          <button value="cancel" class="icon-button" aria-label="Close">
+          <button type="button" value="cancel" class="icon-button" aria-label="Close">
             ×
           </button>
         </div>
+        <label>Reviewer name<input id="outcome-reviewer" maxlength="120" required placeholder="Enter your name"></label>
         <label
           >Specialist classification<select id="outcome-value" required>
             <option value="">Select outcome</option>
@@ -1236,7 +1242,7 @@
           ></textarea>
         </label>
         <div class="dialog-actions">
-          <button value="cancel" class="secondary">Cancel</button
+          <button type="button" value="cancel" class="secondary">Cancel</button
           ><button value="confirm" id="confirm-outcome">Record outcome</button>
         </div>
       </form>
@@ -1411,78 +1417,78 @@
           /></label>
         </div>
         <section id="benefit-feature-fields" class="journey-feature-panel" hidden>
-          <h3 class="form-section-title">مؤشرات مدفوعات المنافع — بيانات اصطناعية</h3>
+          <h3 class="form-section-title">Benefit payment evidence — synthetic</h3>
           <p class="dialog-intro">
-            أدخلي أعدادًا ومؤشرات مجمعة فقط. لا تدخلي رقم حساب أو IBAN أو بيانات شخصية.
+            Enter synthetic aggregate measures only. Do not enter real accounts or personal data.
           </p>
           <div class="form-grid compact-grid">
-            <label>طلبات/دفعات خلال 30 يومًا<input id="benefit-requests-30d" type="number" min="0" max="100" value="1" required /></label>
-            <label>تغير مبلغ المنفعة عن المعتاد (%)<input id="benefit-amount-deviation" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
-            <label>أيام منذ تغيير حساب الصرف<input id="benefit-payout-change-days" type="number" min="0" max="3650" value="365" required /></label>
-            <label>دفعات مكررة أو متشابهة<input id="benefit-duplicate-payments" type="number" min="0" max="100" value="0" required /></label>
-            <label>مستفيدون يستخدمون حساب الصرف نفسه<input id="benefit-shared-beneficiaries" type="number" min="1" max="100" value="1" required /></label>
+            <label>Requests / payments in 30 days<input id="benefit-requests-30d" type="number" min="0" max="100" value="1" required /></label>
+            <label>Benefit amount change (%)<input id="benefit-amount-deviation" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
+            <label>Days since payout account change<input id="benefit-payout-change-days" type="number" min="0" max="3650" value="365" required /></label>
+            <label>Duplicate or similar payments<input id="benefit-duplicate-payments" type="number" min="0" max="100" value="0" required /></label>
+            <label>Beneficiaries sharing a payout account<input id="benefit-shared-beneficiaries" type="number" min="1" max="100" value="1" required /></label>
           </div>
         </section>
         <section id="employer-feature-fields" class="journey-feature-panel" hidden>
-          <h3 class="form-section-title">مؤشرات تسجيل المنشأة — بيانات اصطناعية</h3>
+          <h3 class="form-section-title">Employer registration evidence — synthetic</h3>
           <p class="dialog-intro">
-            أدخلي أعدادًا ونسبًا مجمعة فقط. لا تدخلي أسماء أو أرقام هوية أو بيانات اتصال خامة.
+            Enter synthetic aggregate counts and percentages only.
           </p>
           <div class="form-grid compact-grid">
-            <label>تعديلات السجل خلال 30 يومًا<input id="employer-amendments-30d" type="number" min="0" max="100" value="0" required /></label>
-            <label>عمر المنشأة عند التعديل الجوهري (يوم)<input id="employer-age-at-change" type="number" min="0" max="36500" value="365" required /></label>
-            <label>منشآت مرتبطة بمرجع تواصل مستعار<input id="employer-linked-contacts" type="number" min="1" max="100" value="1" required /></label>
-            <label>تغير عدد العاملين (%)<input id="employer-workforce-change" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
-            <label>تعديلات بأثر رجعي خلال 90 يومًا<input id="employer-backdated-90d" type="number" min="0" max="100" value="0" required /></label>
-            <label>تعارضات بين المصادر<input id="employer-source-conflicts" type="number" min="0" max="100" value="0" required /></label>
+            <label>Record amendments in 30 days<input id="employer-amendments-30d" type="number" min="0" max="100" value="0" required /></label>
+            <label>Employer age at material change (days)<input id="employer-age-at-change" type="number" min="0" max="36500" value="365" required /></label>
+            <label>Employers linked by a synthetic contact<input id="employer-linked-contacts" type="number" min="1" max="100" value="1" required /></label>
+            <label>Workforce change (%)<input id="employer-workforce-change" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
+            <label>Backdated changes in 90 days<input id="employer-backdated-90d" type="number" min="0" max="100" value="0" required /></label>
+            <label>Source conflicts<input id="employer-source-conflicts" type="number" min="0" max="100" value="0" required /></label>
           </div>
         </section>
         <section id="retirement-feature-fields" class="journey-feature-panel" hidden>
-          <h3 class="form-section-title">مؤشرات التقاعد — بيانات اصطناعية</h3>
-          <p class="dialog-intro">أدخلي مؤشرات مدد مجمعة فقط؛ الأهلية الفعلية تعتمد على القواعد المعتمدة لدى مالك الخدمة.</p>
+          <h3 class="form-section-title">Retirement evidence — synthetic</h3>
+          <p class="dialog-intro">Enter aggregate durations. Operational eligibility remains governed by the service owner.</p>
           <div class="form-grid compact-grid">
-            <label>أشهر الاشتراك المثبتة<input id="retirement-contribution-months" type="number" min="0" max="720" value="240" required /></label>
-            <label>أشهر فجوات الاشتراك<input id="retirement-gap-months" type="number" min="0" max="120" value="0" required /></label>
-            <label>تغير الأجر قبل طلب التقاعد (%)<input id="retirement-wage-change" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
-            <label>تصحيحات اشتراك بأثر رجعي خلال 12 شهرًا<input id="retirement-retro-corrections" type="number" min="0" max="100" value="0" required /></label>
-            <label>فترات عمل متداخلة<input id="retirement-overlap-periods" type="number" min="0" max="100" value="0" required /></label>
-            <label>أشهر التداخل بين سجلات العمل<input id="retirement-overlap-months" type="number" min="0" max="120" value="0" required /></label>
+            <label>Verified contribution months<input id="retirement-contribution-months" type="number" min="0" max="720" value="240" required /></label>
+            <label>Contribution gap months<input id="retirement-gap-months" type="number" min="0" max="120" value="0" required /></label>
+            <label>Wage change before retirement request (%)<input id="retirement-wage-change" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
+            <label>Retroactive contribution corrections in 12 months<input id="retirement-retro-corrections" type="number" min="0" max="100" value="0" required /></label>
+            <label>Overlapping employment periods<input id="retirement-overlap-periods" type="number" min="0" max="100" value="0" required /></label>
+            <label>Overlapping employment months<input id="retirement-overlap-months" type="number" min="0" max="120" value="0" required /></label>
           </div>
         </section>
         <section id="maternity-feature-fields" class="journey-feature-panel" hidden>
-          <h3 class="form-section-title">مؤشرات منفعة الأمومة — بيانات اصطناعية</h3>
-          <p class="dialog-intro">هذه مؤشرات اختبار وليست قواعد أهلية نظامية؛ لا تدخلي بيانات تعريف شخصية.</p>
+          <h3 class="form-section-title">Maternity benefit evidence — synthetic</h3>
+          <p class="dialog-intro">These are prototype inputs, not statutory eligibility rules. Use synthetic data only.</p>
           <div class="form-grid compact-grid">
-            <label>أشهر الاشتراك في نافذة الأهلية<input id="maternity-contribution-months" type="number" min="0" max="36" value="12" required /></label>
-            <label>الأيام بين الحدث المؤهل والطلب<input id="maternity-event-request-days" type="number" min="0" max="365" value="5" required /></label>
-            <label>تغير الأجر قبل الحدث (%)<input id="maternity-wage-change" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
-            <label>مدة علاقة العمل عند الحدث (يوم)<input id="maternity-employer-tenure" type="number" min="0" max="36500" value="365" required /></label>
-            <label>طلبات منافع مشابهة متزامنة<input id="maternity-concurrent-claims" type="number" min="0" max="100" value="0" required /></label>
-            <label>تصحيحات اشتراك بأثر رجعي خلال 12 شهرًا<input id="maternity-retro-corrections" type="number" min="0" max="100" value="0" required /></label>
+            <label>Contribution months in the assessment window<input id="maternity-contribution-months" type="number" min="0" max="36" value="12" required /></label>
+            <label>Days between event and request<input id="maternity-event-request-days" type="number" min="0" max="365" value="5" required /></label>
+            <label>Wage change before event (%)<input id="maternity-wage-change" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
+            <label>Employment tenure at event (days)<input id="maternity-employer-tenure" type="number" min="0" max="36500" value="365" required /></label>
+            <label>Concurrent similar benefit requests<input id="maternity-concurrent-claims" type="number" min="0" max="100" value="0" required /></label>
+            <label>Retroactive contribution corrections in 12 months<input id="maternity-retro-corrections" type="number" min="0" max="100" value="0" required /></label>
           </div>
         </section>
         <section id="contribution-feature-fields" class="journey-feature-panel" hidden>
-          <h3 class="form-section-title">مؤشرات الأجور والاشتراكات — بيانات اصطناعية</h3>
-          <p class="dialog-intro">استخدمي نسبًا وأعدادًا مجمعة لملف الأجور، من دون أسماء أو أرقام عاملين.</p>
+          <h3 class="form-section-title">Contribution and wage evidence — synthetic</h3>
+          <p class="dialog-intro">Use synthetic aggregate payroll measures without real worker identifiers.</p>
           <div class="form-grid compact-grid">
-            <label>العاملون ذوو تغير أجر جوهري (%)<input id="contribution-material-change-workers" type="number" min="0" max="100" step="0.1" value="0" required /></label>
-            <label>وسيط تغير الأجر (%)<input id="contribution-median-wage-change" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
-            <label>تأخر ملف الأجور (يوم)<input id="contribution-payroll-delay" type="number" min="0" max="365" value="0" required /></label>
-            <label>إعادة إرسال الملفات خلال 30 يومًا<input id="contribution-resubmissions" type="number" min="0" max="100" value="0" required /></label>
-            <label>تصحيحات رجعية خلال 90 يومًا<input id="contribution-retro-corrections" type="number" min="0" max="100" value="0" required /></label>
-            <label>عمال مرتبطون بمنشآت متعددة<input id="contribution-cross-employer-workers" type="number" min="0" max="100000" value="0" required /></label>
-            <label>فرق المطابقة بين إجماليات المصادر (%)<input id="contribution-reconciliation-deviation" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
+            <label>Workers with material wage changes (%)<input id="contribution-material-change-workers" type="number" min="0" max="100" step="0.1" value="0" required /></label>
+            <label>Median wage change (%)<input id="contribution-median-wage-change" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
+            <label>Payroll submission delay (days)<input id="contribution-payroll-delay" type="number" min="0" max="365" value="0" required /></label>
+            <label>Resubmissions in 30 days<input id="contribution-resubmissions" type="number" min="0" max="100" value="0" required /></label>
+            <label>Retroactive corrections in 90 days<input id="contribution-retro-corrections" type="number" min="0" max="100" value="0" required /></label>
+            <label>Workers linked across employers<input id="contribution-cross-employer-workers" type="number" min="0" max="100000" value="0" required /></label>
+            <label>Source total reconciliation difference (%)<input id="contribution-reconciliation-deviation" type="number" min="-100" max="1000" step="0.1" value="0" required /></label>
           </div>
         </section>
         <section id="saned-feature-fields" class="journey-feature-panel" hidden>
           <h3 class="form-section-title">SANED model inputs — synthetic demo</h3>
           <p class="dialog-intro">
-            هذه الحقول لتجربة نموذج SANED ببيانات اصطناعية فقط.
+            These fields construct a synthetic event history for the SANED model.
           </p>
 
           <div class="form-grid compact-grid">
           <label>
-            حجم القوى العاملة
+            Workforce size
             <input
               id="model-workforce"
               type="number"
@@ -1493,7 +1499,7 @@
           </label>
 
           <label>
-            تعديلات المطالبة خلال 30 يومًا
+            Claim amendments in 30 days
             <input
               id="model-amendments"
               type="number"
@@ -1505,7 +1511,7 @@
           </label>
 
           <label>
-            الأجر السابق
+            Previous wage
             <input
               id="model-previous-wage"
               type="number"
@@ -1516,7 +1522,7 @@
           </label>
 
           <label>
-            الأجر الحالي
+            Current wage
             <input
               id="model-current-wage"
               type="number"
@@ -1527,7 +1533,7 @@
           </label>
 
           <label>
-            استبعادات المنشأة خلال 7 أيام
+            Employer exclusions in 7 days
             <input
               id="model-exclusions"
               type="number"
@@ -1539,7 +1545,7 @@
           </label>
 
           <label>
-            تغييرات المشرف خلال 24 ساعة
+            Supervisor changes in 24 hours
             <input
               id="model-supervisor-changes"
               type="number"
@@ -1577,5 +1583,6 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <script src="app.js?v=2.0.0"></script>
 <script src="madar.js?v=2.0.0"></script>
-  </body>
+  <script src="operations.js?v=3"></script>
+</body>
 </html>
