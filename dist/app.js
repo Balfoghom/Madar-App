@@ -2501,7 +2501,7 @@ function renderQueue() {
               '</span><span class="subtext">' +
               (item.dataQuality ? item.dataQuality.score + "% · " + item.dataQuality.passed + "/" + item.dataQuality.total + " field checks" : item.confidenceScore + "% illustrative estimate") +
               "</span></td>",
-            '<td class="reason">' + escapeHtml(item.signals[0][1]) + "</td>",
+            '<td class="reason"><span class="queue-reason-text" title="' + escapeHtml(item.signals[0][1]) + '">' + escapeHtml(item.signals[0][1]) + "</span></td>",
             '<td class="route">' + escapeHtml(item.route) + "</td>",
             '<td><span class="status-chip">' +
               escapeHtml(item.status) +
