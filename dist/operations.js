@@ -62,49 +62,64 @@
   }
   function enhanceCase(){
     const item=portfolioCases().find(c=>c.id===selectedId),panel=document.querySelector('#case-panel');if(!item)return;
-    const language=caseSummaryLanguage==='ar'?'ar':'en',t=copy[language],autoGenerate=translateOnLoad;translateOnLoad=false;
-    // The opening view is a brief. Full evidence and specialist controls remain accessible.
-    const assessmentStep=panel.querySelector('.agent-trace')?.children[1];
-    if(assessmentStep && (item.rulesAssessment || !item.modelAssessment?.complete)){
-      assessmentStep.querySelector('strong').textContent=item.rulesAssessment?.complete?'Business control checked':'Assessment deferred';
-      assessmentStep.querySelector('small').textContent=item.rulesAssessment?.complete?'Supplied records checked against the illustrative business rule; no AI model used.':'Required source evidence is incomplete; complete it before relying on the assessment.';
-    }
+    const language=caseSummaryLanguage==='ar'?'ar':'en',t=copy[language],ar=language==='ar',autoGenerate=translateOnLoad;translateOnLoad=false;
+    const view=MadarCasePresentation,score=view.score(item),state=view.state(item),financial=view.financial(item);
     const hero=panel.querySelector('.case-hero');
-    hero.querySelector('.score-ring')?.remove();
-    const current=document.createElement('p');current.className='case-current-status';current.textContent=t.status+': '+item.status+(item.outcomeProvenance==='Scripted demo outcome'?(language==='ar'?' · نتيجة تجريبية':' · Scripted demo outcome'):'');hero.append(current);
+    const riskNames={High:'High risk',Medium:'Medium risk',Low:'Low risk',Incomplete:'Evidence incomplete'};
+    const riskArabic={High:'مخاطر مرتفعة',Medium:'مخاطر متوسطة',Low:'مخاطر منخفضة',Incomplete:'أدلة غير مكتملة'};
+    const ring=hero.querySelector('.score-ring');
+    ring.classList.add('case-priority-ring');ring.style.setProperty('--score',`${score.value??0}%`);
+    if(score.value===null)ring.classList.add('qualitative');
+    ring.innerHTML=`<div><strong>${score.value===null?(state.incomplete?'!':item.modelAssessment?.modelFlagged?'↗':'✓'):esc(score.value)}</strong><small>${esc(ar?riskArabic[item.risk]||item.risk:riskNames[item.risk]||item.risk)}</small></div>`;
+    ring.setAttribute('aria-label',`${score.label}${score.value===null?'':': '+score.value+'/100'}. ${riskNames[item.risk]||item.risk}`);
+    const scoreLabel=document.createElement('p');scoreLabel.className='case-score-caption';scoreLabel.textContent=score.value===null?(ar?(state.incomplete?'لا توجد درجة':'تقييم نمط · بلا درجة موحّدة'):score.label):(ar?(score.kind==='simulation'?'درجة المحاكاة':'درجة الضوابط'):score.label);const scoreColumn=document.createElement('div');scoreColumn.className='case-score-column';ring.replaceWith(scoreColumn);scoreColumn.append(ring,scoreLabel);if(state.resolved){const originalSignal=document.createElement('small');originalSignal.className='case-original-signal';originalSignal.textContent=ar?'وقت التقييم':'At assessment';scoreColumn.append(originalSignal);}
+    const status=document.createElement('div');status.className='case-header-status';status.innerHTML=`<span>${esc(state.status)}</span><span>${ar?'بيانات تجريبية':'Synthetic demo'}</span>${state.scripted?`<span>${ar?'نتيجة توضيحية':'Scripted outcome'}</span>`:''}`;hero.append(status);
+    const toolbar=document.createElement('div');toolbar.className='case-panel-toolbar';toolbar.innerHTML=`<span>${ar?'مراجعة الحالة':'CASE REVIEW'}</span><button type="button" class="case-expand" aria-pressed="${panel.closest('.workspace').classList.contains('case-focus')}">${panel.closest('.workspace').classList.contains('case-focus')?(ar?'العودة إلى القائمة':'Back to queue'):(ar?'توسيع الحالة':'Expand case')} <span aria-hidden="true">⤢</span></button>`;hero.before(toolbar);
+    toolbar.querySelector('button').onclick=()=>{const expanded=panel.closest('.workspace').classList.toggle('case-focus');toolbar.querySelector('button').setAttribute('aria-pressed',expanded);toolbar.querySelector('button').textContent=expanded?(ar?'العودة إلى القائمة':'Back to queue'):(ar?'توسيع الحالة':'Expand case');panel.scrollTop=0;panel.scrollIntoView({block:'start',behavior:'smooth'});};
     if(item.crossJourneyEvidence && window.madarConnectedEvidence){
       const evidence=document.createElement('section');evidence.className='detail-section';evidence.innerHTML='<h3>Connected journey evidence</h3>'+window.madarConnectedEvidence(item.crossJourneyEvidence);
       const timeline=panel.querySelector('.timeline')?.closest('section');if(timeline)timeline.replaceWith(evidence);else panel.append(evidence);
     }
-    const action=panel.querySelector('.recommendation')?.closest('section');
-    const details=document.createElement('details');details.className='case-evidence-details';details.innerHTML=`<summary>${t.evidence}</summary>`;
-    [...panel.children].filter(node=>node.matches('section.detail-section')&&node!==action).forEach(node=>details.append(node));
-    panel.append(details);
-    if(action){
-      hero.after(action);
-      const controls=action.querySelector('.action-row');
-      if(controls){const specialist=document.createElement('details');specialist.className='case-specialist-actions';specialist.innerHTML=`<summary>${t.decision}</summary>`;specialist.append(controls);action.append(specialist);}
+    const action=panel.querySelector('.recommendation')?.closest('section'),controls=action?.querySelector('.action-row');
+    const sourceSections=[...panel.children].filter(node=>node.matches('section.detail-section')&&node!==action);
+    const groupNames={context:ar?'الأطراف والسياق المالي':'People & financial context',activity:ar?'تسلسل الأحداث والمصادر':'Activity & source records',assessment:ar?'التقييم واحتساب الدرجة':'Assessment & scoring',history:ar?'سجل المراجعات':'Review history'};
+    const sourceHost=document.createElement('div');sourceHost.className='case-source-groups';
+    const groups={};for(const [key,title] of Object.entries(groupNames)){const group=document.createElement('details');group.id='case-source-'+key;group.className='case-source-group';group.innerHTML=`<summary>${title}</summary>`;groups[key]=group;sourceHost.append(group);}
+    for(const section of sourceSections){
+      const heading=section.querySelector('h3')?.textContent||'';
+      const key=/context/i.test(heading)?'context':/timeline|Connected journey/i.test(heading)?'activity':/history|scenario|governance|approval/i.test(heading)?'history':'assessment';
+      if(/processing steps/i.test(heading)){const inner=document.createElement('details');inner.className='case-processing';inner.innerHTML='<summary>Processing details</summary>';inner.append(section);groups.assessment.append(inner);}else groups[key].append(section);
     }
-    const assistant=document.createElement('section');assistant.className='detail-section ops-assistant';assistant.lang=language;assistant.dir=language==='ar'?'rtl':'ltr';
+    const scoreNote=document.createElement('p');scoreNote.className='case-score-note';scoreNote.textContent=score.note;groups.assessment.querySelector('summary').after(scoreNote);
+    if(!groups.activity.querySelector('section'))groups.activity.insertAdjacentHTML('beforeend','<p class="case-source-empty">No separate source timeline is supplied for this example.</p>');
+    if(!groups.history.querySelector('section'))groups.history.insertAdjacentHTML('beforeend','<p class="case-source-empty">No specialist review has been recorded.</p>');
+    const trace=groups.assessment.querySelector('.agent-trace')?.children[1];if(trace&&(item.rulesAssessment||!item.modelAssessment?.complete)){trace.querySelector('strong').textContent=item.rulesAssessment?.complete?'Business control checked':'Assessment deferred';trace.querySelector('small').textContent=item.rulesAssessment?.complete?'Supplied records checked against the illustrative business rule; no AI model used.':'Complete the required evidence before model review.';}
+    action?.remove();
+    const keyFacts=document.createElement('section');keyFacts.className='detail-section case-key-facts';keyFacts.innerHTML=`<h3>${ar?'أبرز الأدلة':'Key evidence'}</h3>${view.keyEvidence(item).map(fact=>`<button type="button" class="case-fact" data-source="${fact.target}"><strong>${esc(fact.title)}</strong><span>${esc(fact.text)}</span><small>${ar?'عرض المصدر':'View source'} ↗</small></button>`).join('')}<div class="case-exposure-line"><span>${esc(financial.label)}</span><strong>${financial.amount===null?(ar?'غير متاح':'Not supplied'):formatSar(financial.amount)}</strong></div>`;
+    keyFacts.querySelectorAll('[data-source]').forEach(button=>button.onclick=()=>{const group=groups[button.dataset.source];group.open=true;group.scrollIntoView({behavior:'smooth',block:'start'});group.querySelector('summary').focus();});
+    const next=document.createElement('section');next.className='detail-section case-next-step';
+    const owner=routeOwnership(item);
+    next.innerHTML=`<h3>${esc(state.resolved?(ar?'النتيجة المسجلة':'Recorded outcome'):state.incomplete?(ar?'الأدلة المطلوبة':'Evidence needed'):(ar?'الخطوة التالية':'Next step'))}</h3><strong class="case-next-title">${esc(state.resolved?item.outcome:item.route)}</strong><p>${esc(state.resolved?(item.financialOutcome||'Outcome recorded. Review the history for supporting notes.'):owner.next)}</p><dl><div><dt>${state.resolved?'Recorded by':'Recommended team'}</dt><dd>${esc(state.resolved?item.decisionOwner||'See review history':owner.owner)}</dd></div></dl>${state.scripted?'<small>Scripted demonstration outcome · not an actual finding or realised saving.</small>':''}`;
+    const footer=document.createElement('footer');footer.className='case-review-footer';footer.innerHTML=`<small>${ar?'القرار النهائي للمختص':'The specialist retains the final decision.'}</small><button type="button" class="primary-btn">${esc(ar?(state.resolved?'تحديث النتيجة':'تسجيل المراجعة'):state.action)}</button>`;
+    footer.querySelector('button').disabled=!item.assessmentId;
+    const chooser=document.createElement('dialog');chooser.id='case-review-actions';chooser.className='case-review-dialog';chooser.setAttribute('aria-labelledby','case-review-heading');chooser.innerHTML=`<div class="dialog-head"><div><h2 id="case-review-heading">${ar?'تسجيل المراجعة':'Record review'}</h2><p>${esc(item.transactionId)} · ${esc(state.status)}</p></div><button type="button" class="icon-button" aria-label="Close">×</button></div><p>Choose how to proceed. Your name and rationale are required when saving.</p>`;
+    if(controls){controls.querySelector('#record-outcome-btn').textContent=state.resolved?'Update outcome':'Record outcome';if(state.resolved)controls.querySelectorAll('#approve-route,#override-route-btn,#reject-route').forEach(button=>button.hidden=true);controls.querySelector('#record-outcome-btn').addEventListener('click',()=>{const heading=document.querySelector('#outcome-dialog h2');if(heading)heading.textContent=state.resolved?'Update specialist outcome':'Record specialist outcome';},true);chooser.append(controls);controls.addEventListener('click',event=>{if(event.target.closest('button:not(:disabled)'))chooser.close();},true);}
+    chooser.querySelector('.icon-button').onclick=()=>chooser.close();document.body.append(chooser);footer.querySelector('button').onclick=()=>{if(state.resolved){chooser.querySelector('#record-outcome-btn').click();}else chooser.showModal();};
+    const assistant=document.createElement('section');assistant.className='detail-section ops-assistant';assistant.lang=language;assistant.dir=ar?'rtl':'ltr';
     assistant.innerHTML=`<div class="case-brief-heading"><h3>${t.title}</h3><div class="case-language-switch" role="group" aria-label="Explanation language"><button type="button" data-language="en" aria-pressed="${language==='en'}">English</button><button type="button" data-language="ar" aria-pressed="${language==='ar'}" lang="ar">العربية</button></div></div><div class="ops-llm-draft"><p class="case-brief-intro">${t.intro}</p></div><button class="primary-btn case-explain-button" disabled>${t.loading}</button><p class="ops-llm-status" role="status"></p>`;
-    hero.after(assistant);
+    hero.after(assistant);assistant.after(keyFacts);keyFacts.after(next);next.after(sourceHost);sourceHost.after(footer);
     assistant.querySelectorAll('[data-language]').forEach(button=>button.onclick=()=>{if(caseSummaryLanguage===button.dataset.language)return;translateOnLoad=!!assistant.querySelector('.case-ask-button');caseSummaryLanguage=button.dataset.language;renderCase();});
-    const button=assistant.querySelector('.case-explain-button'),status=assistant.querySelector('[role="status"]'),host=assistant.querySelector('.ops-llm-draft');
-    if(!item.assessmentId || (!item.modelAssessment&&!item.rulesAssessment)){button.hidden=true;status.textContent=t.unsaved;return;}
+    const button=assistant.querySelector('.case-explain-button'),message=assistant.querySelector('[role="status"]'),host=assistant.querySelector('.ops-llm-draft');
+    if(!item.assessmentId || (!item.modelAssessment&&!item.rulesAssessment)){button.hidden=true;message.textContent=t.unsaved;return;}
     const attached=()=>assistant.isConnected && item.assessmentId===cases.find(c=>c.id===item.id)?.assessmentId;
-    const showDraft=draft=>{renderAssistant(draft,host,item,language);button.hidden=true;status.textContent='';};
+    const showDraft=draft=>{renderAssistant(draft,host,item,language);button.hidden=true;message.textContent='';};
     Promise.all([backendJSON('/llm/status'),backendJSON('/case-explanation',{caseId:item.id,assessmentId:item.assessmentId,language,generate:false})]).then(([config,response])=>{
-      if(!attached())return;
-      if(response.draft){showDraft(response.draft);return;}
-      button.textContent=t.generate;button.disabled=!config.configured;status.textContent=config.configured?'':t.setup;if(autoGenerate && config.configured)button.click();
-    }).catch(()=>{if(attached()){button.textContent=t.generate;button.disabled=false;status.textContent=t.unavailable;}});
-    button.onclick=async()=>{
-      button.disabled=true;button.textContent=t.loading;status.textContent='';
-      try{const response=await backendJSON('/case-explanation',{caseId:item.id,assessmentId:item.assessmentId,language,generate:true},55000);if(attached())showDraft(response.draft);}
-      catch(error){if(attached()){status.textContent=language==='ar'?t.unavailable:error.message;button.disabled=false;button.textContent=t.generate;}}
-    };
+      if(!attached())return;if(response.draft){showDraft(response.draft);return;}
+      button.textContent=t.generate;button.disabled=!config.configured;message.textContent=config.configured?'':t.setup;if(autoGenerate&&config.configured)button.click();
+    }).catch(()=>{if(attached()){button.textContent=t.generate;button.disabled=false;message.textContent=t.unavailable;}});
+    button.onclick=async()=>{button.disabled=true;button.textContent=t.loading;message.textContent='';try{const response=await backendJSON('/case-explanation',{caseId:item.id,assessmentId:item.assessmentId,language,generate:true},55000);if(attached())showDraft(response.draft);}catch(error){if(attached()){message.textContent=ar?t.unavailable:error.message;button.disabled=false;button.textContent=t.generate;}}};
   }
-  const original=renderCase;renderCase=function(){original();enhanceCase()};
+  const original=renderCase;renderCase=function(){document.querySelector('#case-review-actions')?.remove();original();enhanceCase()};
   let loadingDemo=false;
   async function loadDemo(){
     if(loadingDemo)return;

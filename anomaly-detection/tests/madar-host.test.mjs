@@ -16,6 +16,7 @@ test('single-server hosting supplies assets and same-origin API behind optional 
  const headers={Authorization:'Basic '+Buffer.from('madar:synthetic-test-gate').toString('base64')};
  const page=await fetch(base,{headers});assert.equal(page.status,200);const html=await page.text();assert.match(html,/Madar \| مدار/);assert.match(html,/window.MADAR_API_BASE="\/api"/);
  assert.equal((await fetch(base+'/madar.js',{headers})).status,200);
+ const presentation=await fetch(base+'/case-presentation.js',{headers});assert.equal(presentation.status,200);assert.match(presentation.headers.get('content-type'),/javascript/);
  assert.equal((await fetch(base+'/synthetic-model-evidence.csv')).status,401);
  const sample=await fetch(base+'/synthetic-model-evidence.csv',{headers});
  assert.equal(sample.status,200);

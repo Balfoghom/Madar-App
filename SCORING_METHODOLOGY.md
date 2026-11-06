@@ -8,6 +8,14 @@ The interface contains three different assessment modes. Their numbers must not 
 | Connected-journey fitted model | Random Forest similarity to provisional synthetic review patterns | A model or comparator-rule flag recommends specialist review; missing evidence causes abstention |
 | Illustrative legacy portfolio | Median/MAD statistical demonstration with configurable weighted control and pattern adjustments | Browser sandbox only; never changes the fitted-model policy or retrains a model |
 
+## Case-panel score labels
+
+The case header retains a score indicator but labels its origin. Illustrative cases show the existing weighted **Simulation score**; the default mix is 55% existing control plus 45% simulated behavioral score plus pattern adjustments, rounded, capped at 100, with the existing critical-control floor. Scoring Simulation can change the illustrative configuration only.
+
+Assessed journey/rules cases show **Control score**. AI or comparator findings can raise review priority while that number stays unchanged (for example, control score 20 with Medium review priority). Connected cases show a qualitative pattern indicator, without inventing a combined numeric score. Incomplete assessments show no numeric score. Resolved cases retain the original assessment indicator alongside a separate outcome status.
+
+The visual redesign does not change detector inference, thresholds, scoring, routing policy or stored specialist decisions.
+
 ## Fitted journey routing
 
 The prototype operational-control bands are Low 0–34, Medium 35–74 and High 75–100. Missing required model evidence yields Incomplete. A model flag, comparator flag or supplied cross-source conflict raises a Low case to at least Medium. These are provisional routing assumptions, not validated enterprise risk bands. Model percentiles are not added to the operational score.

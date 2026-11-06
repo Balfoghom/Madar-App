@@ -15,7 +15,7 @@ Requires **Node.js 22.13 or newer**. No package installation, Python training or
 
 The app opens on **Fraud Operations**. One server supplies the interface and API; do not start a separate frontend or model service. If the port is occupied, stop the previous app or run `PORT=8091 npm start` and open that port.
 
-For optional LLM explanations, follow [LLM_SETUP.md](LLM_SETUP.md). Case panels show a concise brief with English / العربية controls; detailed evidence is collapsed. After a brief is generated, “Ask about this case” opens an evidence-grounded conversation in the selected language. Conversations stay in browser memory and cannot change cases. The app works without them and clearly displays “API setup required.”
+For optional LLM explanations, follow [LLM_SETUP.md](LLM_SETUP.md). Case panels show an explicitly labeled score or pattern indicator, a concise brief with English / العربية controls, key evidence linked to source sections, and a visible state-aware review action. People/financial context, source activity, scoring and review history are grouped separately; Expand case provides a wider reading view. Detailed model evidence stays collapsed. After a brief is generated, “Ask about this case” opens an evidence-grounded conversation in the selected language. Conversations stay in browser memory and cannot change cases. The app works without them and clearly displays “API setup required.”
 
 ## Validate the working journey
 
