@@ -1,6 +1,6 @@
 import {createDemoPortfolio} from './lib/demo-portfolio.mjs';
 import {withDataQuality} from './lib/data-quality.mjs';
-import {llmStatus, explanationEvidence, generateExplanation, PROMPT_VERSION} from './lib/case-explainer.mjs';
+import {llmStatus, explanationEvidence, generateExplanation, generateCaseAnswer, validateLanguage, validateConversation, PROMPT_VERSION} from './lib/case-explainer.mjs';
 import { createCrossJourneyAssessment, parseEventCSV, demoCases, crossJourneyModel } from './lib/cross-journey-adapter.mjs';
 import { createServer } from "node:http";
 import { createApplicationAssessment, InputError } from "./lib/assessment-adapter.mjs";
@@ -367,7 +367,7 @@ async function migrateSavedJourneyAssessments() {
   }
   return journeyAssessmentMigration;
 }
-export function createInferenceServer({explain = generateExplanation} = {}) {
+export function createInferenceServer({explain = generateExplanation, answer = generateCaseAnswer} = {}) {
   return createServer(async (req, res) => {
     const corsHeaders = {
       "Access-Control-Allow-Origin": ["http://localhost:8080", "http://127.0.0.1:8080"].includes(req.headers.origin) ? req.headers.origin : "http://localhost:8080",
@@ -398,13 +398,14 @@ export function createInferenceServer({explain = generateExplanation} = {}) {
       try {
         let payload='';for await (const chunk of req){payload+=chunk;if(Buffer.byteLength(payload)>4096)throw new InputError('Explanation request too large.',413)}
         const body=JSON.parse(payload);
-        if(!body || Object.keys(body).some(k=>!['caseId','assessmentId','generate'].includes(k)) || typeof body.caseId!=='string' || typeof body.assessmentId!=='string' || typeof body.generate!=='boolean') throw new InputError('Select a saved case and its current assessment.');
+        if(!body || Object.keys(body).some(k=>!['caseId','assessmentId','generate','language'].includes(k)) || typeof body.caseId!=='string' || typeof body.assessmentId!=='string' || typeof body.generate!=='boolean') throw new InputError('Select a saved case and its current assessment.');
+        const language=validateLanguage(body.language);
         await assessmentWrites.catch(()=>{});
         const record=(await readSavedAssessments()).find(r=>r.caseId===body.caseId);
         if(!record || record.assessmentId!==body.assessmentId)throw new InputError('The case assessment changed. Refresh first.',409);
         const evidence=explanationEvidence(record), status=llmStatus();
         await explanationWrites.catch(()=>{});
-        const existing=(await readJsonFile(explanationsPath,[])).find(x=>x.assessmentId===body.assessmentId && x.evidenceFingerprint===evidence.fingerprint && x.promptVersion===PROMPT_VERSION && x.model===status.model);
+        const existing=(await readJsonFile(explanationsPath,[])).find(x=>x.assessmentId===body.assessmentId && x.evidenceFingerprint===evidence.fingerprint && x.promptVersion===PROMPT_VERSION && x.model===status.model && (x.language || 'en')===language);
         if(existing)return send(200,{draft:existing,cached:true});
         if(!body.generate)return send(200,{draft:null,configured:status.configured});
         if(!status.configured)throw new InputError('LLM explanations are not configured. Use the evidence overview or follow the API setup guide.',503);
@@ -412,7 +413,7 @@ export function createInferenceServer({explain = generateExplanation} = {}) {
         const now=Date.now();while(explanationRequests.length && explanationRequests[0]<now-60000)explanationRequests.shift();
         if(explanationRequests.length>=5)throw new InputError('The demo allows five LLM requests per minute. Try again shortly.',429);
         pendingExplanations.add(key);ownsLock=true;explanationRequests.push(now);
-        const draft=await explain(record);
+        const draft=await explain(record,{language});
         const operation=explanationWrites.catch(()=>{}).then(async()=>{
           await assessmentWrites.catch(()=>{});
           const latest=(await readSavedAssessments()).find(r=>r.caseId===body.caseId);
@@ -422,6 +423,31 @@ export function createInferenceServer({explain = generateExplanation} = {}) {
         return send(200,{draft,cached:false});
       }catch(error){return send(error.status || (error instanceof SyntaxError?400:500),{error:error instanceof InputError?error.message:'Could not prepare the case explanation.'})}
       finally{if(ownsLock)pendingExplanations.delete(key)}
+    }
+    if(req.method === 'POST' && path === '/case-question') {
+      let key, ownsLock=false;
+      try {
+        let payload='';for await(const chunk of req){payload+=chunk;if(Buffer.byteLength(payload)>32000)throw new InputError('Question request too large.',413);}
+        const body=JSON.parse(payload);
+        if(!body || Object.keys(body).some(k=>!['caseId','assessmentId','language','question','history','evidenceFingerprint'].includes(k)) || typeof body.caseId!=='string' || typeof body.assessmentId!=='string' || typeof body.evidenceFingerprint!=='string')throw new InputError('Select a saved case and its current explanation.');
+        const language=validateLanguage(body.language), conversation=validateConversation(body.question,body.history);
+        await assessmentWrites.catch(()=>{});
+        const record=(await readSavedAssessments()).find(r=>r.caseId===body.caseId);
+        if(!record || record.assessmentId!==body.assessmentId)throw new InputError('The assessment changed. Refresh the case and start a new conversation.',409);
+        const evidence=explanationEvidence(record);
+        if(evidence.fingerprint!==body.evidenceFingerprint)throw new InputError('The evidence changed. Refresh the case and start a new conversation.',409);
+        if(!llmStatus().configured)throw new InputError('The case assistant is not configured.',503);
+        key=body.caseId;if(pendingExplanations.has(key))throw new InputError('The assistant is already preparing a response for this case.',409);
+        const now=Date.now();while(explanationRequests.length && explanationRequests[0]<now-60000)explanationRequests.shift();
+        if(explanationRequests.length>=5)throw new InputError('The demo allows five AI requests per minute. Try again shortly.',429);
+        pendingExplanations.add(key);ownsLock=true;explanationRequests.push(now);
+        const result=await answer(record,{language,...conversation});
+        await assessmentWrites.catch(()=>{});
+        const latest=(await readSavedAssessments()).find(r=>r.caseId===body.caseId);
+        if(!latest || latest.assessmentId!==body.assessmentId || explanationEvidence(latest).fingerprint!==evidence.fingerprint)throw new InputError('The evidence changed while the answer was generated. Refresh the case.',409);
+        return send(200,result);
+      }catch(error){return send(error.status || (error instanceof SyntaxError?400:500),{error:error instanceof InputError?error.message:'Could not answer this case question.'});}
+      finally{if(ownsLock)pendingExplanations.delete(key);}
     }
     if(req.method === 'POST' && path === '/demo-portfolio'){
       try{

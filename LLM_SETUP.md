@@ -2,7 +2,7 @@
 
 ## What is implemented
 
-The prototype has a server-side **OpenAI Responses API** adapter for English case briefs: case in brief, why it matters, cited observations, questions to investigate and suggested next steps. The business narrative follows the original GOSI prototype’s case-summary approach; it does not copy its legacy weighted-risk claims. It is disabled until a provider, model and API key are configured. The ordinary structured evidence summary continues to work without it.
+The prototype has a server-side **OpenAI Responses API** adapter for concise English and Arabic case briefs: case in brief, why it matters, cited observations, questions to investigate and suggested next steps. The business narrative follows the original GOSI prototype’s case-summary approach; it does not copy its legacy weighted-risk claims. It is disabled until a provider, model and API key are configured. The ordinary structured evidence summary continues to work without it.
 
 Azure OpenAI and internal gateways are not implemented in this adapter. If the team requires one, adapt and validate its endpoint/authentication before enabling it. Do not put a gateway URL into the OpenAI key field.
 
@@ -19,6 +19,14 @@ Azure OpenAI and internal gateways are not implemented in this adapter. If the t
 Manual alternative: copy `.env.example` to `.env`, set the key locally, and restart. Never overwrite an existing `.env` blindly.
 
 For hosting, use the provider’s secret/environment settings instead of uploading `.env`. Configure a project spending limit and the appropriate approved model. To disable the integration, clear `MADAR_LLM_PROVIDER` and restart.
+
+## Case panel and specialist questions
+
+The placeholder Evidence Summary is removed. The case panel shows a short AI brief: what happened, why it matters and one verification step. Raw evidence and specialist controls are collapsed. English / العربية selects the brief language, including right-to-left Arabic. Switching a completed brief to an uncached language generates that version on demand; each language is cached separately.
+
+“Ask about this case” opens a focused question dialog in the selected language. `/case-question` uses the same minimal current case facts and evidence citations. It sends the question and up to four recent question/answer pairs to OpenAI with `store:false`. Conversation text is held in browser memory only, separated by case, assessment, evidence fingerprint and language; it is not an audit record. Do not enter real personal or confidential information. Refresh clears the conversation. Questions cannot change the case. Invalid/stale evidence, duplicate in-flight requests and the shared five-request-per-minute limit are checked server-side.
+
+Existing v3 drafts are retained on disk but are not reused for the new concise v4 brief. The first request after deployment generates a new brief. Technical source labels stay in their source language; the language control applies to the AI brief and conversation.
 
 ## Data and behavior
 
@@ -38,6 +46,6 @@ Drafts are cached locally against the assessment, evidence, prompt version and c
 - [ ] Test an invalid key or unavailable model and confirm that evidence remains usable and the failure is visible.
 - [ ] Record response latency and ask the fraud specialist to assess usefulness and editing effort. Do not claim measured time savings until tested against a baseline.
 
-The current business-brief prompt is `madar-business-brief-v3`; previous brief versions are not reused. Automated tests use mocked provider responses. A real API smoke test was not performed during implementation because no provider/model/key was configured.
+The current business-brief prompt is `madar-business-brief-v4`; previous brief versions are not reused. Automated tests use mocked provider responses. A real API smoke test was not performed during implementation because no provider/model/key was configured.
 
 Official references: [Structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses), [Responses migration guide](https://developers.openai.com/api/docs/guides/migrate-to-responses).

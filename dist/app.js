@@ -2550,10 +2550,6 @@ function renderCase() {
   const caseLocation = isSaudi(item.country)
     ? item.city
     : "Outside Saudi Arabia";
-  const summaryArabic = caseSummaryLanguage === "ar";
-  const caseSummary = summaryArabic
-    ? generateArabicCaseSummary(item)
-    : generateCaseSummary(item);
   const actionOwnership = routeOwnership(item);
   panel.innerHTML = [
     '<div class="case-hero">',
@@ -2631,23 +2627,6 @@ function renderCase() {
       formatSar(item.preventedAmount) +
       "</strong></div>",
     '</div><small class="financial-boundary">Synthetic prototype values. Prevention is counted only when the specialist outcome and payment status support it.</small></section>',
-    '<section class="detail-section ai-summary-section ' +
-      (summaryArabic ? "rtl-summary" : "") +
-      '" dir="' +
-      (summaryArabic ? "rtl" : "ltr") +
-      '"><div class="summary-heading"><h3 class="detail-title">' +
-      (summaryArabic ? "ملخص الأدلة" : "Evidence summary") +
-      '</h3><div class="summary-actions"><span>' +
-      (summaryArabic ? "مولّد في النموذج الأولي" : "Prototype-generated") +
-      '</span><button id="summary-language-toggle" type="button">' +
-      (summaryArabic ? "English" : "العربية") +
-      "</button></div></div><p>" +
-      escapeHtml(caseSummary) +
-      "</p><small>" +
-      (summaryArabic
-        ? "يلخص هذا النص الأدلة المتاحة للمراجعة، ولا يثبت وجود احتيال ولا يستبدل قرار المختص."
-        : "This summary organizes available evidence for review. It does not confirm fraud or replace the specialist decision.") +
-      "</small></section>",
     '<section class="detail-section"><h3 class="detail-title">Assessment components</h3><div class="score-split four">',
     '<div class="mini-score"><span>Existing control</span><strong>' +
       (item.ruleScore == null ? "Not supplied" : item.ruleScore) +
@@ -2720,12 +2699,6 @@ function renderCase() {
   panel.querySelectorAll("[data-scenario-action]").forEach((button) => {
     button.addEventListener("click", () => openScenarioReview(item, button.dataset.scenarioAction));
   });
-  document
-    .querySelector("#summary-language-toggle")
-    .addEventListener("click", function () {
-      caseSummaryLanguage = caseSummaryLanguage === "ar" ? "en" : "ar";
-      renderCase();
-    });
   if (!item.assessmentId) {
     panel.querySelectorAll("#approve-route, #override-route-btn, #reject-route, #record-outcome-btn").forEach((button) => { button.disabled = true; });
     panel.insertAdjacentHTML("beforeend", '<p class="session-note">This is an unsaved scoring simulation. Use New Assessment or import synthetic model evidence to record a persistent specialist review.</p>');
