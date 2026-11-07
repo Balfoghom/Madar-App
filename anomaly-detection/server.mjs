@@ -1,3 +1,4 @@
+import {HYBRID_POLICY_VERSION} from './lib/hybrid-policy.mjs';
 import {routingPolicy} from './lib/routing-policy.mjs';
 import {createWorkspacePortfolio,createDemoIntake,DEMO_INTAKE_BATCH,enrichDemoRecord,applyBusinessConfig,caseStatus,activeWorkspaceRecords} from './lib/workspace-demo.mjs';
 import {createDemoPortfolio} from './lib/demo-portfolio.mjs';
@@ -464,12 +465,14 @@ export function createInferenceServer({explain = generateExplanation, answer = g
           const migrated=previous.map(record=>{
             const old=record.caseData;
             const connected=record.assessmentSource==='cross-journey'&&old?.crossJourneyEvidence;
-            const saned=old?.journey==='SANED'&&old?.modelInput&&old.modelAssessment&&!old.businessSimulation;
-            if((!connected&&!saned)||(record.modelResult?.modelVersion===(connected?crossJourneyModel.version:model.version)&&(!saned||old.assessmentMode==='saned-hybrid')))return record;
-            const fresh=connected?createCrossJourneyAssessment(old.crossJourneyEvidence):createApplicationAssessment(old,{source:record.assessmentSource});
+            const modeled=old?.modelAssessment&&!old.businessSimulation&&record.assessmentSource!=='rules-demo';
+            const expectedVersion=connected?crossJourneyModel.version:old?.journey==='SANED'?model.version:journeyModelMetadata.find(m=>m.journey===old?.journey)?.version;
+            if((!connected&&!modeled)||(record.modelResult?.modelVersion===expectedVersion&&old.policy===HYBRID_POLICY_VERSION))return record;
+            const fresh=connected?createCrossJourneyAssessment(old.crossJourneyEvidence,{ruleScore:old.ruleScore}):createApplicationAssessment(old,{source:record.assessmentSource});
             const preserved={};for(const key of ['customerName','employerName','subject','entity','nationalId','mobile','employerNumber','supervisorName','country','region','city','transactionAmount','amountAtRisk','preventedAmount','confirmedFraudAmount','paymentStatus','financialOutcome','financialProvenance','outcome','outcomeProvenance','decisionDate','decisionOwner','reviewHistory','humanDecision','workflow','workflowStage','demoPortfolio','demoIntakeBatch','intakeReceivedAt','scenario'])if(old[key]!==undefined)preserved[key]=old[key];
-            Object.assign(fresh.caseData,preserved,{assessmentHistory:[...(old.assessmentHistory||[]),{assessmentId:record.assessmentId,modelVersion:record.modelResult?.modelVersion,assessedAt:record.assessedAt}].slice(-10)});
-            if(old.humanDecision)fresh.caseData.route=old.route;
+            Object.assign(fresh.caseData,preserved,{assessmentHistory:[...(old.assessmentHistory||[]),{assessmentId:record.assessmentId,modelVersion:record.modelResult?.modelVersion,policy:old.policy,assessedAt:record.assessedAt}].slice(-10)});
+            if(old.humanDecision||old.reviewHistory?.some(r=>r.type==='decision')||old.workflow?.stage==='Closed'||(old.outcome&&!/^(Suspected|Inconclusive)/.test(old.outcome)))fresh.caseData.route=old.route;
+            fresh.caseData.audit=[...(old.audit||[]),...(fresh.caseData.audit||[]),`Decision policy updated to ${HYBRID_POLICY_VERSION}; prior assessment ${record.assessmentId} retained in history.`];
             fresh.caseData.status=caseStatus(fresh.caseData);fresh.reviewHistory=record.reviewHistory||[];
             return fresh;
           });
@@ -518,7 +521,7 @@ export function createInferenceServer({explain = generateExplanation, answer = g
     if (req.method === "GET" && path === "/health")
       return send(200, {
         status: "ready",
-        contractVersion: "integration-v0.3-saned-hybrid",
+        contractVersion: "integration-v0.4-shared-hybrid",
         modelVersion: model.version,
         crossJourneyModelVersion: crossJourneyModel.version,
         syntheticOnly: true,
@@ -534,17 +537,18 @@ export function createInferenceServer({explain = generateExplanation, answer = g
         let payload = "";
         for await (const chunk of req) { payload += chunk; if (Buffer.byteLength(payload) > 1_100_000) return send(413,{error:"Event upload is too large."}); }
         const body = JSON.parse(payload);
-        if (!body || Array.isArray(body) || Object.keys(body).length !== 1 || !["csv","case_id","evidence"].includes(Object.keys(body)[0])) throw new InputError("Supply csv, a bundled case_id, or saved synthetic evidence.");
+        if (!body || Array.isArray(body) || Object.keys(body).some(k=>!["csv","case_id","evidence","existingControlScore"].includes(k)) || ["csv","case_id","evidence"].filter(k=>Object.hasOwn(body,k)).length!==1) throw new InputError("Supply csv, a bundled case_id, or saved synthetic evidence.");
         const inputs = body.csv !== undefined ? parseEventCSV(body.csv) : body.evidence ? [body.evidence] : [demoCases.find(c => c.id === body.case_id)];
         if (body.evidence && (body.evidence.synthetic !== true || typeof body.evidence.id !== 'string' || !/^CJ-SYN-[\w-]+$/.test(body.evidence.id) || !Array.isArray(body.evidence.events) || body.evidence.events.length > 1000 || body.evidence.events.some(e=>!e || typeof e.eventId !== 'string' || !e.eventId.trim() || !Number.isFinite(e.recordedAt) || !Number.isFinite(new Date(e.recordedAt).getTime())) || new Set(body.evidence.events.map(e=>e.eventId)).size !== body.evidence.events.length || !Number.isFinite(body.evidence.asOf) || !Number.isFinite(new Date(body.evidence.asOf).getTime()))) throw new InputError('Supply a valid synthetic event history.');
         if (inputs.some(c=>!c)) throw new InputError("Synthetic cross-journey case not found.",404);
-        const records = inputs.map(createCrossJourneyAssessment);
+        if(body.existingControlScore!==undefined&&(!Number.isFinite(body.existingControlScore)||body.existingControlScore<0||body.existingControlScore>100))throw new InputError('Existing control score must be between 0 and 100.');
+        const records = inputs.map(input=>createCrossJourneyAssessment(input,{ruleScore:body.existingControlScore}));
         const operation = assessmentWrites.catch(()=>{}).then(async()=>{
           const previous = await readSavedAssessments();
           const reviews = await readJsonFile(humanReviewsPath, []);
           const saved = records.map(record=>{
             const latest = previous.find(p=>p.caseId===record.caseId && p.assessmentSource==='cross-journey');
-            if (latest?.evidenceFingerprint === record.evidenceFingerprint && latest.modelVersion === record.modelVersion) return latest;
+            if (latest?.evidenceFingerprint === record.evidenceFingerprint && latest.modelVersion === record.modelVersion && latest.decisionFingerprint === record.decisionFingerprint) return latest;
             record.reviewHistory = reviews.filter(r=>r.caseId===record.caseId);
             record.caseData.reviewHistory = record.reviewHistory;
             return record;
@@ -731,7 +735,7 @@ export function createInferenceServer({explain = generateExplanation, answer = g
           for (const signal of item.caseData?.signals || []) {
             const code = Array.isArray(signal) ? signal[0] : signal?.code;
             const label = Array.isArray(signal) ? signal[1] : signal?.label;
-            if (!code || /^CROSS_JOURNEY_EVIDENCE_|^SANED_COMPARATOR_\d+$|^MODEL_FEATURE_\d+$/.test(code) || seen.has(code) || ["COMBINED_PATTERN", "MODEL_NOT_FLAGGED", "LOWER_BEHAVIORAL_DEVIATION", "NO_MATERIAL_ANOMALY", "EVIDENCE_INCOMPLETE", "CROSS_JOURNEY_PATTERN", "MODEL_UNUSUAL_COMBINATION"].includes(code)) continue;
+            if (!code || /^CROSS_JOURNEY_EVIDENCE_|^SANED_COMPARATOR_\d+$|^MODEL_FEATURE_\d+$/.test(code) || seen.has(code) || ["HYBRID_SCORE_COMPONENTS", "CONTROL_SCORE_MISSING", "COMBINED_PATTERN", "MODEL_NOT_FLAGGED", "LOWER_BEHAVIORAL_DEVIATION", "NO_MATERIAL_ANOMALY", "EVIDENCE_INCOMPLETE", "CROSS_JOURNEY_PATTERN", "MODEL_UNUSUAL_COMBINATION"].includes(code)) continue;
             seen.add(code);
             const entry = counts.get(code) || { code, label: String(label || code), confirmedCases: 0, examples: [] };
             entry.confirmedCases += 1;

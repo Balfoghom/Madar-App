@@ -1,3 +1,4 @@
+import {hybridPolicy,hybridReasons} from './hybrid-policy.mjs';
 import {randomUUID,createHash} from 'node:crypto';
 import bundledBusiness from '../data/business-demo-cases.json' with {type:'json'};
 import {withDataQuality} from './data-quality.mjs';
@@ -38,11 +39,15 @@ export function enrichDemoRecord(record){
  data.demoContextProvenance='Fictional presentation identity and control/financial context; source model evidence is unchanged.';
  if(!Number.isFinite(data.transactionAmount))data.transactionAmount=18000+(n%18)*3250;
  if(!Number.isFinite(data.amountAtRisk))data.amountAtRisk=data.risk==='Low'?0:Math.round(data.transactionAmount*.8);
- if(!Number.isFinite(data.ruleScore)){
+ if(!Number.isFinite(data.ruleScore)&&!(data.assessmentMode==='hybrid'&&data.assessmentSource==='cross-journey')){
    data.ruleScore=data.risk==='High'?85:data.risk==='Medium'?55:data.risk==='Low'?15:40;
    data.controlScoreProvenance='Supplied fictional operational-control context for the demo; not a model output.';
  }
- if(data.assessmentSource==='cross-journey'&&data.modelAssessment?.complete){data.score=data.ruleScore;data.scoreMeaning='Supplied demo control score; cross-journey model finding remains separate.';}
+ if(data.assessmentSource==='cross-journey'&&data.assessmentMode==='hybrid'){
+  const policy=hybridPolicy(data,data.modelAssessment);Object.assign(data,policy,{anomalyScore:policy.scoringComponents?.anomalyScore??null,interaction:policy.scoringComponents?.patternAdjustment||0});
+  data.features={...data.features,missingData:!policy.decisionComplete};data.reasonCodes=[...(data.reasonCodes||[]).filter(r=>!['HYBRID_SCORE_COMPONENTS','CONTROL_SCORE_MISSING'].includes(r.code)),...hybridReasons(policy)];data.signals=data.reasonCodes.map(r=>[r.code,r.description]);
+ }
+
  data.financialProvenance ||= 'Fictional supplied scenario amount; not inferred from model output.';
  data.status=caseStatus(data);
  return withDataQuality({...record,caseData:data});
@@ -97,7 +102,7 @@ export function createDemoIntake(now=new Date()){
  const names=['Latifah Saad Alharbi','Dania Omar Alqahtani','Bayan Fahad Alotaibi','Wijdan Khalid Alzahrani','Raghad Nasser Alghamdi','Basma Hamad Almutairi'];
  const scenarios=['Registration and wage changes before linked maternity requests','Shared payment account before maternity requests','Conflicting wage records before a maternity request','Routine maternity request with linked employment history','Maternity request after a legitimate account update','Maternity request missing a contributor link'];
  return maternityIntake.map((evidence,index)=>{
-  const record=createCrossJourneyAssessment(structuredClone(evidence));
+  const record=createCrossJourneyAssessment(structuredClone(evidence),{ruleScore:[25,25,55,10,15,25][index]});
   Object.assign(record.caseData,{demoPortfolio:true,demoIntakeBatch:DEMO_INTAKE_BATCH,intakeReceivedAt:now.toISOString(),customerName:names[index],scenario:scenarios[index],country:'Saudi Arabia',region:index%2?'Makkah':'Riyadh',city:index%2?'Jeddah':'Riyadh',transactionAmount:24000+index*2000,amountAtRisk:!record.complete?null:(record.modelFlagged||record.ruleFlagged)?24000+index*2000:0,financialProvenance:'Supplied synthetic maternity request amount; not an inferred entitlement or confirmed loss.',detectionMethod:'Cross-journey AI + comparator rules'});
   const enriched=enrichDemoRecord(record);
   if(!record.complete)enriched.caseData.amountAtRisk=null;

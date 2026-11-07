@@ -4,7 +4,7 @@ import {mkdtemp,rm,readFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {once} from 'node:events';
-import {separatedPolicy} from '../lib/assessment-adapter.mjs';
+import {hybridPolicy} from '../lib/hybrid-policy.mjs';
 import {parseEventCSV,createCrossJourneyAssessment,demoCases} from '../lib/cross-journey-adapter.mjs';
 const dir=await mkdtemp(join(tmpdir(),'madar-cross-integration-'));
 process.env.ASSESSMENT_DATA_DIR=dir;
@@ -17,7 +17,7 @@ test('expanded event CSV round-trips all twelve genuine model assessments',()=>{
  for (let i=0;i<results.length;i++) assert.equal(results[i].evidenceFingerprint,createCrossJourneyAssessment(demoCases[i]).evidenceFingerprint);
  assert.deepEqual(results.map(r=>r.modelFlagged??null),[false,true,false,true,true,null,false,false,false,true,true,true]);
  assert.deepEqual(results.map(r=>r.ruleFlagged??null),[false,false,false,true,true,null,false,false,false,false,false,false]);
- const proof=results[1];assert.equal(proof.caseData.sourceTimeline.length,12);assert.equal(proof.linkedContributorCount,3);assert.equal(proof.caseData.score,null);assert.equal(proof.caseData.entity,grouped[1].employerId);
+ const proof=results[1];assert.equal(proof.caseData.sourceTimeline.length,12);assert.equal(proof.linkedContributorCount,3);assert.equal(proof.caseData.ruleScore,55);assert.equal(proof.caseData.score,Math.max(0,Math.min(100,Math.round(55*.55+proof.modelResult.score*45))));assert.equal(proof.caseData.entity,grouped[1].employerId);
  assert.equal(results[5].caseData.risk,'Incomplete');assert.equal(results[5].percentile,null);
 });
 test('CSV rejects conflicting grouping keys, duplicate events and non-synthetic input',()=>{
@@ -49,9 +49,9 @@ test('connected import is idempotent, decisions persist, changed evidence requir
 });
 
 test('reported source conflicts require verification without changing the model flag',()=>{
- const model={complete:true,modelFlagged:false,ruleFlagged:false};
- const policy=separatedPolicy({journey:'SANED',ruleScore:10,features:{crossSourceConflict:true}},model);
- assert.equal(policy.route,'Data Verification Review');assert.equal(policy.risk,'Medium');assert.equal(model.modelFlagged,false);assert.equal(policy.score,10);
+ const model={complete:true,score:.4,modelFlagged:false,ruleFlagged:false};
+ const policy=hybridPolicy({journey:'SANED',ruleScore:10,features:{crossSourceConflict:true}},model);
+ assert.equal(policy.route,'Data Verification Review');assert.equal(policy.risk,'Medium');assert.equal(model.modelFlagged,false);assert.equal(policy.score,24);
 });
 
 test('cross-journey destination follows the request evidence rather than a SANED constant',()=>{

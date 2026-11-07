@@ -13,3 +13,9 @@ test('digital model findings propose cybersecurity review without rewriting fitt
  const result=withRouting(override);assert.equal(result.caseData.route,'Business Owner Review');assert.equal(result.caseData.recommendedRoute,'Cybersecurity Review');assert.deepEqual(result.modelResult,model);
  }
 });
+
+test('resolved cases retain their recorded route when a newer policy recommends a different route',()=>{
+ const data={journey:'SANED',risk:'High',ruleScore:90,route:'Straight-through processing',outcome:'Legitimate activity',features:{},assessmentMode:'hybrid'};
+ const resolved=routingPolicy.apply(data);assert.equal(resolved.recommendedRoute,'Fraud Prevention & Inspection Review');assert.equal(resolved.route,'Straight-through processing');
+ assert.equal(routingPolicy.apply({...data,outcome:'Suspected fraud — further investigation'}).route,'Fraud Prevention & Inspection Review');
+});

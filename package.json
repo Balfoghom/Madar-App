@@ -8,7 +8,6 @@
   },
   "scripts": {
     "start": "node start.mjs",
-    "train:saned": "node anomaly-detection/ml/train-saned.mjs",
     "test": "node --test anomaly-detection/tests/*.test.mjs anomaly-detection/cross-journey/tests/*.test.mjs",
     "llm:setup": "node scripts/setup-llm.mjs"
   }

@@ -1,4 +1,5 @@
-import {withRouting} from './routing-policy.mjs';
+import {withDataQuality} from './data-quality.mjs';
+import {hybridPolicy,hybridReasons} from './hybrid-policy.mjs';
 import { createHash, randomUUID } from 'node:crypto';
 import { assess, model } from '../cross-journey/inference/detector.mjs';
 import demoCases from '../cross-journey/data/demo-cases.json' with { type: 'json' };
@@ -48,6 +49,7 @@ export function parseEventCSV(text) {
     if (!Number.isFinite(new Date(asOf).getTime())) throw new InputError('assessment_time must be a valid timestamp in milliseconds.');
     if (!grouped.has(r.case_id)) grouped.set(r.case_id,{id:r.case_id,synthetic:true,employerId:r.employer_id,asOf,events:[]});
     const c = grouped.get(r.case_id);
+    if(header.includes('existing_control_score')){const control=number(r.existing_control_score,'existing_control_score',true);if(control!==undefined&&(control<0||control>100))throw new InputError('existing_control_score must be between 0 and 100.');if(c.events.length&&c.existingControlScore!==control)throw new InputError('A case has inconsistent existing control scores.');c.existingControlScore=control;}
     if (c.asOf !== asOf || c.employerId !== r.employer_id) throw new InputError(`Case ${c.id} has inconsistent assessment time or employer IDs.`);
     if (c.events.some(e => e.eventId === r.event_id)) throw new InputError(`Duplicate event ${r.event_id} in ${c.id}.`);
     const recordedAt = number(r.recorded_at,'recorded_at');
@@ -57,13 +59,15 @@ export function parseEventCSV(text) {
   if (grouped.size > 200) throw new InputError('Import at most 200 grouped cases.');
   return [...grouped.values()];
 }
-export function createCrossJourneyAssessment(evidence) {
+export function createCrossJourneyAssessment(evidence, context={}) {
   const result = assess(evidence);
   const assessmentId = randomUUID(), assessedAt = new Date().toISOString();
   const known = demoCases.find(c => c.id === evidence.id);
   const scenario = titles[known?.family] || 'Connected synthetic event history';
   const review = result.modelFlagged || result.ruleFlagged;
-  const risk = !result.complete ? 'Incomplete' : review ? 'Medium' : 'Low';
+  const controlScore=context.ruleScore??evidence.existingControlScore??null;
+  const policy=hybridPolicy({journey:evidence.events.filter(e=>['claim','maternity','payment','retirement'].includes(e.type)&&e.recordedAt<=evidence.asOf).sort((a,b)=>a.recordedAt-b.recordedAt).at(-1)?.journey,assessmentSource:'cross-journey',ruleScore:controlScore,features:{crossSourceConflict:evidence.events.some(e=>e.recordedAt<=evidence.asOf&&e.recordedAt>=evidence.asOf-30*86400000&&e.sourceConflict)}},result);
+  const risk=policy.risk;
   const events = evidence.events.filter(e => e.recordedAt <= evidence.asOf && e.recordedAt >= evidence.asOf - 30 * 86400000).sort((a,b) => a.recordedAt - b.recordedAt);
   const subjects = [...new Set(events.map(e => e.subjectId))];
   const destination=events.filter(event=>["claim","payment","retirement","maternity"].includes(event.type)).at(-1);
@@ -72,16 +76,16 @@ export function createCrossJourneyAssessment(evidence) {
   if (result.completedContributorChains >= 2) reasonCodes.push({code:'CJ_COMPLETED_CONTRIBUTOR_SEQUENCE',description:result.reasons[1]});
   if(result.maternityContributorChains>=2)reasonCodes.push({code:'CJ_MATERNITY_CONTRIBUTOR_SEQUENCE',description:result.reasons.find(r=>r.includes('registration → wage → maternity'))});
   for(const [index,description] of result.reasons.entries())if(index>0&&!reasonCodes.some(r=>r.description===description))reasonCodes.push({code:'CROSS_JOURNEY_EVIDENCE_'+index,description});
-  reasonCodes.push(...(result.ruleFindings || []));
+  reasonCodes.push(...(result.ruleFindings || []),...hybridReasons(policy));
   const caseData = {
     id:evidence.id,transactionId:evidence.id,synthetic:true,journey:primaryJourney,scenario,
-    assessmentId,assessedAt,assessmentSource:'cross-journey',assessmentMode:'model-separated',
+    assessmentId,assessedAt,assessmentSource:'cross-journey',assessmentMode:'hybrid',
     subject:subjects.join(', '),entity:evidence.employerId || 'Missing employer',customerName:subjects.length + ' linked contributor' + (subjects.length === 1 ? '' : 's'),employerName:evidence.employerId || 'Missing employer',
     requested:assessedAt,country:'Saudi Arabia',region:'Not supplied',city:'Not supplied',source:'Synthetic linked event history',
-    score:null,ruleScore:null,risk,route:result.route,status:!result.complete?'Complete evidence':review?'Awaiting specialist':'Standard review',
-    comparison:!result.complete?'Evidence incomplete':result.modelFlagged && !result.ruleFlagged?'Model recommends review; included comparator rules remain quiet':result.modelFlagged?'Rules and AI recommend review':'No review threshold crossed',
-    confidence:'Not calibrated',confidenceScore:null,anomalyScore:result.percentile ?? null,interaction:0,
-    features:{velocity:events.length,linkedEntities:subjects.length,retroDays:0,priorRisk:0,overrides:0,identityReuse:0,amountChangePct:0,crossSourceConflict:events.some(e=>e.sourceConflict),missingData:!result.complete,urgentPriority:0},
+    ...policy,ruleScore:controlScore,risk,route:policy.route,status:policy.status,recommendedRoute:policy.route,
+    comparison:policy.decisionComplete?'Hybrid review priority combines the supplied control score, the existing model AI score and approved adjustments. The original model finding remains unchanged.':policy.decisionIssue,
+    confidence:'Not calibrated',confidenceScore:null,anomalyScore:policy.scoringComponents?.anomalyScore??null,interaction:policy.scoringComponents?.patternAdjustment||0,
+    features:{velocity:events.length,linkedEntities:subjects.length,retroDays:0,priorRisk:0,overrides:0,identityReuse:0,amountChangePct:0,crossSourceConflict:events.some(e=>e.sourceConflict),missingData:!policy.decisionComplete,urgentPriority:0},
     primaryCode:reasonCodes[0].code,primaryReason:result.reasons.join(' '),reasonCodes,signals:reasonCodes.map(r=>[r.code,r.description]),
     modelAssessment:{...result,assessmentId,assessedAt,algorithm:model.algorithm || 'Random Forest'},
     aiModel:{version:result.modelVersion,rawScore:result.score ?? null,percentile:result.percentile ?? null,flagged:result.modelFlagged ?? null,complete:result.complete,ruleFlagged:result.ruleFlagged ?? null,features:result.features,algorithm:'Random Forest'},
@@ -92,5 +96,5 @@ export function createCrossJourneyAssessment(evidence) {
   };
   const keys=['eventId','recordedAt','effectiveAt','journey','type','subjectId','employerId','identifierId','amount','previousAmount','sourceConflict','ruleOverride','latitude','longitude','locationVerified','previousIdentifierId','changedField'];
   const canonical={id:evidence.id,employerId:evidence.employerId || '',asOf:evidence.asOf,events:[...evidence.events].sort((a,b)=>a.eventId.localeCompare(b.eventId)).map(e=>Object.fromEntries(keys.map(key=>[key,e[key] === "" ? null : e[key] ?? null])))};
-  return withRouting({assessmentId,assessedAt,caseId:evidence.id,transactionId:evidence.id,synthetic:true,assessmentSource:'cross-journey',journey:primaryJourney,scenario,...result,risk,modelResult:caseData.modelAssessment,caseData,evidenceFingerprint:createHash('sha256').update(JSON.stringify(canonical)).digest('hex')});
+  return withDataQuality({assessmentId,assessedAt,caseId:evidence.id,transactionId:evidence.id,synthetic:true,assessmentSource:'cross-journey',journey:primaryJourney,scenario,...result,risk,decisionComplete:policy.decisionComplete,applicationAssessment:policy,businessAssessment:policy,decisionFingerprint:createHash('sha256').update(JSON.stringify({policy:policy.policy,controlScore,score:policy.score,patterns:policy.scoringComponents?.approvedPatterns})).digest('hex'),modelResult:caseData.modelAssessment,caseData,evidenceFingerprint:createHash('sha256').update(JSON.stringify(canonical)).digest('hex')});
 }

@@ -2,7 +2,7 @@
 (() => {
   const root = document.querySelector('#madar-workspace');
   const names = {routine_digital:'Routine digital activity',legitimate_travel:'Legitimate travel',legitimate_account_update:'Legitimate account update',account_takeover_sequence:'Rapid account-change sequence',coordinated_iban_network:'Linked payment-account changes',rapid_profile_payment:'Repeated profile and payment changes',routine:'Routine activity',coordinated_claim_sequence:'Connected SANED sequence',legitimate_restructuring:'Legitimate restructuring',identifier_reuse_network:'Shared identifier network',retroactive_source_conflict:'Conflicting evidence',missing:'Missing employer evidence'};
-  let catalog = [], records = new Map(), selected = 'CJ-SYN-demo-00001', busy = false, error = '', activeModelVersion = '';
+  let catalog = [], records = new Map(), selected = 'CJ-SYN-demo-00001', busy = false, error = '', activeModelVersion = '',controlScore='';
   const esc = escapeHtml;
   const date = value => new Date(value).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Riyadh'});
   const eventNames = {registration:'Registration',wage:'Wage change',exclusion:'Employment exclusion',claim:'SANED request',payment:'Payment',retirement:'Retirement',maternity:'Maternity',login:'Account login',iban_change:'IBAN change',profile_update:'Profile update'};
@@ -29,6 +29,7 @@
   }
   async function run(body) {
     if (busy) return;
+    if(!body.csv){const value=records.get(selected)?.caseData.ruleScore;const supplied=controlScore!==''?Number(controlScore):value;if(!Number.isFinite(supplied)||supplied<0||supplied>100){error='Supply the existing control score (0–100) before calculating the hybrid assessment.';render();return;}body={...body,existingControlScore:supplied};}
     busy = true; error = ''; render();
     try {
       const response = await backendJSON('/cross-journey/assess',body,30000);
@@ -45,7 +46,7 @@
   };
   function resultBadge(record) {
     if(!record) return '<span class="cj-badge neutral">Not assessed</span>';
-    if(!record.complete) return '<span class="cj-badge incomplete">Complete evidence</span>';
+    if(record.caseData?.decisionComplete===false||!record.complete) return '<span class="cj-badge incomplete">Complete evidence</span>';
     return (record.modelFlagged || record.ruleFlagged) ? '<span class="cj-badge review">Specialist review</span>' : '<span class="cj-badge typical">Standard review</span>';
   }
   function timeline(evidence) {
@@ -87,10 +88,11 @@
     for(const r of records.values()) if(!available.has(r.caseId)) available.set(r.caseId,{id:r.caseId,family:r.scenario});
     const items=[...available.values()].sort((a,b)=>(a.id==='CJ-SYN-demo-00001'?-1:b.id==='CJ-SYN-demo-00001'?1:a.id.localeCompare(b.id)));
     root.innerHTML = `<div class="cj-hero"><div><p class="eyebrow">MADAR · CONNECTED JOURNEY INTELLIGENCE</p><h2>Connected evidence.<br>One case workflow.</h2><p>An example detection capability feeding Madar’s investigation, explanation and review workflow.</p><div class="cj-pills"><span>Explainable evidence</span><span>Human decision</span><span>Synthetic proof</span></div></div><div class="cj-hero-side"><img src="madar-mark.svg" alt=""><span lang="ar">مدار</span><small>Connected journeys.<br>Clearer risk decisions.</small></div></div>
-      <div class="cj-toolbar"><div><h2>Connected journey review</h2><p>Employer Registration → Contribution & Wage → SANED</p></div><div><button class="primary-btn" id="cj-run-all" ${busy?'disabled':''}>${busy?'Assessing evidence…':'Assess demo portfolio'}</button><label class="secondary-btn cj-upload">Upload events<input id="cj-upload" type="file" accept=".csv,text/csv" ${busy?'disabled':''}></label><a class="text-btn" href="${backendBaseUrl}/cross-journey/template" download>Download event CSV</a></div></div>
+      <div class="cj-toolbar"><div><label>Existing control score (0–100)<input id="cj-control-score" type="number" min="0" max="100" value="${esc(controlScore!==''?controlScore:record?.caseData.ruleScore??'')}" aria-label="Existing control score for connected assessment"></label><h2>Connected journey review</h2><p>Employer Registration → Contribution & Wage → SANED</p></div><div><button class="primary-btn" id="cj-run-all" ${busy?'disabled':''}>${busy?'Assessing evidence…':'Assess demo portfolio'}</button><label class="secondary-btn cj-upload">Upload events<input id="cj-upload" type="file" accept=".csv,text/csv" ${busy?'disabled':''}></label><a class="text-btn" href="${backendBaseUrl}/cross-journey/template" download>Download event CSV</a></div></div>
       ${error?`<div class="cj-error" role="alert">${esc(error)} <button id="cj-retry" class="text-btn">Retry connection</button></div>`:''}
       <div class="cj-layout"><aside class="cj-cases"><p class="eyebrow">SYNTHETIC CASES</p>${items.length?items.map(item=>`<button class="cj-case-choice ${selected===item.id?'selected':''}" data-cj-id="${esc(item.id)}" aria-pressed="${selected===item.id}"><strong>${esc(names[item.family]||item.family)}</strong><small>${esc(item.id)}</small>${resultBadge(records.get(item.id))}</button>`).join(''):'<p>Connecting to the model service…</p>'}<div class="cj-boundary"><strong>What this proves</strong><p>Linked event evidence is evaluated by a fitted model. Source systems and payments are simulated.</p><button class="text-btn" id="cj-vision">View enterprise vision →</button></div></aside><div>${detail(record)}</div></div>`;
-    root.querySelectorAll('[data-cj-id]').forEach(button=>button.onclick=()=>{selected=button.dataset.cjId;render();});
+    root.querySelector('#cj-control-score').oninput=event=>{controlScore=event.target.value;};
+    root.querySelectorAll('[data-cj-id]').forEach(button=>button.onclick=()=>{selected=button.dataset.cjId;controlScore='';render();});
     root.querySelector('#cj-run-selected')?.addEventListener('click',()=>{
       const current=records.get(selected);
       run(current ? {evidence:current.caseData.crossJourneyEvidence} : {case_id:selected});

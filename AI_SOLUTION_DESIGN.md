@@ -19,7 +19,7 @@ The intended value is less time assembling evidence and writing case summaries, 
 ## Implemented prototype
 
 - English Madar / مدار workspace opens on Fraud Operations.
-- Seven bundled synthetic models supply cases. SANED uses a custom JavaScript Isolation Forest trained on 96 fully synthetic behavioral histories with 80 isolation trees. A hybrid decision engine combines the existing control score, AI anomaly score and approved behavioral-pattern adjustments. The explainability layer supplies reason codes, field-quality confidence, supporting evidence and the recommended review route. Five other journey Isolation Forests and the connected Random Forest remain available with their existing policies.
+- Seven existing models supply cases: six journey-specific Isolation Forests and the connected Random Forest. A shared hybrid decision engine combines existing controls, each model’s AI score and approved behavioral-pattern adjustments. The explainability layer supplies reason codes, field-quality confidence, supporting evidence and the recommended review route. Model training and inference remain unchanged.
 - CSV/manual synthetic intake, calculated model evidence and a shared case queue.
 - Named ownership and staged work: New → Triage → Investigation → Decision pending → Closed. Adjacent transitions and a resolved outcome before closure are enforced server-side.
 - Named human routing decisions, outcomes, financial consistency checks, assessment-version checks and persisted local review history.

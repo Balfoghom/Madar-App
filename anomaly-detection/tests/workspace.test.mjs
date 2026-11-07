@@ -97,10 +97,10 @@ test('SANED model and hybrid-policy upgrade preserves existing decisions, outcom
  const path=join(dir,'backend-assessments.json'),records=JSON.parse(await readFile(path,'utf8')),record=records.find(r=>r.caseId===original.caseId);
  record.modelResult.modelVersion='historical-saned-model';record.caseData.assessmentMode='model-separated';record.caseData.workflow={stage:'Triage',assignedTo:'Retained owner',revision:2};await writeFile(path,JSON.stringify(records));
  const upgraded=(await post('/workspace-demo')).saved.find(r=>r.caseId===record.caseId);
- assert.notEqual(upgraded.assessmentId,record.assessmentId);assert.equal(upgraded.modelResult.modelVersion,'saned-custom-js-if-96x80-v1');assert.equal(upgraded.caseData.assessmentMode,'saned-hybrid');
+ assert.notEqual(upgraded.assessmentId,record.assessmentId);assert.equal(upgraded.modelResult.modelVersion,'saned-if-20261016-v1');assert.equal(upgraded.caseData.assessmentMode,'hybrid');
  assert.deepEqual(upgraded.caseData.workflow,record.caseData.workflow);assert.deepEqual(upgraded.reviewHistory,decided.reviewHistory);assert.equal(upgraded.caseData.route,'Cybersecurity Review');
  for(const key of ['outcome','preventedAmount','confirmedFraudAmount','financialOutcome'])assert.equal(upgraded.caseData[key],record.caseData[key]);
  assert.ok(upgraded.caseData.assessmentHistory.some(h=>h.assessmentId===record.assessmentId));
  const repeated=(await post('/workspace-demo')).saved.find(r=>r.caseId===record.caseId);assert.equal(repeated.assessmentId,upgraded.assessmentId);
- const registry=await(await fetch(base+'/journey-models')).json(),saned=registry.models.find(m=>m.journey==='SANED');assert.equal(saned.trainingCases,96);assert.equal(saned.treeCount,80);assert.equal(registry.models.length,7);
+ const registry=await(await fetch(base+'/journey-models')).json(),saned=registry.models.find(m=>m.journey==='SANED');assert.equal(saned.trainingCases,2400);assert.equal(saned.treeCount,100);assert.equal(registry.models.length,7);
 });

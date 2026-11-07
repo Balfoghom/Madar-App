@@ -2,7 +2,7 @@
 
 ## Runtime
 
-Node.js 22.13+ runs `start.mjs`, serving an allowlisted static interface from `dist/` and routing `/api/*` to `anomaly-detection/server.mjs`. No npm dependencies are required for inference. SANED model training is an offline custom JavaScript task (96 synthetic histories, 80 trees); the connected Random Forest retains its pinned Python training environment.
+Node.js 22.13+ runs `start.mjs`, serving an allowlisted static interface from `dist/` and routing `/api/*` to `anomaly-detection/server.mjs`. No npm dependencies are required for inference. Model training is an offline task with separate pinned Python dependencies.
 
 The launcher reads an optional root `.env` before importing the API. Host environment variables take precedence. `.env` files are ignored by Git and Docker. Secrets must remain on the server.
 
@@ -14,10 +14,8 @@ The launcher reads an optional root `.env` before importing the API. Host enviro
 | `dist/app.js` | Intake, queue, decisions, outcomes, reports, governance views and separately scoped legacy simulation |
 | `dist/madar.js` | Connected-event example, evidence timeline, inference and specialist review |
 | `anomaly-detection/server.mjs` | Validation, inference APIs, serialized local mutations, workflow, explanations and model registry |
-| `lib/assessment-adapter.mjs` | SANED hybrid decision mapping and separate policies for the other five journey models |
-| `lib/isolation-forest.mjs`, `ml/train-saned.mjs` | Custom JavaScript Isolation Forest, trained on 96 fully synthetic SANED histories with 80 isolation trees |
-| `lib/hybrid-policy.mjs` | 55% control + 45% raw AI anomaly × 100 + approved catalog adjustments, bounded review score and critical-control protection |
-| `lib/data-quality.mjs`, `lib/case-explainer.mjs` | Reason/evidence context, field-quality confidence and optional cited case explanation |
+| `lib/assessment-adapter.mjs` | Six existing journey models feeding the shared hybrid policy and explainability |
+| `lib/hybrid-policy.mjs` |55% control +45% existing AI score ×100 + scoped approved adjustments; incomplete-control handling and critical-control protection |
 | `lib/cross-journey-adapter.mjs` | Event CSV contract and connected-model case mapping |
 | `cross-journey/inference/detector.mjs` | Derived features and fitted Random Forest inference |
 | `lib/case-explainer.mjs` | Minimal evidence packet, OpenAI Responses request, strict output validation |
@@ -32,7 +30,7 @@ Paths under `lib/` are relative to `anomaly-detection/`.
 - `/case-explanation` retrieves or generates a draft for a current saved synthetic assessment. Cache identity includes assessment ID, evidence fingerprint, prompt version and configured model. Changed facts require a fresh explanation; evidence changing during generation prevents saving that draft.
 - `/llm/status` exposes configuration status, not credentials. Only explicit generation requests call the external provider. Provider refusal, timeout or invalid output cannot become a fabricated successful explanation.
 - Repeated identical connected evidence with the same model version is idempotent. Changed evidence/version creates a new assessment while preserving historical human reviews.
-- Sandbox configuration is never used as the active routing policy for fitted-model cases.
+- Scoring-simulation configuration is separate from the versioned shared hybrid policy. All native fitted-model outputs remain unchanged.
 
 ## Storage and concurrency
 
@@ -49,3 +47,12 @@ Responses use `store:false` and strict structured outputs. The server validates 
 ## Deployment boundary
 
 Single Node service, persistent runtime directory, HTTPS from the hosting platform and optional shared demo password. Enterprise deployment needs SSO and enforced roles, transactional storage, approved connectors and provider, audit integrity, retention, observability, evaluation and controlled release processes. Existing ServiceNow files are import examples, not an implemented connector.
+
+
+## Shared decision layer
+
+`hybrid-review-55-45-v2` applies to all six journey model adapters and the connected Random Forest adapter. `/workspace-demo` migrates saved model-based assessments to this policy while preserving reviews, ownership, outcomes and specialist routes. Different model scores are preserved natively and normalized ×100 only for the prototype decision formula; ranks are not blended. Rules-only simulations remain separate.
+
+Cross-journey control context is separate from the event evidence. A changed control score creates a fresh decision assessment with the same inference result; identical evidence, control and policy reuse the existing assessment. Missing control context produces an Incomplete decision and Low field-quality confidence without hiding valid model evidence. The approved adjustment catalog is scoped by journey and model version and cannot be supplied through an upload.
+
+The operational-language prompt serves briefs and follow-up answers. It retains internal provenance while omitting repetitive environment labels in the narrative. Recommendations and recorded statuses never establish that a payment or formal decision was executed.

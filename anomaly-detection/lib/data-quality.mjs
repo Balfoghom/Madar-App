@@ -7,7 +7,7 @@ export function dataQuality(data) {
   const check=(field,valid,critical=false)=>checks.push({field,valid:!!valid,critical});
   for(const field of ['transactionId','journey','subject','entity','country','region','city']) check(field,supplied(data[field]),['subject','entity'].includes(field));
   check('transactionAmount',number(data.transactionAmount)&&data.transactionAmount>=0);
-  if(data.assessmentSource!=='cross-journey')check('existingControlScore',number(data.ruleScore)&&data.ruleScore>=0&&data.ruleScore<=100,true);
+  if(data.assessmentSource!=='cross-journey'||data.assessmentMode==='hybrid')check('existingControlScore',number(data.ruleScore)&&data.ruleScore>=0&&data.ruleScore<=100,true);
   // Linked-event conflicts are counted at their source cell, not again in the aggregate flag.
   if(!data.crossJourneyEvidence)check('sourceConsistency',!data.features?.crossSourceConflict);
   if(data.accessEvidence){

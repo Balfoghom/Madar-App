@@ -49,7 +49,7 @@ export function createDemoPortfolio(now=new Date()){
     records.push(record);
   });
   demoCases.forEach((evidence,index)=>{
-    const record=createCrossJourneyAssessment({...structuredClone(evidence),id:'CJ-SYN-enterprise-'+String(index).padStart(3,'0')});
+    const record=createCrossJourneyAssessment({...structuredClone(evidence),id:'CJ-SYN-enterprise-'+String(index).padStart(3,'0')},{ruleScore:[15,55,20,55,55,25,15,15,15,55,55,55][index]});
     const [region,city]=locations[(index+6)%locations.length];
     record.assessedAt=time;
     Object.assign(record.caseData,{demoPortfolio:true,scenario:['Routine connected activity','Connected activity with simulated prevention','Legitimate restructuring pattern','Shared identifier pattern','Conflicting source records','Incomplete linked history','Routine digital access','Legitimate travel','Legitimate account update','Rapid login and account changes','Shared IBAN before benefit requests','Repeated profile and payment-account changes'][index],assessedAt:time,requested:time,country:'Saudi Arabia',region,city,transactionAmount:42000+index*6000,amountAtRisk:!record.complete?null:(record.modelFlagged||record.ruleFlagged)?42000+index*6000:0,detectionMethod:'Cross-journey AI + comparator rules',financialProvenance:'Supplied synthetic request total for the linked contributors; not inferred from wage changes.'});

@@ -5,10 +5,10 @@
   function normalize(route){return routes.includes(route)?route:aliases[route]||'Business Owner Review';}
   function recommend(data){
     if(data.risk==='Incomplete'||data.features?.missingData||data.dataQuality?.criticalMissing)return routes[1];
-    if(data.risk==='High')return routes[5];
     const model=data.modelAssessment;
     const evidence=data.crossJourneyEvidence,events=(evidence?.events||[]).filter(e=>Number.isFinite(e.recordedAt)&&e.recordedAt<=evidence.asOf&&e.recordedAt>=evidence.asOf-30*86400000);
     const accountSequence=model?.modelFlagged&&events.some(e=>e.type==='login')&&events.some(e=>e.type==='profile_update'||e.type==='iban_change');
+    if(data.risk==='High'&&!(data.assessmentMode==='hybrid'&&data.ruleScore<80&&accountSequence))return routes[5];
     if(accountSequence)return routes[3];
     if(data.features?.crossSourceConflict)return routes[1];
     if(data.risk==='Low')return routes[0];
@@ -27,7 +27,7 @@
     })[value];
   }
   function apply(data){
-    const recommendedRoute=recommend(data),reviewed=!!data.humanDecision||data.reviewHistory?.some(r=>r.type==='decision');
+    const recommendedRoute=recommend(data),reviewed=!!data.humanDecision||data.reviewHistory?.some(r=>r.type==='decision')||data.workflow?.stage==='Closed'||(!!data.outcome&&!/^(Suspected|Inconclusive)/.test(data.outcome));
     const route=reviewed?normalize(data.route):recommendedRoute;
     const status=data.dataQuality?.criticalMissing&&['Ready to proceed','Awaiting specialist','Complete evidence'].includes(data.status)?'Evidence needed':data.status;
     return {...data,status,route,recommendedRoute,routingPolicyVersion:'governed-routing-v2',...{recommendedOwner:ownership(recommendedRoute,data.journey).owner,nextStep:ownership(route,data.journey).next}};

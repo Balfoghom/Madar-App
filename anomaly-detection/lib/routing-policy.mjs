@@ -3,5 +3,5 @@ export const routingPolicy=globalThis.MadarRoutingPolicy;
 export function withRouting(record){
  if(!record.caseData)return record;
  const caseData=routingPolicy.apply(record.caseData);
- return {...record,caseData,applicationAssessment:{...record.applicationAssessment,route:caseData.recommendedRoute}};
+ return {...record,caseData,...(record.businessAssessment?{businessAssessment:{...record.businessAssessment,route:caseData.recommendedRoute}}:{}),applicationAssessment:{...record.applicationAssessment,route:caseData.recommendedRoute}};
 }

@@ -1305,11 +1305,12 @@ document.querySelector("#route-decision-form").addEventListener("submit", async 
 function generateCaseSummary(item) {
   const recorded=item.outcome ? 'Recorded outcome: '+item.outcome+'. '+(item.outcomeProvenance==='Scripted demo outcome'?'This is a scripted demo outcome. ':'') : '';
   if(item.rulesAssessment)return recorded + item.primaryReason + ' Recommended route: '+item.route+'. This case uses an illustrative business control, not a trained AI model.';
-  if (item.assessmentSource === "cross-journey") return recorded + item.modelAssessment.reasons.join(" ") + " Recommended route: " + item.route + ". Assessment uses connected synthetic event evidence; the supplied operational-control context remains separate from the Cross-Journey Model.";
+  if (item.assessmentSource === "cross-journey" && item.assessmentMode!=="hybrid") return recorded + item.modelAssessment.reasons.join(" ") + " Recommended route: " + item.route + ". Assessment uses connected synthetic event evidence; the supplied operational-control context remains separate from the Cross-Journey Model.";
   if (item.modelAssessment) {
     const m = item.modelAssessment;
+    if(item.assessmentMode==='hybrid'&&item.decisionComplete===false)return recorded+(item.decisionIssue||'Complete the decision evidence.')+' The original model evidence is retained. Recommended route: '+item.route+'.';
     if (!m.complete) return recorded + "Model evidence is incomplete. Complete the requested evidence before relying on a model recommendation. Existing control score: " + item.ruleScore + "/100. Specialist review is required.";
-    if(item.assessmentMode==='saned-hybrid')return recorded+'Hybrid review score: '+item.score+'/100. Existing control '+item.ruleScore+'/100 contributes 55%; custom Isolation Forest anomaly '+Number(item.scoringComponents.anomalyScore).toFixed(1)+'/100 contributes 45%; approved pattern adjustment '+item.scoringComponents.patternAdjustment+'. '+(m.modelFlagged?'The model suggests review. ':'The model did not cross its review threshold. ')+'Recommended route: '+item.route+'. This prioritizes human review and is not a fraud probability.';
+    if(item.assessmentMode==='hybrid')return recorded+'Hybrid review score: '+item.score+'/100. Existing control '+item.ruleScore+'/100 contributes 55%; existing model AI '+Number(item.scoringComponents.anomalyScore).toFixed(1)+'/100 contributes 45%; approved pattern adjustment '+item.scoringComponents.patternAdjustment+'. '+(m.modelFlagged?'The model suggests review. ':'The model did not cross its review threshold. ')+'Recommended route: '+item.route+'. This prioritizes human review and is not a fraud probability.';
     return recorded + "Existing control score: " + item.ruleScore + "/100. The model returned an unusualness percentile of " + Number(m.percentile).toFixed(1) + "% against synthetic reference data. " + (m.modelFlagged ? "The model suggests review. " : "The model did not flag the combination at its threshold. ") + "These outputs are separate, not a calibrated fraud probability. Proposed route: " + item.route + ". The specialist retains the final decision.";
   }
 
@@ -2466,9 +2467,9 @@ function renderQueue() {
               '">' +
               item.risk +
               " " +
-              (item.assessmentSource === "cross-journey" ? "" : item.score == null ? " —" : " · " + item.score) +
+              (item.score == null ? " —" : " · " + item.score) +
               '</span><span class="subtext">' +
-              (item.assessmentSource === "cross-journey" ? "Cross-Journey Model: " + (!item.modelAssessment.complete ? "Incomplete evidence" : item.modelAssessment.modelFlagged ? "Review suggested" : "No model flag") : item.assessmentMode === "saned-hybrid" ? "Hybrid · control " + item.ruleScore + " · AI " + (item.anomalyScore == null ? "unavailable" : Number(item.anomalyScore).toFixed(1)) : item.modelAssessment ? "Existing control " + item.ruleScore + " · Reference percentile " + (item.modelAssessment.complete ? Number(item.modelAssessment.percentile).toFixed(1) + "%" : "unavailable") : item.rulesAssessment ? "Business control · no AI model" : "Scoring simulation · behavioral score " + item.anomalyScore) +
+              (item.assessmentMode === "hybrid" ? "Hybrid · control " + item.ruleScore + " · AI " + (item.anomalyScore == null ? "unavailable" : Number(item.anomalyScore).toFixed(1)) : item.modelAssessment ? "Existing control " + item.ruleScore + " · Reference percentile " + (item.modelAssessment.complete ? Number(item.modelAssessment.percentile).toFixed(1) + "%" : "unavailable") : item.rulesAssessment ? "Business control · no AI model" : "Scoring simulation · behavioral score " + item.anomalyScore) +
               "</span></td>",
             '<td><span class="confidence-chip ' +
               item.confidence +
@@ -2553,7 +2554,7 @@ function renderCase() {
       '"><div><strong>' +
       (item.score == null ? "—" : item.score) +
       "</strong><small>" +
-      (item.assessmentMode === "saned-hybrid" ? "Hybrid review score" : item.rulesAssessment ? "Control score" : item.assessmentSource === "cross-journey" ? "Pattern review" : item.modelAssessment ? "Existing control" : "Scoring simulation") +
+      (item.assessmentMode === "hybrid" ? "Hybrid review score" : item.rulesAssessment ? "Control score" : item.assessmentSource === "cross-journey" ? "Pattern review" : item.modelAssessment ? "Existing control" : "Scoring simulation") +
       "</small></div></div></div>",
     item.features.urgentPriority
       ? '<span class="urgent-banner">Urgent operational priority — urgency does not change risk</span>'
@@ -2609,11 +2610,11 @@ function renderCase() {
     '<div class="mini-score"><span>Existing control</span><strong>' +
       (item.ruleScore == null ? "Not supplied" : item.ruleScore) +
       "</strong></div>",
-    '<div class="mini-score"><span>' + (item.assessmentSource === 'cross-journey' ? 'Pattern assessment' : item.assessmentMode === 'saned-hybrid' ? 'AI anomaly (/100)' : item.modelAssessment ? 'Reference percentile' : item.rulesAssessment ? 'AI model' : 'Simulated behavioral score') + '</span><strong>' +
-      (item.assessmentSource === 'cross-journey' ? (!item.modelAssessment.complete ? 'Incomplete' : item.modelAssessment.modelFlagged ? 'Review' : 'Not flagged') : item.rulesAssessment ? 'Not used' : item.anomalyScore == null ? '—' : Number(item.anomalyScore).toFixed(1)) +
+    '<div class="mini-score"><span>' + (item.assessmentMode === 'hybrid' ? 'AI score (/100)' : item.assessmentSource === 'cross-journey' ? 'Pattern assessment' : item.modelAssessment ? 'Reference percentile' : item.rulesAssessment ? 'AI model' : 'Simulated behavioral score') + '</span><strong>' +
+      (item.assessmentMode === 'hybrid' ? (item.anomalyScore == null ? '—' : Number(item.anomalyScore).toFixed(1)) : item.assessmentSource === 'cross-journey' ? (!item.modelAssessment.complete ? 'Incomplete' : item.modelAssessment.modelFlagged ? 'Review' : 'Not flagged') : item.rulesAssessment ? 'Not used' : item.anomalyScore == null ? '—' : Number(item.anomalyScore).toFixed(1)) +
       "</strong></div>",
     '<div class="mini-score"><span>Pattern adjustment</span><strong>' +
-      (item.assessmentMode === 'saned-hybrid' ? (item.interaction||0)+' points' : item.modelAssessment || item.rulesAssessment ? 'Not applied' : '+' + item.interaction) +
+      (item.assessmentMode === 'hybrid' ? (item.interaction||0)+' points' : item.modelAssessment || item.rulesAssessment ? 'Not applied' : '+' + item.interaction) +
       "</strong></div>",
     '<div class="mini-score"><span>Data quality</span><strong>' +
       (item.dataQuality ? item.dataQuality.label : item.confidenceScore + '% illustrative') +
@@ -3950,7 +3951,7 @@ async function importCSVText(text, mode, label) {
     document.querySelector("#import-status").textContent = result.incomplete ? "Saved · evidence incomplete" : "Model assessment saved";
     document.querySelector("#import-status").className = "status-chip " + (result.incomplete ? "testing" : "approved");
     document.querySelector("#import-result").className = "import-result";
-    document.querySelector("#import-result").innerHTML = `<div class="import-summary-grid"><div><span>Saved cases</span><strong>${accepted.length}</strong></div><div><span>Model complete</span><strong>${result.complete}</strong></div><div><span>Complete evidence</span><strong>${result.incomplete}</strong></div><div><span>Rejected</span><strong>${rejected.length}</strong></div></div><p>${Math.round(performance.now() - started)} ms · Synthetic evidence assessed by the backend, with model version and original model fields retained.</p>${rejected.length ? '<p class="import-warning">' + escapeHtml(rejected.join(" ")) + '</p>' : ""}<p class="session-note">SANED hybrid review priority combines controls with the raw AI anomaly score; its reference percentile remains separate. Incomplete evidence is not low risk. Select a row to inspect all model fields.</p>`;
+    document.querySelector("#import-result").innerHTML = `<div class="import-summary-grid"><div><span>Saved cases</span><strong>${accepted.length}</strong></div><div><span>Model complete</span><strong>${result.complete}</strong></div><div><span>Complete evidence</span><strong>${result.incomplete}</strong></div><div><span>Rejected</span><strong>${rejected.length}</strong></div></div><p>${Math.round(performance.now() - started)} ms · Synthetic evidence assessed by the backend, with model version and original model fields retained.</p>${rejected.length ? '<p class="import-warning">' + escapeHtml(rejected.join(" ")) + '</p>' : ""}<p class="session-note">Hybrid review priority combines controls with the raw AI anomaly score; its reference percentile remains separate. Incomplete evidence is not low risk. Select a row to inspect all model fields.</p>`;
     renderAll(); loadBackendHistory();
     showToast(accepted.length + " cases saved with actual model responses.");
   } catch (error) { showImportError(error.message); }

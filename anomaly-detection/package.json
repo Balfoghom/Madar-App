@@ -7,7 +7,6 @@
   "scripts": {
     "test": "node --test tests/*.test.mjs",
     "demo": "node demo.mjs",
-    "train:saned": "node ml/train-saned.mjs",
     "train:journeys": "node ml/train-journey-models.mjs",
     "start": "node server.mjs"
   }

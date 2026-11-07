@@ -20,7 +20,7 @@ test('integration contract: CSV inference, hybrid scores, abstention and immutab
   const missing=uploaded.saved.find(x=>x.complete===false);assert.ok(missing);assert.equal(missing.caseData.risk,'Incomplete');assert.equal(missing.caseData.score,null);assert.equal(missing.percentile,null);
   const before=uploaded.saved.find(x=>x.caseId==='UPL-contract-0');
   const other=await post('/assess',{assessment:{...context(0,90),id:'NEW-control-only'}});
-  assert.equal(other.score,before.score);assert.equal(other.percentile,before.percentile);assert.equal(other.caseData.ruleScore,90);assert.equal(other.caseData.score,75);assert.equal(other.caseData.assessmentMode,'saned-hybrid');assert.equal(other.caseData.scoringComponents.controlFloor,75);assert.equal(other.caseData.risk,'High');
+  assert.equal(other.score,before.score);assert.equal(other.percentile,before.percentile);assert.equal(other.caseData.ruleScore,90);assert.equal(other.caseData.score,75);assert.equal(other.caseData.assessmentMode,'hybrid');assert.equal(other.caseData.scoringComponents.controlFloor,75);assert.equal(other.caseData.risk,'High');
   await post('/assess',{assessment:{...context(0),synthetic:false}},400);
   await post('/assess',{assessment:{...context(0),modelInput:{case_id:'SYN-unknown'}}},404);
   await post('/assess',{case_id:cases[0].id,score:99},400);

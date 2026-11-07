@@ -5,8 +5,8 @@
     const connected=item.assessmentSource==='cross-journey';
     const incomplete=item.risk==='Incomplete' || item.modelAssessment?.complete===false || item.rulesAssessment?.complete===false;
     if(incomplete)return {value:null,label:'Evidence incomplete',kind:'incomplete',note:'Complete the required evidence before relying on this assessment.'};
+    if(item.assessmentMode==='hybrid')return {value:Number.isFinite(item.score)?item.score:null,label:'Hybrid review score',kind:'hybrid',note:item.scoreMeaning||'Existing controls, AI anomaly score and approved pattern adjustments. Not a fraud probability.'};
     if(connected)return {value:null,label:item.modelAssessment?.modelFlagged?'Model review suggested':'No model review flag',kind:'pattern',note:'The connected model supplies a review recommendation. Existing control score and operational risk band are separate.'};
-    if(item.assessmentMode==='saned-hybrid')return {value:Number.isFinite(item.score)?item.score:null,label:'Hybrid review score',kind:'hybrid',note:item.scoreMeaning||'Existing controls, AI anomaly score and approved pattern adjustments. Not a fraud probability.'};
     if(item.businessSimulation)return {value:Number.isFinite(item.score)?item.score:null,label:'Business-rule score',kind:'simulation',note:'Configured business-rule scoring weights combine operational controls, simulated behavior and pattern adjustments. No trained ML model was used.'};
     if(item.modelAssessment || item.rulesAssessment)return {value:item.businessSimulation?item.score:Number.isFinite(item.ruleScore)?item.ruleScore:null,label:item.businessSimulation?'Business-rule score':'Control score',kind:'control',note:'Existing control score. AI findings may raise the review priority without changing this number.'};
     return {value:Number.isFinite(item.score)?item.score:null,label:'Simulation score',kind:'simulation',note:'Weighted scoring simulation: existing controls, simulated behavior and pattern adjustments. Not a fraud probability.'};
@@ -21,7 +21,7 @@
   }
   function needsReview(item){return !state(item).resolved && item.workflow?.stage!=='Closed';}
   function signals(item){
-    const skipped=/^(MODEL_NOT_FLAGGED|LOWER_BEHAVIORAL_DEVIATION|NO_MATERIAL_ANOMALY|NO_RULE_TRIGGER|CROSS_JOURNEY_PATTERN|MODEL_UNUSUAL_COMBINATION|EVIDENCE_INCOMPLETE|COMBINED_PATTERN|REQUIRED_INFORMATION_MISSING)$/;
+    const skipped=/^(MODEL_NOT_FLAGGED|LOWER_BEHAVIORAL_DEVIATION|NO_MATERIAL_ANOMALY|NO_RULE_TRIGGER|CROSS_JOURNEY_PATTERN|MODEL_UNUSUAL_COMBINATION|EVIDENCE_INCOMPLETE|HYBRID_SCORE_COMPONENTS|CONTROL_SCORE_MISSING|COMBINED_PATTERN|REQUIRED_INFORMATION_MISSING)$/;
     const result=new Map();
     for(const [code,description] of item.signals||[]){
       if(skipped.test(code)||/^(SANED_COMPARATOR_|MODEL_FEATURE_)\d+$/.test(code))continue;
@@ -83,6 +83,7 @@
   function mainReason(item) {
     if(item.assessmentSource!=='cross-journey')return item.primaryReason||item.signals?.[0]?.[1]||'Review the supplied evidence.';
     const model=item.modelAssessment||{},reasons=model.reasons||[];
+    if(item.assessmentMode==='hybrid'&&item.decisionComplete===false&&item.decisionIssue?.startsWith('Existing control'))return item.decisionIssue;
     const request=item.journey==='SANED'?'SANED request':item.journey==='Maternity Benefit'?'maternity request':'service request';
     if(model.complete===false)return 'The connected source evidence is incomplete: '+(reasons[0]||'required event or employer records are missing.');
     if(!model.modelFlagged&&!model.ruleFlagged)return 'The connected activity remained below the model and comparator review thresholds.';

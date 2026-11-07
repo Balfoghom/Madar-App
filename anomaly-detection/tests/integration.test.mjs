@@ -15,9 +15,9 @@ import {assess,features,scoreVector,model} from '../lib/detector.mjs';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
 test('model artifact matches the evaluation fingerprint',()=>assert.equal(createHash('sha256').update(readFileSync(new URL('../data/model.json',import.meta.url))).digest('hex'),evaluation.artifactSha256));
-test('all 600 held-out scores match the saved JavaScript reference and reproduce the reported metrics',()=>{
+test('all 600 held-out scores match Python and reproduce the reported metrics',()=>{
  const counts={tp:0,fp:0,fn:0,tn:0};
- for(const c of evaluationCases){const s=scoreVector(c.features);assert.ok(Math.abs(s-c.referenceScore)<1e-10);const p=s>=model.threshold;counts[c.expectedReview?(p?'tp':'fn'):(p?'fp':'tn')]++;}
+ for(const c of evaluationCases){const s=scoreVector(c.features);assert.ok(Math.abs(s-c.pythonScore)<1e-10);const p=s>=model.threshold;counts[c.expectedReview?(p?'tp':'fn'):(p?'fp':'tn')]++;}
  for(const k of Object.keys(counts))assert.equal(counts[k],evaluation.metrics['Isolation Forest only'][k]);
 });
 test('partial missing or malformed evidence cannot silently produce a model score',()=>{
