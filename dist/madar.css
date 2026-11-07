@@ -173,3 +173,14 @@ body.case-drawer-open{overflow:auto}.case-drawer-scrim{display:none!important}
 .workspace #case-panel.case-drawer-wide{width:100%}.queue-panel .table-wrap{overflow-x:auto}
 @media(max-width:1050px){.workspace:has(#case-panel:not([hidden])),.workspace:has(#case-panel.case-drawer-wide:not([hidden])){grid-template-columns:minmax(330px,40%) minmax(0,1fr)}}
 @media(max-width:760px){.workspace:has(#case-panel:not([hidden])),.workspace:has(#case-panel.case-drawer-wide:not([hidden])){grid-template-columns:minmax(0,1fr)}.workspace #case-panel{position:relative;top:auto;max-height:75dvh;grid-column:1;grid-row:1}.workspace:has(#case-panel:not([hidden]))>.queue-panel{grid-column:1;grid-row:2}}
+
+/* Business workflow follows existing panels and brand tokens. */
+.business-process{grid-template-columns:repeat(3,minmax(0,1fr))}
+.business-process .method-card{display:flex;flex-direction:column;gap:8px}
+.business-process .text-btn{margin-top:auto;text-align:left}
+.business-route-library{padding:18px;margin:16px 0}
+#business-route-library{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+#business-route-library h4{margin:0 0 6px}#business-route-library p{margin:6px 0;font-size:12px;line-height:1.6}
+#business-route-library strong,#business-route-library small{font-size:11px}
+.case-workflow{margin-top:12px}.case-workflow summary{cursor:pointer;font-weight:600;font-size:11px}.case-workflow form{display:grid;gap:8px;margin-top:10px}.case-workflow label{display:grid;gap:4px;font-size:11px}.case-workflow input,.case-workflow select,.case-workflow textarea{width:100%;max-width:100%;box-sizing:border-box;padding:8px;font:inherit;border:1px solid var(--line);border-radius:6px;background:var(--white);color:inherit}
+@media(max-width:900px){.business-process{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.business-process,#business-route-library{grid-template-columns:1fr}}

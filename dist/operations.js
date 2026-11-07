@@ -103,6 +103,15 @@
     const next=document.createElement('section');next.className='detail-section case-next-step';
     const owner=routeOwnership(item);
     next.innerHTML=`<h3>${esc(state.resolved?(ar?'النتيجة المسجلة':'Recorded outcome'):state.incomplete?(ar?'الأدلة المطلوبة':'Evidence needed'):(ar?'الخطوة التالية':'Next step'))}</h3><strong class="case-next-title">${esc(state.resolved?item.outcome:item.route)}</strong><p>${esc(state.resolved?(item.financialOutcome||'Outcome recorded. Review the history for supporting notes.'):owner.next)}</p><dl><div><dt>${state.resolved?'Recorded by':'Recommended team'}</dt><dd>${esc(state.resolved?item.decisionOwner||'See review history':owner.owner)}</dd></div></dl>${state.scripted?'<small>Scripted demonstration outcome · not an actual finding or realised saving.</small>':''}`;
+    const workflow=document.createElement('details');workflow.className='case-workflow';
+    const stages=['New','Triage','Investigation','Decision pending','Closed'],current=item.workflow||{stage:'New',revision:0,assignedTo:''},stageIndex=stages.indexOf(current.stage);
+    workflow.innerHTML=`<summary>${ar?'متابعة الحالة':'Case ownership & progress'} · ${esc(current.stage)}</summary><p>${ar?'الفريق المقترح':'Recommended team'}: ${esc(MadarRoutingPolicy.ownership(item.route,item.journey).owner)}</p><p>${ar?'النتيجة والمسار ومرحلة العمل حقول منفصلة.':'The recommended route, specialist outcome and work stage are tracked separately.'}</p><form><label>Case owner<input name="assignedTo" maxlength="120" required value="${esc(current.assignedTo)}"></label><label>Work stage<select name="workflowStage">${stages.map((stage,index)=>`<option ${stage===current.stage?'selected':''} ${Math.abs(index-stageIndex)>1?'disabled':''}>${stage}</option>`).join('')}</select></label><label>Reviewer<input name="actorName" maxlength="120" required></label><label>Rationale<textarea name="note" maxlength="2000" required rows="2"></textarea></label><button class="secondary-btn" type="submit" ${!item.assessmentId?'disabled':''}>Save case progress</button><p role="status" aria-live="polite"></p></form>`;
+    next.append(workflow);
+    workflow.querySelector('form').onsubmit=async event=>{
+      event.preventDefault();const form=event.currentTarget,button=form.querySelector('button'),status=form.querySelector('[role="status"]');button.disabled=true;status.textContent='Saving…';
+      try{const fields=Object.fromEntries(new FormData(form));const saved=await backendJSON('/case-workflow',{...fields,caseId:item.id,assessmentId:item.assessmentId,expectedRevision:current.revision});const index=cases.findIndex(c=>c.id===item.id);if(index>=0)cases[index]={...saved.caseData,assessmentId:saved.assessmentId};renderAll();showToast('Case owner and progress saved.');}
+      catch(error){status.textContent=error.message;button.disabled=false;}
+    };
     const footer=document.createElement('footer');footer.className='case-review-footer';footer.innerHTML=`<small>${ar?'القرار النهائي للمختص':'The specialist retains the final decision.'}</small><button type="button" class="primary-btn">${esc(ar?(state.resolved?'تحديث النتيجة':'تسجيل المراجعة'):state.action)}</button>`;
     footer.querySelector('button').disabled=!item.assessmentId;
     const chooser=document.createElement('dialog');chooser.id='case-review-actions';chooser.className='case-review-dialog';chooser.setAttribute('aria-labelledby','case-review-heading');chooser.innerHTML=`<div class="dialog-head"><div><h2 id="case-review-heading">${ar?'تسجيل المراجعة':'Record review'}</h2><p>${esc(item.transactionId)} · ${esc(state.status)}</p></div><button type="button" class="icon-button" aria-label="Close">×</button></div><p>Choose how to proceed. Your name and rationale are required when saving.</p>`;
@@ -147,6 +156,8 @@
     finally{loadingDemo=false;buttons.forEach(button=>{button.disabled=false;button.textContent='Refresh demo cases';});}
   }
   document.querySelectorAll('[data-load-demo]').forEach(button=>button.addEventListener('click',loadDemo));
+  const routeLibrary=document.querySelector('#business-route-library');
+  if(routeLibrary)routeLibrary.innerHTML=MadarRoutingPolicy.routes.map(route=>{const context=MadarRoutingPolicy.ownership(route);return `<article><h4>${esc(route)}</h4><strong>${esc(context.owner)}</strong><p>${esc(context.next)}</p>${route==='Business Owner Review'?'<small>The accountable owner follows the case service journey.</small>':''}</article>`;}).join('');
   switchView('dashboard');
   refreshWorkspace().catch(error=>showToast('Could not load the workspace: '+error.message));
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!document.querySelector('dialog[open]')&&casePanelOpen)closeDrawer();});

@@ -1606,6 +1606,7 @@ let casePanelOpen = false;
 function portfolioCases() { return cases; }
 function useAssessedPortfolio() { portfolioScope='unified'; }
 let activeFilter = "All";
+let activeAssessmentSource = "All";
 let activeJourney = "All";
 let activeRegion = "All";
 let searchQuery = "";
@@ -1815,6 +1816,13 @@ function switchView(name) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function assessmentSourceCategory(item) {
+  if (item.rulesAssessment || item.businessSimulation) return 'Business rules';
+  if (item.assessmentSource === 'cross-journey') return 'Cross-Journey Model';
+  if (item.modelAssessment) return 'Journey-specific model';
+  return 'Scoring simulation';
+}
+
 function filteredCases() {
   const cases = portfolioCases();
   const query = searchQuery.trim().toLowerCase();
@@ -1854,7 +1862,7 @@ function filteredCases() {
           .join(" ")
           .toLowerCase()
           .indexOf(query) >= 0;
-      return riskMatch && journeyMatch && regionMatch && queryMatch;
+      return riskMatch && journeyMatch && regionMatch && queryMatch && (activeAssessmentSource === "All" || assessmentSourceCategory(item) === activeAssessmentSource);
     })
     .sort(function (a, b) {
       return riskOrder(b.risk) - riskOrder(a.risk) || b.score - a.score;
@@ -1862,6 +1870,7 @@ function filteredCases() {
 }
 
 function populateSelects() {
+  document.querySelector("#assessment-source-filter").value = activeAssessmentSource;
   const journeySelect = document.querySelector("#journey-filter");
   const manualJourney = document.querySelector("#assessment-journey");
   const journeys = Array.from(
@@ -2368,7 +2377,7 @@ function wireCaseLinks() {
       selectedId = button.dataset.caseLink;
       casePanelOpen=true;
       activeFilter = "All";
-      activeJourney = "All";
+      activeAssessmentSource = "All"; activeJourney = "All";
       activeRegion = "All";
       searchQuery = "";
       document.querySelector("#case-search").value = "";
@@ -2429,7 +2438,7 @@ function renderQueue() {
               "</span></td>",
             '<td><span class="journey-tag">' +
               escapeHtml(item.journey) +
-              "</span><span class=\"subtext\">" + escapeHtml(item.rulesAssessment ? "Business rules" : item.assessmentSource === "cross-journey" ? "Cross-Journey ML" : item.modelAssessment ? "SANED / journey AI" : "Illustrative simulation") + "</span></td>",
+              "</span><span class=\"subtext\">" + escapeHtml(assessmentSourceCategory(item)) + "</span></td>",
             "<td><strong>" +
               escapeHtml(item.customerName || item.subject) +
               '</strong><span class="subtext">' +
@@ -3714,7 +3723,7 @@ function renderBusinessReport() {
   document.querySelectorAll("[data-signal-code]").forEach(function (button) {
     button.addEventListener("click", function () {
       searchQuery = button.dataset.signalCode;
-      activeFilter = "All"; activeJourney = "All"; activeRegion = "All"; populateSelects();
+      activeFilter = "All"; activeAssessmentSource = "All"; activeJourney = "All"; activeRegion = "All"; populateSelects();
       document.querySelector("#case-search").value = searchQuery;
       switchView("queue");
       resetVisibleSelection();
@@ -3927,7 +3936,7 @@ async function importCSVText(text, mode, label) {
     const accepted = result.saved.map((entry) => entry.caseData);
     if (mode === "replace") cases = cases.filter((item) => item.assessmentSource !== "csv-upload" && !String(item.source || "").startsWith("Imported · ")).concat(accepted); else cases = cases.filter(item => !accepted.some(next => next.id === item.id)).concat(accepted);
     importedCount = mode === "replace" ? accepted.length : importedCount + accepted.length;
-    selectedId = accepted[0].id; activeFilter = "All"; activeJourney = "All"; activeRegion = "All"; searchQuery = "";
+    selectedId = accepted[0].id; activeFilter = "All"; activeAssessmentSource = "All"; activeJourney = "All"; activeRegion = "All"; searchQuery = "";
     const rejected = errors.concat((result.rejected || []).map((entry) => "Backend row " + entry.row + ": " + entry.error));
     document.querySelector("#import-status").textContent = result.incomplete ? "Saved · evidence incomplete" : "Model assessment saved";
     document.querySelector("#import-status").className = "status-chip " + (result.incomplete ? "testing" : "approved");
@@ -4114,7 +4123,7 @@ async function runNewAssessment(event) {
   newAssessmentCount += 1;
   selectedId = item.id;
   activeFilter = "All";
-  activeJourney = "All";
+  activeAssessmentSource = "All"; activeJourney = "All";
   activeRegion = "All";
   searchQuery = "";
   document.querySelector("#new-assessment-dialog").close();
@@ -4198,6 +4207,10 @@ document.querySelectorAll(".filter").forEach(function (button) {
     });
     resetVisibleSelection();
   });
+});
+document.querySelector('#assessment-source-filter').addEventListener('change', function (event) {
+  activeAssessmentSource = event.target.value;
+  resetVisibleSelection();
 });
 document
   .querySelector("#journey-filter")
@@ -4498,7 +4511,7 @@ document.querySelector("#demo-reset-btn").addEventListener("click", async functi
     newAssessmentCount = 0;
     selectedId = cases[0]?.id || "";
     activeFilter = "All";
-    activeJourney = "All";
+    activeAssessmentSource = "All"; activeJourney = "All";
     activeRegion = "All";
     searchQuery = "";
     document.querySelector("#import-result").innerHTML = "<strong>Demo data reset.</strong><p>Original demo examples have been restored; previous session reviews and AI drafts were cleared.</p>";

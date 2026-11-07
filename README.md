@@ -17,6 +17,12 @@ The app opens on **Fraud Operations**. One server supplies the interface and API
 
 For optional LLM explanations, follow [LLM_SETUP.md](LLM_SETUP.md). Case details open only after selecting a record, in a closeable side drawer. Case panels show an explicitly labeled score or pattern indicator, a concise brief with English / العربية controls, key evidence linked to source sections, and a visible state-aware review action. People/financial context, source activity, scoring and review history are grouped separately; Expand case provides a wider reading view. Detailed model evidence stays collapsed. After a brief is generated, “Ask about this case” opens an evidence-grounded conversation in the selected language. Conversations stay in browser memory and cannot change cases. The app works without them and clearly displays “API setup required.”
 
+## Business workflow
+
+Model & Governance presents the business sequence: Observe → Analyze → Explain → Recommend → Specialist decision → Feedback & improve. Each step opens its existing workspace. The route directory uses the same shared routing policy as case recommendations, including accountable teams and next steps.
+
+In the left case panel, expand **Case ownership & progress** to save the owner and work stage with a reviewer and rationale. Route, work stage and specialist outcome remain separate. The backend enforces adjacent stage transitions, current revisions and resolved outcomes before closure. Saving progress does not approve a route or execute a payment action. Scenario approvals create reusable reference examples, not production model or rule releases.
+
 ## Validate the working journey
 
 Use synthetic evidence only. These checks write to your local demo session.

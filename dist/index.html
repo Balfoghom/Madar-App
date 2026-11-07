@@ -431,6 +431,13 @@
                     placeholder="Search case, subject, entity…"
                     aria-label="Search cases"
                   />
+                  <select id="assessment-source-filter" aria-label="Filter by assessment source">
+                    <option value="All">All assessment sources</option>
+                    <option>Business rules</option>
+                    <option>Cross-Journey Model</option>
+                    <option>Journey-specific model</option>
+                    <option>Scoring simulation</option>
+                  </select>
                   <select id="journey-filter" aria-label="Filter by journey">
                     <option value="All">All journeys</option>
                   </select>
@@ -702,45 +709,13 @@
               </p>
             </div>
           </div>
-          <div class="method-flow">
-            <article class="method-card">
-              <span>1</span>
-              <h3>Receive existing controls</h3>
-              <p>
-                Consume approved rule results and events without changing the
-                original operational systems.
-              </p>
-            </article>
-            <article class="method-card">
-              <span>2</span>
-              <h3>Build behavioral context</h3>
-              <p>
-                Compare event frequency, sequence, relationships, and changes
-                with historical patterns.
-              </p>
-            </article>
-            <article class="method-card">
-              <span>3</span>
-              <h3>Detect anomalies</h3>
-              <p>
-                AI identifies unusual combinations that predefined rules may not
-                capture. An anomaly is a risk signal, not proof of fraud.
-              </p>
-            </article>
-            <article class="method-card">
-              <span>4</span>
-              <h3>Explain & recommend</h3>
-              <p>
-                Keep detector outputs and operational policy separate; assemble evidence and recommend a route for specialist review.
-              </p>
-            </article>
-          </div>
+          <div class="method-flow business-process"><article class="method-card"><span>1</span><h3>Observe</h3><p>Receive approved case events, existing controls, related entities and data-quality results.</p><button class="text-btn" data-go-view="intake">Open Data Intake →</button></article><article class="method-card"><span>2</span><h3>Analyze</h3><p>Evaluate the relevant journey or Cross-Journey Model alongside existing controls. Missing critical evidence requires verification.</p><button class="text-btn" data-go-view="ai-demo">Inspect model evidence →</button></article><article class="method-card"><span>3</span><h3>Explain</h3><p>Review the case summary, reason codes, linked events and evidence that supports or challenges the assessment.</p><button class="text-btn" data-go-view="queue">Review case evidence →</button></article><article class="method-card"><span>4</span><h3>Recommend</h3><p>Propose a proportionate route, responsible team and next step. Model evidence remains separate from routing policy.</p><button class="text-btn" data-go-view="queue">Open Intelligence Queue →</button></article><article class="method-card"><span>5</span><h3>Specialist decision</h3><p>Approve or change the route with a rationale, investigate and record the specialist outcome. No payment action is executed.</p><button class="text-btn" data-go-view="queue">Record a review →</button></article><article class="method-card"><span>6</span><h3>Feedback & improve</h3><p>Review outcomes with the business owner; propose indicators for specialist review, Data & AI validation and GM approval.</p><button class="text-btn" data-go-view="business-report">Open business report →</button></article></div><section class="panel business-route-library"><p class="eyebrow">PROPORTIONATE ACTION</p><h3>Routes, accountable teams and next steps</h3><p>Missing evidence routes to verification. A recommendation does not execute a service or payment decision.</p><div id="business-route-library"></div></section>
           <section class="panel journey-model-registry">
             <div class="card-heading">
               <div>
                 <p class="eyebrow">SYNTHETIC MODEL REGISTRY</p>
                 <h3>Prototype capability registry</h3>
-                <p>Saved synthetic model artifacts are loaded for inference only. Training for the other journeys is owned by the team; this integration does not train or modify them.</p>
+                <p>Six journey-specific models and one Cross-Journey Model supply saved inference evidence. Their training and evaluation use synthetic data; specialist decisions remain separate.</p>
               </div>
               <div class="model-registry-actions">
                 <span class="status-chip neutral" id="journey-model-registry-status">Loading models</span>
@@ -776,7 +751,7 @@
               <div class="governance-chain">
                 <span>AI suggestion</span><i>→</i><span>Specialist review</span
                 ><i>→</i><span>Data &amp; AI validation</span><i>→</i
-                ><span>GM approval</span><i>→</i><span>Activation</span>
+                ><span>GM approval</span><i>→</i><span>Approved reference scenario</span>
               </div>
               <ul class="boundary-list">
                 <li>
@@ -789,7 +764,7 @@
                   human review.
                 </li>
                 <li>
-                  Every assessment, route, override, and outcome is auditable.
+                  Assessment versions, routes, overrides and outcomes retain local review history. Enterprise audit integrity remains a future integration.
                 </li>
               </ul>
             </article>
@@ -1577,6 +1552,6 @@
     <script src="app.js?v=2.0.0"></script>
 <script src="madar.js?v=2.0.0"></script>
   <script src="case-presentation.js?v=1"></script>
-  <script src="operations.js?v=8"></script>
+  <script src="operations.js?v=9"></script>
 </body>
 </html>
