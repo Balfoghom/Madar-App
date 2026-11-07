@@ -66,12 +66,14 @@ export function createCrossJourneyAssessment(evidence) {
   const risk = !result.complete ? 'Incomplete' : review ? 'Medium' : 'Low';
   const events = evidence.events.filter(e => e.recordedAt <= evidence.asOf && e.recordedAt >= evidence.asOf - 30 * 86400000).sort((a,b) => a.recordedAt - b.recordedAt);
   const subjects = [...new Set(events.map(e => e.subjectId))];
+  const destination=events.filter(event=>["claim","payment","retirement","maternity"].includes(event.type)).at(-1);
+  const primaryJourney=destination?.journey||events.at(-1)?.journey||"Cross-journey";
   const reasonCodes = [{code: !result.complete ? 'EVIDENCE_INCOMPLETE' : result.modelFlagged ? 'CROSS_JOURNEY_PATTERN' : 'MODEL_NOT_FLAGGED', description:result.reasons[0]}];
   if (result.completedContributorChains >= 2) reasonCodes.push({code:'CJ_COMPLETED_CONTRIBUTOR_SEQUENCE',description:result.reasons[1]});
   for(const [index,description] of result.reasons.entries())if(index>0&&!reasonCodes.some(r=>r.description===description))reasonCodes.push({code:'CROSS_JOURNEY_EVIDENCE_'+index,description});
   reasonCodes.push(...(result.ruleFindings || []));
   const caseData = {
-    id:evidence.id,transactionId:evidence.id,synthetic:true,journey:'SANED',scenario,
+    id:evidence.id,transactionId:evidence.id,synthetic:true,journey:primaryJourney,scenario,
     assessmentId,assessedAt,assessmentSource:'cross-journey',assessmentMode:'model-separated',
     subject:subjects.join(', '),entity:evidence.employerId || 'Missing employer',customerName:subjects.length + ' linked contributor' + (subjects.length === 1 ? '' : 's'),employerName:evidence.employerId || 'Missing employer',
     requested:assessedAt,country:'Saudi Arabia',region:'Not supplied',city:'Not supplied',source:'Synthetic linked event history',
@@ -89,5 +91,5 @@ export function createCrossJourneyAssessment(evidence) {
   };
   const keys=['eventId','recordedAt','effectiveAt','journey','type','subjectId','employerId','identifierId','amount','previousAmount','sourceConflict','ruleOverride','latitude','longitude','locationVerified','previousIdentifierId','changedField'];
   const canonical={id:evidence.id,employerId:evidence.employerId || '',asOf:evidence.asOf,events:[...evidence.events].sort((a,b)=>a.eventId.localeCompare(b.eventId)).map(e=>Object.fromEntries(keys.map(key=>[key,e[key] === "" ? null : e[key] ?? null])))};
-  return withRouting({assessmentId,assessedAt,caseId:evidence.id,transactionId:evidence.id,synthetic:true,assessmentSource:'cross-journey',journey:'SANED',scenario,...result,risk,modelResult:caseData.modelAssessment,caseData,evidenceFingerprint:createHash('sha256').update(JSON.stringify(canonical)).digest('hex')});
+  return withRouting({assessmentId,assessedAt,caseId:evidence.id,transactionId:evidence.id,synthetic:true,assessmentSource:'cross-journey',journey:primaryJourney,scenario,...result,risk,modelResult:caseData.modelAssessment,caseData,evidenceFingerprint:createHash('sha256').update(JSON.stringify(canonical)).digest('hex')});
 }

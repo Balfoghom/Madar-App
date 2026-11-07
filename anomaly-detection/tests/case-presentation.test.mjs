@@ -32,12 +32,12 @@ test('queue reasons describe connected evidence and preserve assessment outputs'
  const records=createDemoPortfolio().filter(r=>r.caseData.assessmentSource==='cross-journey').map(r=>r.caseData);
  const original=JSON.stringify(records);
  const sequence=records.find(r=>r.id==='CJ-SYN-enterprise-001');
- assert.match(view.mainReason(sequence),/3 linked contributors.*registration → wage → exclusion → SANED/);
+ assert.match(view.mainReason(sequence),/Repeated registration, wage and employment-exclusion changes.*3 linked contributors/);
  const digital=records.find(r=>r.id==='CJ-SYN-enterprise-009');
- assert.match(view.mainReason(digital),/1 contributor shows a login → profile update → IBAN change → request/);
+ assert.match(view.mainReason(digital),/Login, profile and IBAN changes.*1 contributor completed.*24 hours/);
  assert.notEqual(view.mainReason(sequence),view.mainReason(digital));
  const missing=records.find(r=>r.modelAssessment.complete===false);
- assert.equal(view.mainReason(missing),missing.modelAssessment.reasons[0]);
+ assert.match(view.mainReason(missing),/connected source evidence is incomplete/);
  assert.equal(JSON.stringify(records),original);
 });
 
@@ -58,4 +58,12 @@ test('business signal counts use semantic categories and deduplicate each case',
  assert.equal(view.attentionMatches(item,'signal:SOURCE_CONFLICT'),false);
  assert.equal(view.reasonLabel(item.signals[0]),'Payment account change');
  assert.equal(view.attentionMatches({confidence:'Low'},'low-quality'),true);
+});
+
+test('linked journey labels describe source services without changing the destination',()=>{
+ const record=createDemoPortfolio().find(r=>r.caseId==='CJ-SYN-enterprise-009').caseData;
+ const original=JSON.stringify(record),linked=view.journeys(record);
+ assert.ok(linked.includes('Digital Access'));assert.ok(linked.includes('Benefit Payments'));assert.ok(linked.includes('SANED'));assert.equal(record.journey,'SANED');
+ const future=structuredClone(record);future.crossJourneyEvidence.events.push({...future.crossJourneyEvidence.events[0],journey:'Future service',recordedAt:future.crossJourneyEvidence.asOf+1});
+ assert.deepEqual(view.journeys(future),linked);assert.equal(JSON.stringify(record),original);
 });

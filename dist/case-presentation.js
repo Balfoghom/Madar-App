@@ -73,19 +73,35 @@
     if(item.dataQuality?.criticalMissing)facts.unshift({title:'Required evidence missing',text:'Required source fields are missing or invalid. Complete them before relying on the assessment.',target:'assessment'});
     return facts.slice(0,3);
   }
+  function journeys(item){
+    if(item.assessmentSource!=='cross-journey')return [item.journey].filter(Boolean);
+    const evidence=item.crossJourneyEvidence;
+    const events=(evidence?.events||[]).filter(event=>Number.isFinite(event.recordedAt)&&event.recordedAt<=evidence.asOf&&event.recordedAt>=evidence.asOf-30*86400000).sort((a,b)=>a.recordedAt-b.recordedAt);
+    const linked=[...new Set(events.map(event=>event.journey).filter(Boolean))];return linked.length?linked:[item.journey].filter(Boolean);
+  }
   function mainReason(item) {
     if(item.assessmentSource!=='cross-journey')return item.primaryReason||item.signals?.[0]?.[1]||'Review the supplied evidence.';
-    const model=item.modelAssessment||{};
-    if(model.complete===false)return model.reasons?.[0]||'Required connected-event evidence is missing; complete it before assessment.';
-    const reasons=(model.reasons||[]).filter(reason=>!/^The trained cross-journey model/i.test(reason));
-    const sequence=reasons.find(reason=>/login →|linked contributors each complete/.test(reason));
-    if(sequence)return sequence.replace(/^1 contributors show/,'1 contributor shows');
-    if(reasons.length)return reasons.slice(0,2).join(' ');
-    const events=(item.crossJourneyEvidence?.events||[]).filter(event=>Number.isFinite(event.recordedAt)&&event.recordedAt<=item.crossJourneyEvidence.asOf&&event.recordedAt>=item.crossJourneyEvidence.asOf-30*86400000);
-    const counts=new Map();for(const event of events)counts.set(event.type,(counts.get(event.type)||0)+1);
-    const names={login:'login',profile_update:'profile update',iban_change:'IBAN change',registration:'registration',wage:'wage',exclusion:'exclusion',request:'request'};
-    const activity=[...counts].map(([type,count])=>`${count} ${names[type]||type.replaceAll('_',' ')} event${count===1?'':'s'}`).join(', ');
-    return `${model.modelFlagged?'Connected activity requires specialist review':'No model review threshold crossed'}${activity?': '+activity:'. No additional event detail supplied.'}`;
+    const model=item.modelAssessment||{},reasons=model.reasons||[];
+    const request=item.journey==='SANED'?'SANED request':'service request';
+    if(model.complete===false)return 'The connected source evidence is incomplete: '+(reasons[0]||'required event or employer records are missing.');
+    const chains=model.completedContributorChains;
+    if(chains>=2)return `Repeated registration, wage and employment-exclusion changes preceded SANED requests across ${chains} linked contributors.`;
+    const sequence=reasons.find(reason=>/contributors show a login →/.test(reason));
+    if(sequence){const count=Number(sequence.match(/^\d+/)?.[0]);return `Login, profile and IBAN changes occurred before a ${request}: ${count} contributor${count===1?' completed':'s completed'} the sequence within 24 hours.`;}
+    if(reasons.some(reason=>/rapid travel|login locations/i.test(reason)))return `Verified login locations imply an unusually rapid location change before the ${request}; account access requires verification.`;
+    if(reasons.some(reason=>/Identifier shared by four/i.test(reason)))return `The same identifier is shared across at least four contributors before the ${request}.`;
+    if(reasons.some(reason=>/cross-source conflicts/i.test(reason)))return `Connected source records contain at least two inconsistencies requiring verification before the ${request}.`;
+    if(reasons.some(reason=>/Retroactive change of 30/i.test(reason)))return `A record change was applied at least 30 days retroactively before the ${request}.`;
+    if(reasons.some(reason=>/Wage increase of 80/i.test(reason)))return `A wage increase of at least 80% appears in the linked records before the ${request}.`;
+    const accounts=reasons.find(reason=>/payment-account changes appear/i.test(reason));
+    if(accounts){const count=Number(accounts.match(/^\d+/)?.[0]);return `Payment-account details changed before the ${request}: ${count} IBAN change${count===1?' requires':'s require'} ownership verification.`;}
+    if(!model.modelFlagged&&!model.ruleFlagged)return 'The connected activity remained below the model and comparator review thresholds.';
+    const evidence=item.crossJourneyEvidence,events=(evidence?.events||[]).filter(event=>Number.isFinite(event.recordedAt)&&event.recordedAt<=evidence.asOf&&event.recordedAt>=evidence.asOf-30*86400000);
+    const exclusions=events.filter(event=>event.type==='exclusion').length;
+    if(exclusions)return `Employment exclusions preceded the ${request}: ${exclusions} exclusion record${exclusions===1?' appears':'s appear'} in the linked history.`;
+    const profiles=events.filter(event=>event.type==='profile_update').length;
+    if(profiles)return `Contributor details changed before the ${request}: ${profiles} profile update${profiles===1?' appears':'s appear'} in the linked records.`;
+    return `Activity across ${journeys(item).join(', ')||'the supplied services'} requires review before the ${request}.`;
   }
   function financial(item){
     if(item.outcomeProvenance==='Scripted demo outcome' && Number.isFinite(item.preventedAmount)&&item.preventedAmount>0)return {label:'Recorded prevention · scripted demo',amount:item.preventedAmount};
@@ -93,5 +109,5 @@
     if(Number.isFinite(item.transactionAmount))return {label:'Supplied transaction amount',amount:item.transactionAmount};
     return {label:'Financial exposure',amount:null};
   }
-  globalThis.MadarCasePresentation=Object.freeze({score,state,keyEvidence,financial,mainReason,needsReview,signals,attentionMatches,reasonLabel});
+  globalThis.MadarCasePresentation=Object.freeze({score,state,keyEvidence,financial,mainReason,needsReview,signals,attentionMatches,reasonLabel,journeys});
 })();

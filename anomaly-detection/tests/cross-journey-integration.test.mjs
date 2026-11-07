@@ -53,3 +53,9 @@ test('reported source conflicts require verification without changing the model 
  const policy=separatedPolicy({journey:'SANED',ruleScore:10,features:{crossSourceConflict:true}},model);
  assert.equal(policy.route,'Data Verification Review');assert.equal(policy.risk,'Medium');assert.equal(model.modelFlagged,false);assert.equal(policy.score,10);
 });
+
+test('cross-journey destination follows the request evidence rather than a SANED constant',()=>{
+ const evidence=structuredClone(demoCases[1]);evidence.id='CJ-SYN-other-destination';
+ const latest=evidence.events.filter(event=>event.type==='claim').sort((a,b)=>a.recordedAt-b.recordedAt).at(-1);latest.journey='Benefit Payments';
+ const record=createCrossJourneyAssessment(evidence);assert.equal(record.journey,'Benefit Payments');assert.equal(record.caseData.journey,'Benefit Payments');assert.equal(record.caseData.crossJourneyEvidence.events.find(event=>event.eventId===latest.eventId).journey,'Benefit Payments');
+});

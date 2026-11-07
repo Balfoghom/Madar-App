@@ -1832,7 +1832,7 @@ function filteredCases() {
     .filter(function (item) {
       const riskMatch = activeFilter === "All" || item.risk === activeFilter;
       const journeyMatch =
-        activeJourney === "All" || item.journey === activeJourney;
+        activeJourney === "All" || MadarCasePresentation.journeys(item).includes(activeJourney);
       const regionValue = isSaudi(item.country) ? item.region : "Outside KSA";
       const regionMatch =
         activeRegion === "All" || regionValue === activeRegion;
@@ -1878,8 +1878,8 @@ function populateSelects() {
   const journeys = Array.from(
     new Set(
       JOURNEYS.concat(
-        cases.map(function (item) {
-          return item.journey;
+        cases.flatMap(function (item) {
+          return MadarCasePresentation.journeys(item);
         }),
       ),
     ),
@@ -1899,7 +1899,7 @@ function populateSelects() {
       .join("");
   journeySelect.value =
     journeys.indexOf(activeJourney) >= 0 ? activeJourney : "All";
-  manualJourney.innerHTML = journeys
+  manualJourney.innerHTML = [...JOURNEYS].sort()
     .map(function (value) {
       return "<option>" + escapeHtml(value) + "</option>";
     })
@@ -2442,7 +2442,7 @@ function renderQueue() {
               urgent +
               "</span></td>",
             '<td><span class="journey-tag">' +
-              escapeHtml(item.journey) +
+              escapeHtml(item.assessmentSource === "cross-journey" ? MadarCasePresentation.journeys(item).join(" · ") || item.journey : item.journey) +
               "</span><span class=\"subtext\">" + escapeHtml(assessmentSourceCategory(item)) + "</span></td>",
             "<td><strong>" +
               escapeHtml(item.customerName || item.subject) +
@@ -2465,7 +2465,7 @@ function renderQueue() {
               '">' +
               item.risk +
               " " +
-              (item.assessmentSource === "cross-journey" ? " · operational band" : item.score == null ? " —" : " · " + item.score) +
+              (item.assessmentSource === "cross-journey" ? "" : item.score == null ? " —" : " · " + item.score) +
               '</span><span class="subtext">' +
               (item.assessmentSource === "cross-journey" ? "Cross-Journey Model: " + (!item.modelAssessment.complete ? "Incomplete evidence" : item.modelAssessment.modelFlagged ? "Review suggested" : "No model flag") : item.modelAssessment ? "Existing control " + item.ruleScore + " · Reference percentile " + (item.modelAssessment.complete ? Number(item.modelAssessment.percentile).toFixed(1) + "%" : "unavailable") : item.rulesAssessment ? "Business control · no AI model" : "Scoring simulation · behavioral score " + item.anomalyScore) +
               "</span></td>",

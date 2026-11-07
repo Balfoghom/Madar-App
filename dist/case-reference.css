@@ -113,3 +113,9 @@
 #case-question-dialog .assistant-boundary{display:block;color:var(--muted);font-size:10px;line-height:1.5;margin-top:10px}
 #case-question-dialog button:disabled{opacity:.5;cursor:wait}
 @media(max-width:600px){#case-question-dialog .case-assistant-section{padding:0 18px 18px}}
+
+/* Queue badges and linked journey labels must stay inside their own cells. */
+.queue-panel td{min-width:0;overflow:hidden}
+.queue-panel :is(.risk-chip,.confidence-chip,.status-chip,.journey-tag){max-width:100%;box-sizing:border-box;white-space:normal;overflow-wrap:anywhere;line-height:1.4}
+.queue-panel .journey-tag{display:inline-block}
+.queue-panel .risk-chip{display:inline-flex;min-width:0}
