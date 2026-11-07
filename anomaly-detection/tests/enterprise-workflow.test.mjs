@@ -75,3 +75,10 @@ test('unusual features from different journey models cannot collide as one indic
  const codes=record=>record.caseData.reasonCodes.filter(r=>r.code.startsWith('MODEL_FEATURE_')).map(r=>r.code);
  assert.ok(codes(benefit).length);assert.ok(codes(employer).length);assert.equal(codes(benefit).some(code=>codes(employer).includes(code)),false);
 });
+
+test('pending financial verification retains exposure without claiming prevention',async()=>{
+ const record=await post('/assess',{assessment:{...input,id:'NEW-pending-verification'}});
+ const outcome={...reviewer(record),outcome:'Suspected fraud — further investigation',financialOutcome:'Pending verification',amountAtRisk:100,confirmedFraudAmount:0,preventedAmount:0};
+ const saved=await post('/outcome',outcome);assert.equal(saved.caseData.amountAtRisk,100);assert.equal(saved.caseData.preventedAmount,0);assert.equal(saved.caseData.financialOutcome,'Pending verification');assert.equal(saved.caseData.paymentStatus,'Unverified');
+ await post('/outcome',{...outcome,preventedAmount:10},400);
+});

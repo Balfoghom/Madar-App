@@ -1,7 +1,7 @@
 /* Madar's connected-journey workspace consumes server-calculated assessments. */
 (() => {
   const root = document.querySelector('#madar-workspace');
-  const names = {routine:'Routine activity',coordinated_claim_sequence:'Connected SANED sequence',legitimate_restructuring:'Legitimate restructuring',identifier_reuse_network:'Shared identifier network',retroactive_source_conflict:'Conflicting evidence',missing:'Missing employer evidence'};
+  const names = {routine_digital:'Routine digital activity',legitimate_travel:'Legitimate travel',legitimate_account_update:'Legitimate account update',account_takeover_sequence:'Rapid account-change sequence',coordinated_iban_network:'Linked payment-account changes',rapid_profile_payment:'Repeated profile and payment changes',routine:'Routine activity',coordinated_claim_sequence:'Connected SANED sequence',legitimate_restructuring:'Legitimate restructuring',identifier_reuse_network:'Shared identifier network',retroactive_source_conflict:'Conflicting evidence',missing:'Missing employer evidence'};
   let catalog = [], records = new Map(), selected = 'CJ-SYN-demo-00001', busy = false, error = '', activeModelVersion = '';
   const esc = escapeHtml;
   const date = value => new Date(value).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Riyadh'});
@@ -41,7 +41,7 @@
   window.madarImportEvents = async function(csv) {
     await run({csv});
     if(error) throw new Error(error);
-    useAssessedPortfolio();selectedId=selected;activeFilter='All';activeJourney='All';activeRegion='All';searchQuery='';document.querySelector('#case-search').value='';renderAll();switchView('queue');
+    useAssessedPortfolio();selectedId=selected;casePanelOpen=true;activeAttention='All';activeAssessmentSource='All';activeFilter='All';activeJourney='All';activeRegion='All';searchQuery='';document.querySelector('#case-search').value='';renderAll();switchView('queue');
   };
   function resultBadge(record) {
     if(!record) return '<span class="cj-badge neutral">Not assessed</span>';
@@ -75,7 +75,7 @@
       <div class="cj-explanation"><p class="eyebrow">WHY THIS CASE WAS ROUTED</p><ul>${r.reasons.map(reason=>`<li>${esc(reason)}</li>`).join('')}</ul>${r.modelFlagged&&!r.ruleFlagged?'<p class="cj-insight">This example detector recommends review while its comparator rules remain quiet. Madar brings the finding, evidence and specialist decision into one workflow.</p>':''}<small>A review recommendation is not a fraud determination. This is a synthetic proof.</small></div>
       <div class="cj-evidence-heading"><div><p class="eyebrow">CONNECTED EVIDENCE</p><h3>${contributors} contributor${contributors===1?'':'s'} · ${journeys.length} journey${journeys.length===1?'':'s'} · ${(c.sourceTimeline||[]).length} event${(c.sourceTimeline||[]).length===1?'':'s'}</h3></div><span class="data-badge">30-day window ending ${esc(date(evidence.asOf))}</span></div>
       ${timeline(evidence)}
-      <div class="cj-review"><div><p class="eyebrow">SPECIALIST REVIEW · DEMO ROLES</p><h3>Decide the next step</h3><p>Record a routing decision and the evidence behind it. The original model assessment remains unchanged.</p><small>This records a demo decision. It does not release or stop a payment.</small></div><form id="cj-review-form"><label>Reviewer name<input name="actor" required maxlength="120" placeholder="Enter your name"></label><label>Decision<select name="action"><option value="approve">Approve recommended route</option><option value="override">Recommend a different route</option><option value="reject">Return recommendation for review</option></select></label><label id="cj-route-label" hidden>Alternative route<select name="route">${MadarRoutingPolicy.routes.map(route=>`<option>${esc(route)}</option>`).join('')}</select></label><label class="cj-note">Evidence and rationale<textarea name="note" required maxlength="2000" rows="3" placeholder="What supports this decision? What should be checked next?"></textarea></label><button class="primary-btn" type="submit" ${busy?'disabled':''}>Save review decision</button><span class="cj-form-status" role="status"></span></form></div>
+      <div class="cj-review"><div><p class="eyebrow">SPECIALIST REVIEW</p><h3>${esc(MadarCasePresentation.state(c).status)}</h3><p>Open this case in the Intelligence Queue to assign an owner, approve or change the route, investigate and record the outcome. Decisions use the same case and retain the original model evidence.</p></div></div>
       <div class="cj-history"><h3>Review history <span>${reviewHistory.length}</span></h3>${reviewHistory.length?reviewHistory.map(h=>`<div><strong>${esc(h.actorName)} · ${esc(h.action||h.outcome||h.type)}${h.route?' → '+esc(h.route):''}</strong><small>${esc(date(h.recordedAt))} · Assessment ${esc(h.assessmentId.slice(0,8))}</small><p>${esc(h.note)}</p></div>`).join(''):'<p>No specialist decision recorded yet.</p>'}</div>
       <details class="cj-model"><summary>Model evidence and validation boundaries</summary><p><strong>Model:</strong> ${esc(r.modelVersion)} · Random Forest</p><p><strong>Assessed:</strong> ${esc(date(record.assessedAt))}</p><p><strong>Review-pattern score:</strong> ${r.complete?r.score:'Not produced'} · <strong>Calibration percentile:</strong> ${r.complete?r.percentile:'Not produced'}</p><p>The score is similarity to synthetic review patterns, not a fraud probability. Reference ranges are context, not exact feature contributions. Synthetic prototype; business interpretation, thresholds and production performance require validation.</p><div class="cj-table-wrap"><table><thead><tr><th>Derived feature</th><th>Observed</th><th>Reference median</th></tr></thead><tbody>${r.features.map(f=>`<tr><td>${esc(f.name)}</td><td>${Number(f.value).toFixed(2)}</td><td>${Number(f.median).toFixed(2)}</td></tr>`).join('')}</tbody></table></div></details>
       <div class="cj-case-actions"><button class="secondary-btn" id="cj-open-queue">Open in investigation queue</button><button class="text-btn" id="cj-run-selected" ${busy?'disabled':''}>Reassess supplied evidence</button></div>
@@ -106,7 +106,7 @@
     root.querySelector('#cj-retry')?.addEventListener('click',load);
     root.querySelector('#cj-vision').onclick=()=>switchView('executive');
     root.querySelector('#cj-open-queue')?.addEventListener('click',()=>{
-      useAssessedPortfolio();selectedId=selected;activeFilter='All';activeJourney='All';activeRegion='All';searchQuery='';document.querySelector('#case-search').value='';renderAll();switchView('queue');
+      useAssessedPortfolio();selectedId=selected;casePanelOpen=true;activeAttention='All';activeAssessmentSource='All';activeFilter='All';activeJourney='All';activeRegion='All';searchQuery='';document.querySelector('#case-search').value='';renderAll();switchView('queue');
     });
     const form=root.querySelector('#cj-review-form');
     if(form){

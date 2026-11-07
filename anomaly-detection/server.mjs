@@ -137,7 +137,7 @@ async function activeConfig() {
 }
 
 const outcomeValues = ["Legitimate activity", "Data Quality Issue", "Error", "Process or data error", "Suspected fraud — further investigation", "Confirmed violation", "Inconclusive", "Confirmed fraud — formally established"];
-const financialValues = ["Proceeded", "Prevented before payment", "Paid — post-payment detection", "Partially prevented", "No financial impact"];
+const financialValues = ["Pending verification", "Proceeded", "Prevented before payment", "Paid — post-payment detection", "Partially prevented", "No financial impact"];
 function saveHumanReview(body, type) {
   assessmentWrites = assessmentWrites.catch(() => {}).then(async () => {
     const saved = await readSavedAssessments();
@@ -168,7 +168,8 @@ function saveHumanReview(body, type) {
       if (body.financialOutcome === "No financial impact" && [body.amountAtRisk,body.confirmedFraudAmount,body.preventedAmount].some(n=>n>0)) throw new InputError("No financial impact requires zero financial amounts.");
       if (body.outcome === "Legitimate activity" && (body.amountAtRisk > 0 || body.preventedAmount > 0)) throw new InputError("Legitimate activity cannot retain fraud exposure or prevented loss.");
       Object.assign(data, { outcomeProvenance: "Recorded local specialist outcome", outcome: body.outcome, financialOutcome: body.financialOutcome, amountAtRisk: body.amountAtRisk, confirmedFraudAmount: body.confirmedFraudAmount, preventedAmount: body.preventedAmount, decisionDate: review.recordedAt, decisionOwner: review.actorName, status: body.outcome.startsWith("Suspected fraud") ? "Under investigation" : "Outcome recorded" });
-      if (body.financialOutcome === "Prevented before payment") data.paymentStatus = "Prevented";
+      if (body.financialOutcome === "Pending verification") data.paymentStatus = "Unverified";
+      else if (body.financialOutcome === "Prevented before payment") data.paymentStatus = "Prevented";
       else if (body.financialOutcome === "Partially prevented") data.paymentStatus = "Partially prevented";
       else if (body.financialOutcome === "Paid — post-payment detection") { data.paymentStatus = "Paid"; data.detectionStage = "After payment"; }
       else if (body.financialOutcome === "Proceeded") data.paymentStatus = "Released";

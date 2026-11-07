@@ -11,9 +11,9 @@
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="stylesheet" href="styles.css?v=1.7.0" />
   <link rel="icon" href="madar-mark.svg" type="image/svg+xml">
-<link rel="stylesheet" href="madar.css?v=4">
+<link rel="stylesheet" href="madar.css?v=5">
 </head>
-  <body>
+  <body class="workspace-loading">
     <div class="app-shell">
       <aside class="sidebar">
         <div class="brand">
@@ -82,6 +82,7 @@
 
 <section id="connected-view" class="view"><button class="text-btn" data-go-view="intake">← Data Intake</button><div id="madar-workspace"></div></section>
 <section id="dashboard-view" class="view active-view">
+<div id="workspace-load-status" class="workspace-load-status" role="status" aria-live="polite">Loading the shared case workspace…</div>
           <div class="page-heading">
             <div>
               <p class="eyebrow">OPERATIONAL OVERVIEW</p>
@@ -214,7 +215,7 @@
               <div class="card-heading">
                 <div>
                   <p class="eyebrow">OUTCOME CATEGORIES</p>
-                  <h3>Review and intervention outcomes</h3>
+                  <h3>Review and intervention outcomes · categories overlap</h3>
                 </div>
               </div>
               <div id="executive-funnel" class="executive-funnel"></div>
@@ -270,7 +271,7 @@
               <button class="secondary-btn" id="print-business-report">
                 Print / Save PDF</button
               ><button class="primary-btn" id="generate-business-report">
-                Generate report
+                Refresh preview
               </button>
             </div>
           </div>
@@ -293,8 +294,8 @@
             <div class="report-state">
               <span class="live-dot"></span>
               <div>
-                <strong>Generated from current session</strong
-                ><small id="report-generated-at">Not generated yet</small>
+                <strong>Assessment-month cohort · latest recorded outcomes</strong
+                ><small id="report-generated-at">Live preview</small>
               </div>
             </div>
           </div>
@@ -310,7 +311,7 @@
               </div>
               <div id="monthly-ai-summary"></div>
               <small class="report-disclaimer"
-                >This summary organizes available evidence. It does not confirm
+                >This summary uses the latest recorded outcomes for the selected assessment cohort. It does not confirm
                 fraud, quantify realized savings, or replace accountable
                 business decisions.</small
               >
@@ -362,8 +363,8 @@
             <article class="panel action-tracker-card">
               <div class="card-heading">
                 <div>
-                  <p class="eyebrow">MANAGEMENT ACTION TRACKER</p>
-                  <h3>Finding → action → accountable owner</h3>
+                  <p class="eyebrow">MANAGEMENT ACTION RECOMMENDATIONS</p>
+                  <h3>Suggested actions for business owners</h3>
                 </div>
               </div>
               <div class="table-wrap">
@@ -423,7 +424,7 @@
                   <h3>Assessment queue</h3>
                   <p id="queue-summary">Showing all current cases</p>
                 </div>
-                <div class="filter-stack">
+                <div id="queue-attention-context" class="queue-attention-context" hidden><span></span><button type="button" class="text-btn" id="clear-queue-attention">Show all cases</button></div><div class="filter-stack">
                   <input
                     id="case-search"
                     class="search-input"
@@ -486,9 +487,10 @@
       <section id="intake-view" class="view">
         <div class="page-heading">
           <div><p class="eyebrow">LIVE PROTOTYPE INPUT</p><h2>Load a new assessment dataset</h2><p>Use explicitly synthetic CSV evidence. The local backend runs the saved model and retains its original fields; missing evidence is not classified as low risk.</p></div>
-          <div class="page-actions"><button class="secondary-btn" id="download-template-btn">Download CSV template</button><button class="secondary-btn danger-outline" id="demo-reset-btn" type="button">Reset demo workspace</button></div>
+          <div class="page-actions"><button type="button" class="primary-btn" id="intake-assessment-btn">New single-case assessment</button>
+<button class="secondary-btn" id="download-template-btn">Download CSV template</button><button class="secondary-btn danger-outline" id="demo-reset-btn" type="button">Reset demo workspace</button></div>
         </div>
-        <p class="session-note">SANED CSV: use a bundled <code>saned_case_id</code>, or provide <code>workforce</code>, <code>as_of</code>, and <code>events_json</code>. Other journeys require <code>journey_features_json</code>. Missing evidence is saved as incomplete. The <code>synthetic</code> flag is a declaration, not a data-provenance check.</p>
+        <p class="session-note"><strong>Choose an input method:</strong> Use New Assessment for a single demo case, the sample template for a batch, or connected source events for a Cross-Journey Model example.<br>Advanced CSV contract — SANED: use a bundled <code>saned_case_id</code>, or provide <code>workforce</code>, <code>as_of</code>, and <code>events_json</code>. Other journeys require <code>journey_features_json</code>. Missing evidence is saved as incomplete. The <code>synthetic</code> flag is a declaration, not a data-provenance check.</p>
         <article class="panel demo-intake"><p class="eyebrow">READY-TO-USE DEMO</p><h3>Enterprise demo portfolio</h3><p>Load rules-based examples across all journeys, with the trained SANED and cross-journey models. Madar prepares one shared workspace for specialist review. Previously saved demo cases and decisions are retained.</p><button class="primary-btn" data-load-demo>Refresh demo cases</button><button class="text-btn" data-go-view="connected" data-view="connected">Inspect connected source events</button><p class="demo-load-status" role="status"></p></article><div class="intake-grid">
           <article class="panel upload-card">
             <div class="card-heading"><div><p class="eyebrow">OPTION 1</p><h3>Upload a CSV file</h3></div></div>
@@ -660,7 +662,7 @@
             <div class="card-heading">
               <div>
                 <p class="eyebrow">MODEL CHANGE GOVERNANCE</p>
-                <h3>Approval required before activation</h3>
+                <h3>Demo configuration review</h3>
                 <p>
                   A sandbox result is evidence for review—not permission to
                   deploy.
@@ -709,7 +711,7 @@
               </p>
             </div>
           </div>
-          <div class="method-flow business-process"><article class="method-card"><span>1</span><h3>Observe</h3><p>Receive approved case events, existing controls, related entities and data-quality results.</p><button class="text-btn" data-go-view="intake">Open Data Intake →</button></article><article class="method-card"><span>2</span><h3>Analyze</h3><p>Evaluate the relevant journey or Cross-Journey Model alongside existing controls. Missing critical evidence requires verification.</p><button class="text-btn" data-go-view="ai-demo">Inspect model evidence →</button></article><article class="method-card"><span>3</span><h3>Explain</h3><p>Review the case summary, reason codes, linked events and evidence that supports or challenges the assessment.</p><button class="text-btn" data-go-view="queue">Review case evidence →</button></article><article class="method-card"><span>4</span><h3>Recommend</h3><p>Propose a proportionate route, responsible team and next step. Model evidence remains separate from routing policy.</p><button class="text-btn" data-go-view="queue">Open Intelligence Queue →</button></article><article class="method-card"><span>5</span><h3>Specialist decision</h3><p>Approve or change the route with a rationale, investigate and record the specialist outcome. No payment action is executed.</p><button class="text-btn" data-go-view="queue">Record a review →</button></article><article class="method-card"><span>6</span><h3>Feedback & improve</h3><p>Review outcomes with the business owner; propose indicators for specialist review, Data & AI validation and GM approval.</p><button class="text-btn" data-go-view="business-report">Open business report →</button></article></div><section class="panel business-route-library"><p class="eyebrow">PROPORTIONATE ACTION</p><h3>Routes, accountable teams and next steps</h3><p>Missing evidence routes to verification. A recommendation does not execute a service or payment decision.</p><div id="business-route-library"></div></section>
+          <div class="method-flow business-process"><article class="method-card"><span>1</span><h3>Observe</h3><p>Receive approved case events, existing controls, related entities and data-quality results.</p><button class="text-btn" data-go-view="intake">Open Data Intake →</button></article><article class="method-card"><span>2</span><h3>Analyze</h3><p>Evaluate the relevant journey or Cross-Journey Model alongside existing controls. Missing critical evidence requires verification.</p><button class="text-btn" data-go-view="ai-demo">Inspect model evidence →</button></article><article class="method-card"><span>3</span><h3>Explain</h3><p>Review the case summary, reason codes, linked events and evidence that supports or challenges the assessment.</p><button class="text-btn" data-go-view="queue">Open case queue →</button></article><article class="method-card"><span>4</span><h3>Recommend</h3><p>Propose a proportionate route, responsible team and next step. Model evidence remains separate from routing policy.</p><button class="text-btn" data-go-view="queue">Open Intelligence Queue →</button></article><article class="method-card"><span>5</span><h3>Specialist decision</h3><p>Approve or change the route with a rationale, investigate and record the specialist outcome. No payment action is executed.</p><button class="text-btn" data-go-view="queue">Choose a case to review →</button></article><article class="method-card"><span>6</span><h3>Feedback & improve</h3><p>Review outcomes with the business owner; propose indicators for specialist review, Data & AI validation and GM approval.</p><button class="text-btn" data-go-view="business-report">Open business report →</button></article></div><section class="panel business-route-library"><p class="eyebrow">PROPORTIONATE ACTION</p><h3>Routes, accountable teams and next steps</h3><p>Missing evidence routes to verification. A recommendation does not execute a service or payment decision.</p><div id="business-route-library"></div></section>
           <section class="panel journey-model-registry">
             <div class="card-heading">
               <div>
@@ -760,7 +762,7 @@
                 </li>
                 <li>Only approved data and defined purposes may be used.</li>
                 <li>
-                  Missing or conflicting data lowers confidence and triggers
+                  Missing or conflicting evidence lowers data quality and triggers
                   human review.
                 </li>
                 <li>
@@ -803,8 +805,7 @@
                 <strong>Human gate</strong>
                 <p>
                   Specialists approve case routing; Data &amp; AI validates
-                  model changes; the GM is the final activation gate within
-                  delegated authority.
+                  model changes; the GM is the final approval gate for reference scenarios. Production release and monitoring require a separate enterprise process.
                 </p>
               </div>
             </div>
@@ -815,11 +816,9 @@
           <div class="page-heading">
             <div>
               <p class="eyebrow">APPENDIX · SCORING METHODOLOGY</p>
-              <h2>How the behavioral risk score is calculated</h2>
+              <h2>Business-rule simulation and model evidence</h2>
               <p>
-                A transparent prototype method for committee review. Values
-                shown here are synthetic Sandbox assumptions—not approved
-                production policy.
+                The weighted formula below applies only to business-rule simulation cases. Journey-specific anomaly models and the Cross-Journey Model retain their own findings; their outputs are not blended into this score.
               </p>
             </div>
             <span class="status-chip neutral">Explainable by design</span>
@@ -832,21 +831,17 @@
                 <p class="eyebrow">SOURCE-SYSTEM INPUT</p>
                 <h3>Existing Control Score</h3>
                 <p>
-                  Approved source-system rules produce or contribute to an
-                  aggregated score from 0–100. The prototype consumes that
-                  result without changing the original rule.
+                  Existing controls contribute a score from 0–100. This demo uses supplied synthetic control results; live source-system integration is future work.
                 </p>
               </div>
             </article>
             <article class="panel appendix-step">
               <span class="appendix-number">2</span>
               <div>
-                <p class="eyebrow">BEHAVIORAL AI</p>
-                <h3>AI Anomaly Score</h3>
+                <p class="eyebrow">BEHAVIORAL SIMULATION</p>
+                <h3>Simulated behavioral contribution</h3>
                 <p>
-                  Each observed feature is compared with the synthetic
-                  historical baseline. Greater deviation contributes more of its
-                  approved maximum weight.
+                  Illustrative features contribute configured points within the simulator. These weighted points are not the trained models’ anomaly outputs.
                 </p>
               </div>
             </article>
@@ -874,7 +869,7 @@
               </p>
             </div>
             <div class="appendix-worked-example">
-              <span>Worked example</span>
+              <span>Default-configuration worked example</span>
               <strong>(70 × 55%) + (64 × 45%) + 8 = 75</strong>
               <small
                 >Result: High risk → specialist review. The score prioritizes
@@ -981,14 +976,10 @@
 
           <div class="appendix-two-column appendix-bottom-row">
             <article class="panel appendix-note-card">
-              <p class="eyebrow">WHY AI MAY RAISE OR LOWER THE RESULT</p>
+              <p class="eyebrow">SIMULATION AND MODEL FINDINGS</p>
               <h3>Rules and behavior remain separately visible</h3>
               <p>
-                If behavior is substantially more unusual than the existing
-                control result, the AI strengthens the signal. If the observed
-                behavior is materially less unusual, it may moderate the
-                combined assessment. Neither component is hidden from the
-                specialist.
+                Simulation contributions can raise or lower the business-rule demonstration score. A trained model supplies a separate finding; routing policy considers it alongside controls and evidence quality without rewriting the model result.
               </p>
             </article>
             <article class="panel appendix-note-card governance-accent">
@@ -996,20 +987,18 @@
               <h3>Configuration is governed</h3>
               <ul class="boundary-list">
                 <li>
-                  Low: 0–34 · Medium: 35–74 · High: 75–100 under current Sandbox
-                  assumptions.
+                  Low: 0–34 · Medium: 35–74 · High: 75–100 under default sandbox settings. Current test thresholds are shown in Scoring Simulation.
                 </li>
                 <li>
                   An approved critical control can establish a minimum review
                   floor.
                 </li>
                 <li>
-                  Confidence is shown separately and is reduced by missing or
-                  conflicting data.
+                  Data quality is separate from the risk band and model performance. Missing critical evidence requires verification.
                 </li>
                 <li>
                   Specialist review, Data &amp; AI validation, and authorized
-                  approval are required before activation.
+                  approval are required for reference examples. Production activation and monitoring are future work.
                 </li>
               </ul>
             </article>
@@ -1090,7 +1079,8 @@
             ×
           </button>
         </div>
-        <label
+        <p class="form-guidance">Choose the team that should review this case next. State the supporting evidence; this saves a routing decision only.</p>
+<label
           >New route<select id="override-route" required>
             <option>Straight-through processing</option>
             <option>Data Verification Review</option>
@@ -1148,14 +1138,15 @@
             ×
           </button>
         </div>
-        <label>Reviewer name<input id="outcome-reviewer" maxlength="120" required placeholder="Enter your name"></label>
-        <label
+        <p class="form-guidance">Record the evidence-backed classification. Suspected and inconclusive outcomes remain open for investigation. A resolved outcome requires a separate closeout step; this form does not execute payment actions.</p>
+<label>Reviewer name<input id="outcome-reviewer" maxlength="120" required placeholder="Enter your name"></label>
+        <p id="outcome-selection-guidance" class="outcome-guidance" aria-live="polite">Choose the evidence-backed classification and financial outcome.</p><label
           >Specialist classification<select id="outcome-value" required>
             <option value="">Select outcome</option>
             <option>Legitimate activity</option>
-            <option>Data Quality Issue</option>
-            <option>Error</option>
-            <option>Process or data error</option>
+            <option value="Data Quality Issue">Data-quality issue — evidence incomplete or unreliable</option>
+
+            <option value="Process or data error">Process or data error — verified operational error</option>
             <option>Suspected fraud — further investigation</option>
             <option>Confirmed violation</option>
             <option>Inconclusive</option>
@@ -1166,6 +1157,7 @@
           <label
             >Financial outcome<select id="financial-outcome-value" required>
               <option value="">Select financial outcome</option>
+              <option>Pending verification</option>
               <option>Proceeded</option>
               <option>Prevented before payment</option>
               <option>Paid — post-payment detection</option>
@@ -1232,8 +1224,7 @@
           </button>
         </div>
         <p class="dialog-intro">
-          Enter a synthetic case. The prototype will calculate a behavioral
-          anomaly score, confidence, reason codes, and a recommended route.
+          Create a demo assessment using the relevant journey model. Enter case context first, then the observed evidence. This form is a test-input tool; live source-system intake is a future capability.
         </p>
         <label class="scenario-reference-select">Approved scenario example<select id="assessment-approved-scenario"><option value="">Create a new scenario</option></select><small>Copies the approved journey and description. Enter the evidence for this new case below.</small></label>
         <h3 class="form-section-title">Case context</h3>
@@ -1285,7 +1276,7 @@
           /></label>
           <label
             >Amount at risk (SAR)<input
-              id="assessment-amount-at-risk"
+              aria-describedby="exposure-input-guidance" id="assessment-amount-at-risk"
               type="number"
               min="0"
               step="0.01"
@@ -1308,7 +1299,7 @@
             </select></label
           >
         </div>
-        <h3 class="form-section-title">Observed risk features</h3>
+        <p id="exposure-input-guidance" class="form-guidance">Amounts are supplied demo context, not model estimates or verified loss. Observed evidence below should come from source records; defaults are examples.</p><h3 class="form-section-title">Observed evidence — demo test inputs</h3>
         <div class="form-grid compact-grid">
           <label
             >Existing control score<input
@@ -1338,7 +1329,7 @@
               required
           /></label>
           <label
-            >Prior risk / outcome score<input
+            >Prior validated control score (0–100)<input
               id="assessment-prior-risk"
               type="number"
               min="0"
@@ -1549,9 +1540,10 @@
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <script src="routing-policy.js?v=2"></script>
-    <script src="app.js?v=2.0.0"></script>
+    <script src="case-presentation.js?v=2"></script>
+    <script src="app.js?v=2.1.0"></script>
 <script src="madar.js?v=2.0.0"></script>
-  <script src="case-presentation.js?v=1"></script>
-  <script src="operations.js?v=10"></script>
+
+  <script src="operations.js?v=11"></script>
 </body>
 </html>

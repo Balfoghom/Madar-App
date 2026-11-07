@@ -5,8 +5,7 @@
     const connected=item.assessmentSource==='cross-journey';
     const incomplete=item.risk==='Incomplete' || item.modelAssessment?.complete===false || item.rulesAssessment?.complete===false;
     if(incomplete)return {value:null,label:'Evidence incomplete',kind:'incomplete',note:'Complete the required evidence before relying on this assessment.'};
-    if(connected && Number.isFinite(item.ruleScore))return {value:item.ruleScore,label:'Control score',kind:'control',note:'Supplied demo operational-control score. The Cross-Journey Model result is separate.'};
-    if(connected)return {value:null,label:item.modelAssessment?.modelFlagged?'Review suggested':'No model flag',kind:'pattern',note:'The connected model recommends a review route; no combined numeric score is supplied.'};
+    if(connected)return {value:null,label:item.modelAssessment?.modelFlagged?'Model review suggested':'No model review flag',kind:'pattern',note:'The connected model supplies a review recommendation. Existing control score and operational risk band are separate.'};
     if(item.businessSimulation)return {value:Number.isFinite(item.score)?item.score:null,label:'Business-rule score',kind:'simulation',note:'Configured business-rule scoring weights combine operational controls, simulated behavior and pattern adjustments. No trained ML model was used.'};
     if(item.modelAssessment || item.rulesAssessment)return {value:item.businessSimulation?item.score:Number.isFinite(item.ruleScore)?item.ruleScore:null,label:item.businessSimulation?'Business-rule score':'Control score',kind:'control',note:'Existing control score. AI findings may raise the review priority without changing this number.'};
     return {value:Number.isFinite(item.score)?item.score:null,label:'Simulation score',kind:'simulation',note:'Weighted scoring simulation: existing controls, simulated behavior and pattern adjustments. Not a fraud probability.'};
@@ -15,7 +14,36 @@
     const outcome=typeof item.outcome==='string'?item.outcome:'';
     const resolved=!!outcome && !/^(Suspected|Inconclusive)/.test(outcome);
     const incomplete=item.risk==='Incomplete'||item.dataQuality?.criticalMissing===true;
-    return {resolved,incomplete,heading:resolved?'Recorded outcome':incomplete?'Evidence needed':'Recommended next step',action:resolved?'Update outcome':'Record review',status:resolved?'Outcome recorded':item.status||'Awaiting review',scripted:item.outcomeProvenance==='Scripted demo outcome'};
+    const workStage=item.workflow?.stage||null;
+    const status=workStage==='Closed'?'Closed':resolved?'Outcome recorded · closure pending':outcome?'Investigation ongoing':incomplete?'Evidence needed':workStage&&workStage!=='New'?workStage:item.humanDecision?.action==='reject'?'Returned for review':item.humanDecision?'Route decided · follow-up needed':item.route==='Straight-through processing'?'Ready to proceed':'Awaiting review';
+    return {resolved,incomplete,workStage,heading:resolved?'Recorded outcome':incomplete?'Evidence needed':'Recommended next step',action:resolved?'Update outcome':'Record review',status,scripted:item.outcomeProvenance==='Scripted demo outcome'};
+  }
+  function needsReview(item){return !state(item).resolved && item.workflow?.stage!=='Closed';}
+  function signals(item){
+    const skipped=/^(MODEL_NOT_FLAGGED|LOWER_BEHAVIORAL_DEVIATION|NO_MATERIAL_ANOMALY|NO_RULE_TRIGGER|CROSS_JOURNEY_PATTERN|MODEL_UNUSUAL_COMBINATION|EVIDENCE_INCOMPLETE|COMBINED_PATTERN|REQUIRED_INFORMATION_MISSING)$/;
+    const result=new Map();
+    for(const [code,description] of item.signals||[]){
+      if(skipped.test(code)||/^(SANED_COMPARATOR_|MODEL_FEATURE_)\d+$/.test(code))continue;
+      let key=code;
+      if(/^CROSS_JOURNEY_EVIDENCE_/.test(code)){
+        key=/login →/.test(description)?'ACCOUNT_CHANGE_SEQUENCE':/rapid travel|login locations/i.test(description)?'LOGIN_LOCATION_CONFLICT':/payment-account changes/i.test(description)?'PAYMENT_ACCOUNT_CHANGE':/profile updates/i.test(description)?'PROFILE_CHANGE':/linked contributors.*sequence/i.test(description)?'LINKED_EMPLOYMENT_SEQUENCE':null;
+      }
+      if(code==='CJ_COMPLETED_CONTRIBUTOR_SEQUENCE')key='LINKED_EMPLOYMENT_SEQUENCE';
+      if(key)result.set(key,[key,description]);
+    }
+    return [...result.values()];
+  }
+  function reasonLabel(signal){
+    const code=signal[0];
+    const special={CROSS_JOURNEY_PATTERN:'Connected model finding',MODEL_NOT_FLAGGED:'No model review flag',MODEL_UNUSUAL_COMBINATION:'Unusual combination',EVIDENCE_INCOMPLETE:'Required evidence missing',REQUIRED_INFORMATION_MISSING:'Required information missing',NO_MATERIAL_ANOMALY:'No material anomaly',LOWER_BEHAVIORAL_DEVIATION:'Lower behavioral deviation'};
+    return special[code]||(signals({signals:[signal]})[0]?.[0]||'Observed evidence').replaceAll('_',' ').toLowerCase().replace(/^./,c=>c.toUpperCase());
+  }
+  function attentionMatches(item,kind){
+    if(kind==='unresolved-high')return item.risk==='High'&&needsReview(item);
+    if(kind==='low-quality')return item.confidence==='Low'||item.dataQuality?.label==='Low';
+    if(kind==='data-quality')return item.dataQuality?item.dataQuality.issues.length>0:!!(item.features?.missingData||item.features?.crossSourceConflict);
+    if(kind?.startsWith('signal:'))return signals(item).some(([code])=>code===kind.slice(7));
+    return true;
   }
   function keyEvidence(item) {
     const facts=[];
@@ -65,5 +93,5 @@
     if(Number.isFinite(item.transactionAmount))return {label:'Supplied transaction amount',amount:item.transactionAmount};
     return {label:'Financial exposure',amount:null};
   }
-  globalThis.MadarCasePresentation=Object.freeze({score,state,keyEvidence,financial,mainReason});
+  globalThis.MadarCasePresentation=Object.freeze({score,state,keyEvidence,financial,mainReason,needsReview,signals,attentionMatches,reasonLabel});
 })();

@@ -1271,7 +1271,7 @@ function renderModelEvidence(item) {
   }
   if (!model) return '<section class="detail-section model-evidence"><h3 class="detail-title">Scoring simulation</h3><p>No complete trained-model response is attached to this case. Its statistical simulation score is not a model percentile or model assessment.</p></section>';
   const value = (v) => v === null || v === undefined ? "—" : typeof v === "boolean" ? String(v) : String(v);
-  const rows = [["modelVersion", model.modelVersion], [item.assessmentSource === "cross-journey" ? "score (synthetic review-pattern similarity)" : "score (raw anomaly score)", model.complete ? model.score : undefined], ["calibration percentile (technical reference rank, not risk %)", model.complete ? model.percentile : null], ["modelFlagged", model.modelFlagged], ["ruleFlagged", model.ruleFlagged], ["complete", model.complete]];
+  const rows = [["modelVersion", model.modelVersion], [item.assessmentSource === "cross-journey" ? "score (synthetic review-pattern similarity)" : "score (raw anomaly score)", model.complete ? model.score : undefined], ["calibration percentile (technical reference rank, not risk %)", model.complete ? model.percentile : null], ["Model recommends review", model.modelFlagged == null ? "Not assessed" : model.modelFlagged ? "Yes" : "No"], ["Comparator rules triggered", model.comparatorRulesAvailable === false ? "Not configured" : model.ruleFlagged == null ? "Not assessed" : model.ruleFlagged ? "Yes" : "No"], ["Required model evidence complete", model.complete ? "Yes" : "No"]];
   const features = (model.features || []).map((feature) => `<tr><td>${escapeHtml(feature.name)}</td><td>${escapeHtml(value(feature.value))}</td><td>${escapeHtml(value(feature.median))}</td><td>${escapeHtml(value(feature.low))} – ${escapeHtml(value(feature.high))}</td><td>${escapeHtml(String(feature.unusual ?? feature.outsideReferenceRange ?? false))}</td></tr>`).join("");
   return `<section class="detail-section model-evidence"><h3 class="detail-title">Trained model result</h3><p>${model.complete ? "Unusualness percentile is relative to synthetic reference data, not fraud probability." : "Complete evidence · استكمال الأدلة. No model score or low-risk classification was produced."}</p><table class="model-contract-table"><tbody>${rows.map(([field, v]) => `<tr><th>${escapeHtml(field)}</th><td>${escapeHtml(value(v))}</td></tr>`).join("")}</tbody></table>${model.comparatorRulesAvailable === false ? '<p>ruleFlagged is not applicable: this journey has no configured provisional comparator rule engine.</p>' : ""}<h4>Model features</h4><div class="model-feature-scroll"><table class="model-contract-table"><thead><tr><th>Feature</th><th>Value</th><th>Median</th><th>Reference range</th><th>Unusual</th></tr></thead><tbody>${features || '<tr><td colspan="5">No complete model features.</td></tr>'}</tbody></table></div><h4>Model reasons</h4><ul>${(model.reasons || []).map((reason) => `<li>${escapeHtml(reason)}</li>`).join("")}</ul><p class="session-note">${escapeHtml(model.explanationBoundary || "Reference ranges provide context, not exact causal attribution.")}</p><small>${escapeHtml(model.assessmentId || item.assessmentId || "")} · ${escapeHtml(model.assessedAt || item.assessedAt || "")}</small></section>`;
 }
@@ -1282,7 +1282,7 @@ function renderReviewHistory(item) {
 let routeDecisionAction = null;
 function openRouteDecision(item, action) {
   routeDecisionAction = { caseId: item.id, assessmentId: item.assessmentId, action };
-  document.querySelector("#route-decision-title").textContent = action === "approve" ? "Approve recommended route" : "Reject recommendation";
+  document.querySelector("#route-decision-title").textContent = action === "approve" ? "Approve recommended route" : "Return recommendation for review";
   document.querySelector("#route-decision-note").value = "";
   document.querySelector('#route-decision-context').textContent = action === 'approve' ? 'Approve the original recommended route: ' + (item.recommendedRoute || item.modelAssessment?.route || item.route) : 'Return this recommendation for specialist review.';
   document.querySelector("#route-decision-error").textContent = "";
@@ -1607,6 +1607,7 @@ function portfolioCases() { return cases; }
 function useAssessedPortfolio() { portfolioScope='unified'; }
 let activeFilter = "All";
 let activeAssessmentSource = "All";
+let activeAttention = "All";
 let activeJourney = "All";
 let activeRegion = "All";
 let searchQuery = "";
@@ -1803,7 +1804,7 @@ function switchView(name) {
     document.querySelector("#team-dialog").close();
   }
 
-  if(name!=='queue'){casePanelOpen=false;document.body.classList.remove('case-drawer-open');}
+  if(name!=='queue'){casePanelOpen=false;document.querySelector('#case-panel').hidden=true;document.querySelector('#queue-view').classList.remove('review-open');document.body.classList.remove('case-drawer-open');}
 
   document.querySelectorAll(".nav-item").forEach(function (item) {
     item.classList.toggle("active", item.dataset.view === ({connected:"intake",indicators:"method","ai-demo":"method"}[name] || name));
@@ -1813,7 +1814,7 @@ function switchView(name) {
   });
   const target = document.querySelector("#" + name + "-view");
   if (target) target.classList.add("active-view");
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  window.scrollTo({ top: 0, behavior: "auto" });
 }
 
 function assessmentSourceCategory(item) {
@@ -1823,6 +1824,7 @@ function assessmentSourceCategory(item) {
   return 'Scoring simulation';
 }
 
+function clearQueueAttention(){activeAttention="All";}
 function filteredCases() {
   const cases = portfolioCases();
   const query = searchQuery.trim().toLowerCase();
@@ -1834,7 +1836,7 @@ function filteredCases() {
       const regionValue = isSaudi(item.country) ? item.region : "Outside KSA";
       const regionMatch =
         activeRegion === "All" || regionValue === activeRegion;
-      const signalText = item.signals
+      const signalText = [...item.signals,...MadarCasePresentation.signals(item)]
         .map(function (signal) {
           return signal.join(" ");
         })
@@ -1862,7 +1864,7 @@ function filteredCases() {
           .join(" ")
           .toLowerCase()
           .indexOf(query) >= 0;
-      return riskMatch && journeyMatch && regionMatch && queryMatch && (activeAssessmentSource === "All" || assessmentSourceCategory(item) === activeAssessmentSource);
+      return MadarCasePresentation.attentionMatches(item,activeAttention) && riskMatch && journeyMatch && regionMatch && queryMatch && (activeAssessmentSource === "All" || assessmentSourceCategory(item) === activeAssessmentSource);
     })
     .sort(function (a, b) {
       return riskOrder(b.risk) - riskOrder(a.risk) || b.score - a.score;
@@ -1994,7 +1996,7 @@ function renderDashboardMetrics() {
     return item.risk === "Low";
   }).length;
   const awaiting = cases.filter(function (item) {
-    return item.status === "Awaiting specialist";
+    return MadarCasePresentation.needsReview(item);
   }).length;
   const outside = cases.filter(function (item) {
     return !isSaudi(item.country);
@@ -2016,9 +2018,9 @@ function renderDashboardMetrics() {
     ["Medium risk", medium, "Targeted verification", "medium-stat"],
     ["Low risk", low, "Eligible for accelerated processing", "low-stat"],
     [
-      "Awaiting human decision",
+      "Open cases",
       awaiting,
-      "Controls and AI recommend; specialist decides",
+      "Includes evidence requests and ongoing investigations",
       "review-stat",
     ],
     [
@@ -2107,7 +2109,7 @@ function renderRiskDistribution() {
   ].join("");
   document.querySelectorAll("[data-risk-link]").forEach(function (button) {
     button.addEventListener("click", function () {
-      activeFilter = button.dataset.riskLink;
+      clearQueueAttention(); activeFilter = button.dataset.riskLink;
       document.querySelectorAll(".filter").forEach(function (item) {
         item.classList.toggle("active", item.dataset.filter === activeFilter);
       });
@@ -2149,7 +2151,7 @@ function renderJourneyChart() {
     .join("");
   document.querySelectorAll("[data-journey-link]").forEach(function (button) {
     button.addEventListener("click", function () {
-      activeJourney = button.dataset.journeyLink;
+      clearQueueAttention(); activeJourney = button.dataset.journeyLink;
       switchView("queue");
       populateSelects();
       resetVisibleSelection();
@@ -2357,11 +2359,11 @@ function renderLatestActivity() {
         '"><span class="activity-icon ' +
         item.risk.toLowerCase() +
         '">' +
-        (item.score == null ? "—" : item.score) +
+        (item.assessmentSource === "cross-journey" ? "◎" : item.score == null ? "—" : item.score) +
         "</span><div><strong>" +
         escapeHtml(item.transactionId + " · " + item.journey) +
         "</strong><p>" +
-        escapeHtml((item.primaryReason || item.scenario) + " · " + item.status) +
+        escapeHtml(MadarCasePresentation.mainReason(item) + " · " + MadarCasePresentation.state(item).status) +
         '</p></div><span class="activity-time">' +
         escapeHtml(new Date(item.assessedAt || item.requested).toLocaleDateString("en-GB",{day:"numeric",month:"short"})) +
         "</span></button>"
@@ -2374,10 +2376,10 @@ function renderLatestActivity() {
 function wireCaseLinks() {
   document.querySelectorAll("[data-case-link]").forEach(function (button) {
     button.addEventListener("click", function () {
-      selectedId = button.dataset.caseLink;
+      clearQueueAttention(); selectedId = button.dataset.caseLink;
       casePanelOpen=true;
       activeFilter = "All";
-      activeAssessmentSource = "All"; activeJourney = "All";
+      activeAttention = 'All'; activeAssessmentSource = "All"; activeJourney = "All";
       activeRegion = "All";
       searchQuery = "";
       document.querySelector("#case-search").value = "";
@@ -2401,6 +2403,9 @@ function renderDashboard() {
 }
 
 function renderQueue() {
+  const attentionLabels={'unresolved-high':'Unresolved high-risk cases','low-quality':'Low data quality','data-quality':'Data-quality exceptions'};
+  const context=document.querySelector('#queue-attention-context');
+  context.hidden=activeAttention==='All';context.querySelector('span').textContent=attentionLabels[activeAttention]||activeAttention.replace('signal:','Signal: ').replaceAll('_',' ');
   const cases = portfolioCases();
   const visible = filteredCases();
   if (!visible.length) selectedId = null;
@@ -2460,7 +2465,7 @@ function renderQueue() {
               '">' +
               item.risk +
               " " +
-              (item.score == null ? " —" : " · " + item.score) +
+              (item.assessmentSource === "cross-journey" ? " · operational band" : item.score == null ? " —" : " · " + item.score) +
               '</span><span class="subtext">' +
               (item.assessmentSource === "cross-journey" ? "Cross-Journey Model: " + (!item.modelAssessment.complete ? "Incomplete evidence" : item.modelAssessment.modelFlagged ? "Review suggested" : "No model flag") : item.modelAssessment ? "Existing control " + item.ruleScore + " · Reference percentile " + (item.modelAssessment.complete ? Number(item.modelAssessment.percentile).toFixed(1) + "%" : "unavailable") : item.rulesAssessment ? "Business control · no AI model" : "Scoring simulation · behavioral score " + item.anomalyScore) +
               "</span></td>",
@@ -2474,7 +2479,7 @@ function renderQueue() {
             '<td class="reason"><span class="queue-reason-text" title="' + escapeHtml(MadarCasePresentation.mainReason(item)) + '">' + escapeHtml(MadarCasePresentation.mainReason(item)) + "</span></td>",
             '<td class="route">' + escapeHtml(item.route) + "</td>",
             '<td><span class="status-chip">' +
-              escapeHtml(item.status) +
+              escapeHtml(MadarCasePresentation.state(item).status) +
               "</span></td>",
             "</tr>",
           ].join("");
@@ -2615,12 +2620,12 @@ function renderCase() {
     '</div><div class="comparison-note">' +
       escapeHtml(item.comparison) +
       "</div></section>",
-    '<section class="detail-section"><h3 class="detail-title">Explainable reason codes</h3><ul class="reason-list">' +
+    '<section class="detail-section"><h3 class="detail-title">Assessment reasons</h3><ul class="reason-list">' +
       item.signals
         .map(function (signal) {
           return (
             "<li><strong>" +
-            escapeHtml(signal[0]) +
+            escapeHtml(MadarCasePresentation.reasonLabel(signal)) +
             "</strong><span>" +
             escapeHtml(signal[1]) +
             "</span></li>"
@@ -2628,7 +2633,7 @@ function renderCase() {
         })
         .join("") +
       "</ul></section>",
-    '<section class="detail-section"><h3 class="detail-title">Data quality & confidence</h3><div class="quality-row"><span class="confidence-chip ' +
+    '<section class="detail-section"><h3 class="detail-title">Data quality & missing evidence</h3><div class="quality-row"><span class="confidence-chip ' +
       item.confidence +
       '">' +
       item.confidence +
@@ -2687,7 +2692,7 @@ function renderCase() {
   document
     .querySelector("#record-outcome-btn")
     .addEventListener("click", function () {
-      document.querySelector("#outcome-value").value = item.outcome || "";
+      document.querySelector("#outcome-value").value = item.outcome === "Error" ? "Process or data error" : item.outcome || "";
       document.querySelector("#financial-outcome-value").value =
         item.financialOutcome || "";
       document.querySelector("#outcome-amount-at-risk").value =
@@ -2697,7 +2702,7 @@ function renderCase() {
       document.querySelector("#outcome-prevented-amount").value =
         item.preventedAmount || 0;
       document.querySelector("#outcome-note").value = "";
-      document.querySelector("#outcome-dialog").showModal();
+      explainOutcomeForm(); document.querySelector("#outcome-dialog").showModal();
     });
 }
 
@@ -2761,7 +2766,7 @@ function renderSimulationResults() {
       values.Medium +
       '</b>Medium</span><span class="sim-low"><b>' +
       values.Low +
-      "</b>Low</span></div></div>"
+      "</b>Low</span><span class=\"sim-incomplete\"><b>" + (values.Incomplete || 0) + "</b>Incomplete</span></div></div>"
     );
   }
   results.innerHTML = [
@@ -2776,7 +2781,7 @@ function renderSimulationResults() {
       decreased +
       " cases</b></div><div><span>Band unchanged</span><b>" +
       unchanged +
-      " cases</b></div></div>",
+      " cases</b></div></div><p class=\"session-note\">Only business-rule simulation cases can change. Model results and incomplete evidence remain separate.</p>",
   ].join("");
 }
 
@@ -2857,8 +2862,8 @@ function renderSimulationGovernance() {
     ["Draft", "Sandbox configuration only"],
     ["Specialist Review", "Purpose, indicators, and impact"],
     ["Data & AI Validation", "Performance, bias, and robustness"],
-    ["GM Approval", "Final activation gate within authority"],
-    ["Activation", "Controlled release and monitoring"],
+    ["GM Approval", "Approval of a test configuration"],
+    ["Approved test configuration", "Production release and monitoring are future work"],
   ];
   const currentIndex = Math.max(
     0,
@@ -2880,7 +2885,7 @@ function renderSimulationGovernance() {
         state +
         gate +
         '"><span>' +
-        (index + 1) +
+        "•" +
         "</span><strong>" +
         stage[0] +
         "</strong><small>" +
@@ -2960,7 +2965,7 @@ const scenarioReviewActions = {
   review: ["Accept for testing", "Specialist"],
   "pass-test": ["Record test passed", "Data & AI"],
   approve: ["Approve scenario", "GM"],
-  activate: ["Activate approved example", "GM"],
+  activate: ["Make approved reference available", "GM"],
   reject: ["Reject scenario", null],
 };
 function renderScenarioGovernance(item) {
@@ -2970,13 +2975,13 @@ function renderScenarioGovernance(item) {
   const nextAction = { "Not submitted": "submit", "Specialist Review": "review", Testing: "pass-test", "GM Approval": "approve", Approved: "activate" }[stage];
   const stageIndex = scenarioReviewStages.indexOf(stage);
   const timeline = (proposal?.history || []).map((entry) => `<li><strong>${escapeHtml(entry.status)}</strong><span>${escapeHtml(entry.actorName)} · ${escapeHtml(entry.role)} · ${escapeHtml(new Date(entry.at).toLocaleString())}</span><p>${escapeHtml(entry.note)}</p></li>`).join("");
-  return `<section class="detail-section scenario-governance"><div class="summary-heading"><h3 class="detail-title">SCENARIO APPROVAL</h3><span class="scenario-status">${escapeHtml(stage)}</span></div>
+  return `<section class="detail-section scenario-governance"><div class="summary-heading"><h3 class="detail-title">SCENARIO APPROVAL</h3><span class="scenario-status">${escapeHtml(stage==="Active"?"Reference available":stage)}</span></div>
     <p class="scenario-description">Submit a reviewed New Assessment scenario as a reusable example for its journey.</p>
-    <ol class="scenario-stage-list">${scenarioReviewStages.map((label, index) => `<li class="${stage !== "Rejected" && index <= stageIndex ? "reached" : ""}">${escapeHtml(label)}</li>`).join("")}</ol>
+    <ol class="scenario-stage-list">${scenarioReviewStages.map((label, index) => `<li class="${stage !== "Rejected" && index <= stageIndex ? "reached" : ""}">${escapeHtml(label==="Active"?"Reference available":label)}</li>`).join("")}</ol>
     ${!item.outcome ? '<p class="warning-note">Record the specialist outcome first, then submit this scenario for approval.</p>' : ""}
     <div class="action-row">${nextAction ? `<button type="button" class="secondary-btn" data-scenario-action="${nextAction}" ${!item.outcome ? "disabled" : ""}>${scenarioReviewActions[nextAction][0]}</button>` : ""}${stageIndex >= 0 && stage !== "Active" ? '<button type="button" class="secondary-btn" data-scenario-action="reject">Reject</button>' : ""}</div>
     ${timeline ? `<ol class="scenario-review-history">${timeline}</ol>` : ""}
-    <p class="session-note">Activation adds an approved example to New Assessment. Model training and scoring weights are unchanged by this approval.</p></section>`;
+    <p class="session-note">Making a reference available adds an approved example to New Assessment. Model training and scoring weights are unchanged by this approval.</p></section>`;
 }
 function openScenarioReview(item, action) {
   const proposal = scenarioProposals.find((entry) => entry.caseId === item.id);
@@ -3050,7 +3055,7 @@ async function loadIndicatorSuggestions() {
     }));
     status.textContent = saved.length
       ? saved.length + " saved suggestion(s), generated from repeated confirmed synthetic outcomes."
-      : "No repeated confirmed synthetic pattern yet. Record at least two relevant confirmed synthetic outcomes, then analyze again.";
+      : "No saved suggestions. Analyze confirmed cases to check for recurring patterns; at least two relevant confirmed outcomes are required.";
     renderIndicators();
   } catch (error) {
     status.textContent = "Suggestions unavailable: " + error.message;
@@ -3105,7 +3110,7 @@ async function renderIndicators() {
           '</div><div><span class="' +
           stateClass +
           '">' +
-          escapeHtml(item.status) +
+          escapeHtml(MadarCasePresentation.state(item).status) +
           "</span></div><div>" +
           action +
           "</div></div>"
@@ -3187,7 +3192,7 @@ function renderExecutiveDashboard() {
     return item.risk === "Low";
   });
   const awaiting = cases.filter(function (item) {
-    return item.status === "Awaiting specialist";
+    return MadarCasePresentation.needsReview(item);
   });
   const outcomes = cases.filter(function (item) {
     return item.outcome;
@@ -3275,7 +3280,7 @@ function renderExecutiveDashboard() {
       "Formally established outcome",
     ],
     [
-      "Prevented before payment",
+      "Recorded prevention outcomes",
       financial.prevented.length,
       financial.aiPrevented.length + " AI-flagged · synthetic demo outcomes",
     ],
@@ -3283,11 +3288,11 @@ function renderExecutiveDashboard() {
   document.querySelector("#executive-funnel").innerHTML = funnel
     .map(function (item, index) {
       const width = total
-        ? Math.max(18, Math.round((item[1] / total) * 100))
-        : 18;
+        ? Math.round((item[1] / total) * 100)
+        : 0;
       return (
         '<div class="funnel-row"><div><span>' +
-        (index + 1) +
+        "•" +
         "</span><strong>" +
         item[0] +
         "</strong><small>" +
@@ -3345,44 +3350,44 @@ function renderExecutiveDashboard() {
 
   const topSignals = {};
   cases.forEach(function (item) {
-    item.signals.forEach(function (signal) {
+    MadarCasePresentation.signals(item).forEach(function (signal) {
       if (!["MODEL_NOT_FLAGGED","LOWER_BEHAVIORAL_DEVIATION","NO_MATERIAL_ANOMALY","NO_RULE_TRIGGER","CROSS_JOURNEY_PATTERN","MODEL_UNUSUAL_COMBINATION","EVIDENCE_INCOMPLETE","COMBINED_PATTERN"].includes(signal[0])) topSignals[signal[0]] = (topSignals[signal[0]] || 0) + 1;
     });
   });
   const leadingSignal = topEntry(topSignals);
   const attention = [
     {
-      label: "Unresolved high-risk activity",
+      label: "Unresolved high-risk activity", filter: "unresolved-high",
       value: high.filter(function (item) {
-        return !item.outcome;
+        return MadarCasePresentation.needsReview(item);
       }).length,
       detail: "Requires prioritized specialist decision",
       caseItem: high.find(function (item) {
-        return !item.outcome;
+        return MadarCasePresentation.needsReview(item);
       }),
     },
     {
-      label: "Low-confidence assessments",
+      label: "Low data-quality assessments", filter: "low-quality",
       value: cases.filter(function (item) {
-        return item.confidence === "Low";
+        return MadarCasePresentation.attentionMatches(item,"low-quality");
       }).length,
       detail: "Evidence must be completed before reliance",
       caseItem: cases.find(function (item) {
-        return item.confidence === "Low";
+        return MadarCasePresentation.attentionMatches(item,"low-quality");
       }),
     },
     {
-      label: "Data-quality exceptions",
+      label: "Data-quality exceptions", filter: "data-quality",
       value: dq.length,
       detail: "Route issues to the accountable data owner",
       caseItem: dq[0],
     },
     {
-      label: "Most recurring signal",
+      label: "Most recurring signal", filter: "signal:"+leadingSignal,
       value: topSignals[leadingSignal] || 0,
       detail: leadingSignal.replace(/_/g, " "),
       caseItem: cases.find(function (item) {
-        return item.signals.some(function (signal) {
+        return MadarCasePresentation.signals(item).some(function (signal) {
           return signal[0] === leadingSignal;
         });
       }),
@@ -3397,7 +3402,7 @@ function renderExecutiveDashboard() {
       return (
         "<button " +
         (item.caseItem
-          ? 'data-case-link="' + escapeHtml(item.caseItem.id) + '"'
+          ? 'data-attention-filter="' + escapeHtml(item.filter) + '"'
           : "disabled") +
         "><span>" +
         item.value +
@@ -3409,7 +3414,9 @@ function renderExecutiveDashboard() {
       );
     })
     .join("");
-  wireCaseLinks();
+  document.querySelectorAll('[data-attention-filter]').forEach(button=>button.onclick=()=>{
+    activeAttention=button.dataset.attentionFilter;activeFilter='All';activeJourney='All';activeRegion='All';activeAssessmentSource='All';searchQuery='';casePanelOpen=false;document.querySelector('#case-search').value='';populateSelects();switchView('queue');resetVisibleSelection();
+  });
 
   const realization = [
     [
@@ -3445,7 +3452,7 @@ function renderExecutiveDashboard() {
     .querySelectorAll("[data-executive-journey]")
     .forEach(function (button) {
       button.addEventListener("click", function () {
-        activeJourney = button.dataset.executiveJourney;
+        clearQueueAttention(); activeJourney = button.dataset.executiveJourney;
         populateSelects();
         switchView("queue");
         resetVisibleSelection();
@@ -3472,6 +3479,7 @@ function reportCases() {
 }
 
 function renderBusinessReport() {
+  document.querySelector("#report-generated-at").textContent="Live preview · updates with the selected period and scope";
   const list = reportCases();
   const total = list.length;
   const high = list.filter(function (item) {
@@ -3527,7 +3535,7 @@ function renderBusinessReport() {
     [
       "Amount prevented",
       formatKpiSar(financial.preventedAmount),
-      "Before or during payment",
+      "Recorded demo outcomes; not verified savings",
       "low-stat",
     ],
   ];
@@ -3549,7 +3557,7 @@ function renderBusinessReport() {
 
   const signalCounts = {};
   list.forEach(function (item) {
-    item.signals.forEach(function (signal) {
+    MadarCasePresentation.signals(item).forEach(function (signal) {
       if (!["COMBINED_PATTERN", "MODEL_NOT_FLAGGED", "LOWER_BEHAVIORAL_DEVIATION", "NO_MATERIAL_ANOMALY", "NO_RULE_TRIGGER", "CROSS_JOURNEY_PATTERN", "MODEL_UNUSUAL_COMBINATION", "EVIDENCE_INCOMPLETE", "REQUIRED_INFORMATION_MISSING"].includes(signal[0]))
         signalCounts[signal[0]] = (signalCounts[signal[0]] || 0) + 1;
     });
@@ -3560,9 +3568,9 @@ function renderBusinessReport() {
   });
   const leadJourney = topEntry(journeyCounts);
   const pendingHigh = list.filter(function (item) {
-    return !item.outcome && ["High", "Medium"].includes(item.risk);
+    return MadarCasePresentation.needsReview(item) && ["High", "Medium"].includes(item.risk);
   }).length;
-  const summary=total?`<p><strong>${total} cases reviewed across ${Object.keys(journeyCounts).length} journeys.</strong> ${financial.detected.length} cases require risk review; ${pendingHigh} medium- or high-risk cases are awaiting an outcome.</p><p>Potential exposure: <strong>${formatSar(financial.knownAmountAtRisk)}</strong>. Recorded outcomes include ${financial.suspected.length} suspected cases and ${financial.confirmed.length} confirmed fraud cases. ${financial.prevented.length} prevention outcomes total <strong>${formatSar(financial.preventedAmount)}</strong>.</p><p><strong>Next action:</strong> prioritize outstanding reviews in ${escapeHtml(leadJourney)}, and investigate the leading recurring signal: ${escapeHtml(leadSignal.replace(/_/g,' ').toLowerCase())}.</p>`:'<div class="empty-state">No cases match this report period and scope.</div>';
+  const summary=total?`<p><strong>${total} cases assessed across ${Object.keys(journeyCounts).length} journeys.</strong> ${financial.detected.length} assessments have an elevated risk band; ${pendingHigh} medium- or high-risk cases still need a resolved outcome.</p><p>Potential exposure: <strong>${formatSar(financial.knownAmountAtRisk)}</strong>. Recorded outcomes include ${financial.suspected.length} suspected cases and ${financial.confirmed.length} confirmed fraud cases. ${financial.prevented.length} prevention outcomes total <strong>${formatSar(financial.preventedAmount)}</strong>.</p><p><strong>Next action:</strong> prioritize outstanding reviews in ${escapeHtml(leadJourney)}, and investigate the leading recurring signal: ${escapeHtml(leadSignal.replace(/_/g,' ').toLowerCase())}.</p>`:'<div class="empty-state">No cases match this report period and scope.</div>';
   document.querySelector('#monthly-ai-summary').innerHTML=summary+(total?'<p class="session-note">Demo values and scripted outcomes illustrate the proposed operating model; they are not realised savings.</p>':'');
 
   const journeyRows = Object.keys(journeyCounts)
@@ -3671,18 +3679,18 @@ function renderBusinessReport() {
 
   const actionRows = [
     [
-      pendingHigh + " medium- and high-risk cases without recorded outcomes",
+      pendingHigh + " medium- and high-risk cases without a resolved outcome",
       "Complete specialist review and capture the validated outcome",
       "Fraud Prevention, Detection & Inspection",
       pendingHigh ? "High" : "Low",
-      pendingHigh ? "Open" : "Monitored",
+      pendingHigh ? "Suggested" : "No action suggested",
     ],
     [
       dq.length + " data-quality exceptions",
       "Correct the source issue and resubmit affected cases for assessment",
       "Data Owner / Data Quality",
       dq.length ? "High" : "Low",
-      dq.length ? "Open" : "Monitored",
+      dq.length ? "Suggested" : "No action suggested",
     ],
     [
       (signalCounts[leadSignal] || 0) +
@@ -3698,7 +3706,7 @@ function renderBusinessReport() {
       "Review override evidence for model or threshold calibration",
       "Data & AI + Domain Owner",
       overrides.length ? "Medium" : "Low",
-      overrides.length ? "For review" : "Monitored",
+      overrides.length ? "Suggested" : "No action suggested",
     ],
   ];
   document.querySelector("#report-actions").innerHTML = actionRows
@@ -3722,8 +3730,8 @@ function renderBusinessReport() {
     .join("");
   document.querySelectorAll("[data-signal-code]").forEach(function (button) {
     button.addEventListener("click", function () {
-      searchQuery = button.dataset.signalCode;
-      activeFilter = "All"; activeAssessmentSource = "All"; activeJourney = "All"; activeRegion = "All"; populateSelects();
+      searchQuery = "";
+      activeFilter = "All"; activeAttention = "signal:"+button.dataset.signalCode; activeAssessmentSource = "All"; activeJourney = "All"; activeRegion = "All"; populateSelects();
       document.querySelector("#case-search").value = searchQuery;
       switchView("queue");
       resetVisibleSelection();
@@ -3745,7 +3753,7 @@ function renderAll() {
   renderModelState();
 
   document.querySelector("#last-updated").textContent =
-    "Synthetic feed · updated " +
+    "Workspace view refreshed " +
     new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
@@ -3936,7 +3944,7 @@ async function importCSVText(text, mode, label) {
     const accepted = result.saved.map((entry) => entry.caseData);
     if (mode === "replace") cases = cases.filter((item) => item.assessmentSource !== "csv-upload" && !String(item.source || "").startsWith("Imported · ")).concat(accepted); else cases = cases.filter(item => !accepted.some(next => next.id === item.id)).concat(accepted);
     importedCount = mode === "replace" ? accepted.length : importedCount + accepted.length;
-    selectedId = accepted[0].id; activeFilter = "All"; activeAssessmentSource = "All"; activeJourney = "All"; activeRegion = "All"; searchQuery = "";
+    selectedId = accepted[0].id; activeFilter = "All"; activeAttention = 'All'; activeAssessmentSource = "All"; activeJourney = "All"; activeRegion = "All"; searchQuery = "";
     const rejected = errors.concat((result.rejected || []).map((entry) => "Backend row " + entry.row + ": " + entry.error));
     document.querySelector("#import-status").textContent = result.incomplete ? "Saved · evidence incomplete" : "Model assessment saved";
     document.querySelector("#import-status").className = "status-chip " + (result.incomplete ? "testing" : "approved");
@@ -4123,7 +4131,7 @@ async function runNewAssessment(event) {
   newAssessmentCount += 1;
   selectedId = item.id;
   activeFilter = "All";
-  activeAssessmentSource = "All"; activeJourney = "All";
+  activeAttention = 'All'; activeAssessmentSource = "All"; activeJourney = "All";
   activeRegion = "All";
   searchQuery = "";
   document.querySelector("#new-assessment-dialog").close();
@@ -4201,7 +4209,7 @@ document.querySelectorAll("[data-go-view]").forEach(function (button) {
 });
 document.querySelectorAll(".filter").forEach(function (button) {
   button.addEventListener("click", function () {
-    activeFilter = button.dataset.filter;
+    clearQueueAttention(); activeFilter = button.dataset.filter;
     document.querySelectorAll(".filter").forEach(function (item) {
       item.classList.toggle("active", item === button);
     });
@@ -4209,25 +4217,25 @@ document.querySelectorAll(".filter").forEach(function (button) {
   });
 });
 document.querySelector('#assessment-source-filter').addEventListener('change', function (event) {
-  activeAssessmentSource = event.target.value;
+  clearQueueAttention(); activeAssessmentSource = event.target.value;
   resetVisibleSelection();
 });
 document
   .querySelector("#journey-filter")
   .addEventListener("change", function (event) {
-    activeJourney = event.target.value;
+    clearQueueAttention(); activeJourney = event.target.value;
     resetVisibleSelection();
   });
 document
   .querySelector("#region-filter")
   .addEventListener("change", function (event) {
-    activeRegion = event.target.value;
+    clearQueueAttention(); activeRegion = event.target.value;
     resetVisibleSelection();
   });
 document
   .querySelector("#case-search")
   .addEventListener("input", function (event) {
-    searchQuery = event.target.value;
+    clearQueueAttention(); searchQuery = event.target.value;
     resetVisibleSelection();
   });
 document
@@ -4238,6 +4246,7 @@ document
     renderQueue();
   });
 
+document.querySelector("#intake-assessment-btn").addEventListener("click",()=>openAssessmentDialog());
 function openAssessmentDialog() {
   syncJourneyFeatureFields();
   document.querySelector("#new-assessment-dialog").showModal();
@@ -4410,6 +4419,7 @@ document.querySelectorAll("dialog").forEach((dialog) => {
 
 document.querySelector("#confirm-override").addEventListener("click", async (event) => {
   event.preventDefault();
+  if(!document.querySelector("#override-form").reportValidity())return;
   const item = cases.find((entry) => entry.id === selectedId);
   const reason = document.querySelector("#override-reason").value.trim();
   if (!item?.assessmentId || !reason) { showToast("A saved assessment and evidence note are required."); return; }
@@ -4420,8 +4430,20 @@ document.querySelector("#confirm-override").addEventListener("click", async (eve
   } catch (error) { showToast(error.message); }
   finally { document.querySelector("#confirm-override").disabled = false; }
 });
+document.querySelector('#clear-queue-attention').onclick=()=>{clearQueueAttention();resetVisibleSelection();};
+function explainOutcomeForm(){
+ const classification=document.querySelector('#outcome-value').value,financial=document.querySelector('#financial-outcome-value').value;
+ const guidance=document.querySelector('#outcome-selection-guidance');
+ guidance.textContent=classification==='Legitimate activity'?'Legitimate activity must have zero fraud exposure, confirmed fraud and prevented amounts.':classification.startsWith('Confirmed fraud')?'Use only a formally established finding, with a positive confirmed amount and an evidence reference.':classification.startsWith('Suspected')||classification==='Inconclusive'?'This is an unresolved classification. The case stays open for investigation. Do not record a confirmed fraud amount.':classification==='Data Quality Issue'?'Use when missing or unreliable evidence prevents a reliable assessment; record what must be corrected.':classification==='Process or data error'?'Use for an operational error established by review, rather than evidence that is merely missing.':'Choose the evidence-backed specialist classification, then the financial outcome.';
+ if(financial==='Pending verification')guidance.textContent+=' Payment intervention is not verified. Keep prevented amount at zero; this does not mean zero exposure.';
+ if(financial==='No financial impact')guidance.textContent+=' All financial amounts must be zero.';
+ if(/Prevented/.test(financial)||financial==='Partially prevented')guidance.textContent+=' Supply a positive prevented amount supported by the intervention evidence.';
+}
+document.querySelector('#outcome-value').addEventListener('change',explainOutcomeForm);
+document.querySelector('#financial-outcome-value').addEventListener('change',explainOutcomeForm);
 document.querySelector("#confirm-outcome").addEventListener("click", async (event) => {
   event.preventDefault();
+  if(!document.querySelector("#outcome-form").reportValidity())return;
   const item = cases.find((entry) => entry.id === selectedId);
   const button = document.querySelector("#confirm-outcome");
   document.querySelector("#outcome-save-error").textContent = "";
@@ -4511,7 +4533,7 @@ document.querySelector("#demo-reset-btn").addEventListener("click", async functi
     newAssessmentCount = 0;
     selectedId = cases[0]?.id || "";
     activeFilter = "All";
-    activeAssessmentSource = "All"; activeJourney = "All";
+    activeAttention = 'All'; activeAssessmentSource = "All"; activeJourney = "All";
     activeRegion = "All";
     searchQuery = "";
     document.querySelector("#import-result").innerHTML = "<strong>Demo data reset.</strong><p>Original demo examples have been restored; previous session reviews and AI drafts were cleared.</p>";
@@ -4542,7 +4564,7 @@ document
   .addEventListener("click", function () {
     renderBusinessReport();
     document.querySelector("#report-generated-at").textContent =
-      "Generated " +
+      "Preview refreshed " +
       new Date().toLocaleString([], {
         dateStyle: "medium",
         timeStyle: "short",

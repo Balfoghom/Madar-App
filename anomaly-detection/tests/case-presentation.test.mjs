@@ -40,3 +40,22 @@ test('queue reasons describe connected evidence and preserve assessment outputs'
  assert.equal(view.mainReason(missing),missing.modelAssessment.reasons[0]);
  assert.equal(JSON.stringify(records),original);
 });
+
+test('unresolved classifications stay in attention while resolved outcomes require closeout',()=>{
+ const suspected={risk:'High',outcome:'Suspected fraud — further investigation',workflow:{stage:'New'}};
+ assert.equal(view.needsReview(suspected),true);assert.equal(view.state(suspected).status,'Investigation ongoing');
+ assert.equal(view.attentionMatches(suspected,'unresolved-high'),true);
+ const resolved={...suspected,outcome:'Confirmed violation'};
+ assert.equal(view.needsReview(resolved),false);assert.equal(view.state(resolved).status,'Outcome recorded · closure pending');
+ assert.equal(view.state({...resolved,workflow:{stage:'Closed'}}).status,'Closed');
+ const connected={assessmentSource:'cross-journey',risk:'Medium',ruleScore:55,modelAssessment:{complete:true,modelFlagged:true}};
+ assert.equal(view.score(connected).value,null);assert.equal(view.score(connected).label,'Model review suggested');
+});
+test('business signal counts use semantic categories and deduplicate each case',()=>{
+ const item={signals:[['CROSS_JOURNEY_EVIDENCE_1','2 payment-account changes appear before the assessment; verify ownership before payment.'],['CROSS_JOURNEY_EVIDENCE_2','3 payment-account changes appear before the assessment; verify ownership before payment.'],['CROSS_JOURNEY_EVIDENCE_3','1 contributors show a login → profile update → IBAN change → request sequence within 24 hours.']]};
+ assert.deepEqual(view.signals(item).map(([code])=>code),['PAYMENT_ACCOUNT_CHANGE','ACCOUNT_CHANGE_SEQUENCE']);
+ assert.equal(view.attentionMatches(item,'signal:ACCOUNT_CHANGE_SEQUENCE'),true);
+ assert.equal(view.attentionMatches(item,'signal:SOURCE_CONFLICT'),false);
+ assert.equal(view.reasonLabel(item.signals[0]),'Payment account change');
+ assert.equal(view.attentionMatches({confidence:'Low'},'low-quality'),true);
+});

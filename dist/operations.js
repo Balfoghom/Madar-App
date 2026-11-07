@@ -1,7 +1,7 @@
 /* A short executive brief, with specialist evidence and questions on demand. */
 (() => {
   const esc=escapeHtml;
-  function closeDrawer(){casePanelOpen=false;document.querySelector('#case-panel').hidden=true;document.body.classList.remove('case-drawer-open');document.querySelector('[data-case="'+CSS.escape(selectedId||'')+'"]')?.focus({preventScroll:true});}
+  function closeDrawer(){document.querySelector('#queue-view').classList.remove('review-open');casePanelOpen=false;document.querySelector('#case-panel').hidden=true;document.body.classList.remove('case-drawer-open');document.querySelector('[data-case="'+CSS.escape(selectedId||'')+'"]')?.focus({preventScroll:true});}
 
   const conversations=new Map();
   let translateOnLoad=false;
@@ -70,7 +70,7 @@
     });
   }
   function enhanceCase(){
-    const item=portfolioCases().find(c=>c.id===selectedId),panel=document.querySelector('#case-panel');panel.hidden=!casePanelOpen;document.body.classList.toggle('case-drawer-open',casePanelOpen);if(!item||!casePanelOpen)return;
+    const item=portfolioCases().find(c=>c.id===selectedId),panel=document.querySelector('#case-panel');panel.hidden=!casePanelOpen;document.querySelector('#queue-view').classList.toggle('review-open',casePanelOpen);document.body.classList.toggle('case-drawer-open',casePanelOpen);if(!item||!casePanelOpen)return;
     const language=caseSummaryLanguage==='ar'?'ar':'en',t=copy[language],ar=language==='ar',autoGenerate=translateOnLoad;translateOnLoad=false;
     const view=MadarCasePresentation,score=view.score(item),state=view.state(item),financial=view.financial(item);
     const hero=panel.querySelector('.case-hero');hero.querySelector('h2').id='case-review-title';panel.setAttribute('role','complementary');panel.removeAttribute('aria-modal');panel.setAttribute('aria-labelledby','case-review-title');
@@ -79,10 +79,10 @@
     const ring=hero.querySelector('.score-ring');
     ring.classList.add('case-priority-ring');ring.style.setProperty('--score',`${score.value??0}%`);
     if(score.value===null)ring.classList.add('qualitative');
-    ring.innerHTML=`<div><strong>${score.value===null?(state.incomplete?'!':item.modelAssessment?.modelFlagged?'↗':'✓'):esc(score.value)}</strong><small>${esc(ar?riskArabic[item.risk]||item.risk:riskNames[item.risk]||item.risk)}</small></div>`;
+    ring.innerHTML=`<div><strong>${score.value===null?(state.incomplete?'!':item.modelAssessment?.modelFlagged?'↗':'✓'):esc(score.value)}</strong><small>${esc(score.value===null?(ar?'تقييم النموذج':'Model finding'):score.label)}</small></div>`;
     ring.setAttribute('aria-label',`${score.label}${score.value===null?'':': '+score.value+'/100'}. ${riskNames[item.risk]||item.risk}`);
     const scoreLabel=document.createElement('p');scoreLabel.className='case-score-caption';scoreLabel.textContent=score.value===null?(ar?(state.incomplete?'لا توجد درجة':'تقييم نمط · بلا درجة موحّدة'):score.label):(ar?(score.kind==='simulation'?'درجة المحاكاة':'درجة الضوابط'):score.label);const scoreColumn=document.createElement('div');scoreColumn.className='case-score-column';ring.replaceWith(scoreColumn);scoreColumn.append(ring,scoreLabel);if(state.resolved){const originalSignal=document.createElement('small');originalSignal.className='case-original-signal';originalSignal.textContent=ar?'وقت التقييم':'At assessment';scoreColumn.append(originalSignal);}
-    const status=document.createElement('div');status.className='case-header-status';status.innerHTML=`<span>${esc(state.status)}</span><span>${ar?'بيانات تجريبية':'Synthetic demo'}</span>${state.scripted?`<span>${ar?'نتيجة توضيحية':'Scripted outcome'}</span>`:''}`;hero.append(status);
+    const status=document.createElement('div');status.className='case-header-status';status.innerHTML=`<span>${esc(state.status)}</span><span>${esc(riskNames[item.risk]||item.risk)} · operational band</span>${state.scripted?`<span>${ar?'نتيجة توضيحية':'Scripted outcome'}</span>`:''}`;hero.append(status);const operational=document.createElement('dl');operational.className='case-operational-context';const routeOwner=MadarRoutingPolicy.ownership(item.route,item.journey);operational.innerHTML=`<div><dt>Current route</dt><dd>${esc(item.route)}</dd></div><div><dt>Case owner</dt><dd>${esc(item.workflow?.assignedTo||'Unassigned · assign in case progress')}</dd></div><div><dt>Next step</dt><dd>${esc(state.resolved?(item.workflow?.stage==='Closed'?'Closed. Reopen before amending the outcome.':'Complete case closeout or amend the outcome with new evidence.'):state.incomplete?'Complete missing evidence, then reassess.':item.humanDecision?.action==='reject'?'Recheck the evidence and record a revised route.':!item.workflow?.assignedTo?'Assign an owner, confirm the route and investigate.':'Continue investigation and record the supported outcome.')}</dd></div>`;hero.append(operational);
     const toolbar=document.createElement('div');toolbar.className='case-panel-toolbar';toolbar.innerHTML=`<span>${ar?'مراجعة الحالة':'CASE REVIEW'}</span><button type="button" class="case-expand" aria-pressed="${panel.classList.contains('case-drawer-wide')}">${panel.classList.contains('case-drawer-wide')?(ar?'تصغير الحالة':'Compact case'):(ar?'توسيع الحالة':'Expand case')} <span aria-hidden="true">⤢</span></button>`;hero.before(toolbar);
     const closeCase=document.createElement('button');closeCase.type='button';closeCase.className='case-close-button';closeCase.setAttribute('aria-label','Close case');closeCase.textContent='×';toolbar.append(closeCase);closeCase.onclick=closeDrawer;
     toolbar.querySelector('button').onclick=()=>{const expanded=panel.classList.toggle('case-drawer-wide');toolbar.querySelector('button').setAttribute('aria-pressed',expanded);toolbar.querySelector('button').textContent=expanded?(ar?'تصغير الحالة':'Compact case'):(ar?'توسيع الحالة':'Expand case');panel.scrollTop=0;};
@@ -103,10 +103,12 @@
     }
     const trace=panel.querySelector('.agent-trace')?.children[1];
     if(trace&&(item.rulesAssessment||!item.modelAssessment?.complete)){trace.querySelector('strong').textContent=item.rulesAssessment?.complete?'Business control checked':'Assessment deferred';trace.querySelector('small').textContent=item.rulesAssessment?.complete?'Supplied records checked against the illustrative business rule; no AI model used.':'Complete the required evidence before model review.';}
-    const next=action;
+    const next=action;next.querySelector('h3').textContent='Routing & next action';
+    const originalRoute=document.createElement('p');originalRoute.className='session-note';originalRoute.textContent='Original recommendation: '+(item.recommendedRoute||item.route)+(item.route!==item.recommendedRoute&&item.recommendedRoute?' · Current route was selected by a specialist. Approve recommended route restores the original recommendation.':'');next.querySelector('.recommendation').after(originalRoute);
+
     const workflow=document.createElement('section');workflow.className='case-workflow';
     const stages=['New','Triage','Investigation','Decision pending','Closed'],current=item.workflow||{stage:'New',revision:0,assignedTo:''},stageIndex=stages.indexOf(current.stage);
-    workflow.innerHTML=`<h3>${ar?'متابعة الحالة':'Case ownership & progress'} · ${esc(current.stage)}</h3><p>${ar?'الفريق المقترح':'Recommended team'}: ${esc(MadarRoutingPolicy.ownership(item.route,item.journey).owner)}</p><p>${ar?'النتيجة والمسار ومرحلة العمل حقول منفصلة.':'The recommended route, specialist outcome and work stage are tracked separately.'}</p><form><label>Case owner<input name="assignedTo" maxlength="120" required value="${esc(current.assignedTo)}"></label><label>Work stage<select name="workflowStage">${stages.map((stage,index)=>`<option ${stage===current.stage?'selected':''} ${Math.abs(index-stageIndex)>1?'disabled':''}>${stage}</option>`).join('')}</select></label><label>Reviewer<input name="actorName" maxlength="120" required></label><label>Rationale<textarea name="note" maxlength="2000" required rows="2"></textarea></label><button class="secondary-btn" type="submit" ${!item.assessmentId?'disabled':''}>Save case progress</button><p role="status" aria-live="polite"></p></form>`;
+    workflow.innerHTML=`<h3>${ar?'متابعة الحالة':'Case ownership & progress'}</h3><p>${ar?'الفريق المقترح':'Recommended team'}: ${esc(MadarRoutingPolicy.ownership(item.route,item.journey).owner)}</p><p>${state.resolved?'The outcome is resolved; finish the tracked work stages before closing.':item.outcome?'This classification is provisional. Investigation remains open.':'Assign an owner, review the route, investigate, then record an outcome.'} ${item.workflow?'Saved work stage: '+esc(current.stage)+'.':'Work stages have not been tracked yet. The form starts at New and does not reset the existing outcome.'}</p><form><label>Case owner<input name="assignedTo" maxlength="120" required value="${esc(current.assignedTo)}"></label><label>Tracked work stage<select name="workflowStage">${stages.map((stage,index)=>`<option ${stage===current.stage?'selected':''} ${Math.abs(index-stageIndex)>1?'disabled':''}>${stage}</option>`).join('')}</select></label><label>Reviewer<input name="actorName" maxlength="120" required></label><label>Rationale<textarea name="note" maxlength="2000" required rows="2"></textarea></label><button class="secondary-btn" type="submit" ${!item.assessmentId?'disabled':''}>Save case progress</button><p role="status" aria-live="polite"></p></form>`;
     next.append(workflow);
     workflow.querySelector('form').onsubmit=async event=>{
       event.preventDefault();const form=event.currentTarget,button=form.querySelector('button'),status=form.querySelector('[role="status"]');button.disabled=true;status.textContent='Saving…';
@@ -126,11 +128,20 @@
     panel.append(next);
     flattenCaseSections(panel);
     const quickActions=document.createElement('footer');quickActions.className='case-review-footer case-direct-actions';
-    for(const id of ['approve-route','override-route-btn','record-outcome-btn']){
-      const originalButton=controls?.querySelector('#'+id);if(!originalButton)continue;
-      const button=document.createElement('button');button.type='button';button.className=originalButton.className;button.textContent=originalButton.textContent;button.disabled=originalButton.disabled;button.title=originalButton.title;button.onclick=()=>originalButton.click();quickActions.append(button);
-    }
+    const guidance=document.createElement('small');guidance.className='case-action-guidance';guidance.textContent=state.resolved?(item.workflow?.stage==='Closed'?'Case closed. Reopen it in case progress before changing the outcome.':'Outcome recorded. Route decisions are locked; complete closeout or amend the outcome with evidence.'):'Approve the route, select another team, or return it for review. These actions do not execute payments.';quickActions.append(guidance);
+    if(controls){controls.querySelector('#reject-route').textContent='Return for review';quickActions.append(controls);}
     panel.append(quickActions);
+    if(item.workflow?.stage==='Closed'){const outcomeButton=controls?.querySelector('#record-outcome-btn');if(outcomeButton){outcomeButton.disabled=true;outcomeButton.title='Reopen the case in case progress before changing its outcome.';}}
+    // Keep business sections visible; move raw feature tables into their own evidence view.
+    const modelEvidence=panel.querySelector('.model-evidence');
+    if(modelEvidence){
+      const technical=document.createElement('dialog');technical.id='case-technical-evidence';technical.className='case-question-dialog';technical.innerHTML='<div class="dialog-head"><h2>Technical model evidence</h2><button type="button" class="icon-button" aria-label="Close technical evidence">×</button></div>';technical.append(modelEvidence);technical.querySelector('button').onclick=()=>technical.close();document.body.append(technical);
+      const modelLink=document.createElement('button');modelLink.type='button';modelLink.className='text-btn';modelLink.textContent='Inspect technical model evidence';modelLink.onclick=()=>technical.showModal();brief.append(modelLink);
+    }
+    // Recommendation belongs beside the summary, before long source history.
+    brief.after(next);
+    panel.querySelectorAll('.model-contract-table').forEach(table=>table.closest('section')?.classList.add('technical-context'));
+    if(document.activeElement===document.body)closeCase.focus({preventScroll:true});
 
     assistant.querySelectorAll('[data-language]').forEach(button=>button.onclick=()=>{if(caseSummaryLanguage===button.dataset.language)return;translateOnLoad=!!assistant.querySelector('.case-ask-button');caseSummaryLanguage=button.dataset.language;renderCase();});
     const button=assistant.querySelector('.case-explain-button'),message=assistant.querySelector('[role="status"]'),host=assistant.querySelector('.ops-llm-draft');
@@ -139,11 +150,11 @@
     const showDraft=draft=>{renderAssistant(draft,host,item,language);button.hidden=true;message.textContent='';};
     Promise.all([backendJSON('/llm/status'),backendJSON('/case-explanation',{caseId:item.id,assessmentId:item.assessmentId,language,generate:false})]).then(([config,response])=>{
       if(!attached())return;if(response.draft){showDraft(response.draft);return;}
-      button.textContent=t.generate;button.disabled=!config.configured;message.textContent=config.configured?'':t.setup;if(autoGenerate&&config.configured)button.click();
+      button.textContent=t.generate;button.disabled=!config.configured;message.textContent=config.configured?'Answers are advisory and cannot change the case.':t.setup+' The evidence summary and specialist review remain available.';if(autoGenerate&&config.configured)button.click();
     }).catch(()=>{if(attached()){button.textContent=t.generate;button.disabled=false;message.textContent=t.unavailable;}});
     button.onclick=async()=>{button.disabled=true;button.textContent=t.loading;message.textContent='';try{const response=await backendJSON('/case-explanation',{caseId:item.id,assessmentId:item.assessmentId,language,generate:true},55000);if(attached())showDraft(response.draft);}catch(error){if(attached()){message.textContent=ar?t.unavailable:error.message;button.disabled=false;button.textContent=t.generate;}}};
   }
-  const original=renderCase;renderCase=function(){document.querySelector('#case-review-actions')?.remove();original();enhanceCase()};
+  const original=renderCase;renderCase=function(){document.querySelector('#case-review-actions')?.remove();document.querySelector('#case-technical-evidence')?.remove();original();enhanceCase()};
   let workspaceRequest=null;
   async function refreshWorkspace(){
     if(workspaceRequest)return workspaceRequest;
@@ -151,7 +162,7 @@
       const response=await backendJSON('/workspace-demo',{},60000);
       cases=response.saved.map(record=>({...record.caseData,assessmentId:record.assessmentId}));
       if(selectedId&&!cases.some(item=>item.id===selectedId)){selectedId=null;casePanelOpen=false;}
-      renderAll();return response;
+      document.body.classList.remove('workspace-loading');document.querySelector('#workspace-load-status').hidden=true;renderAll();return response;
     })().finally(()=>{workspaceRequest=null;});
     return workspaceRequest;
   }
@@ -171,6 +182,6 @@
   const routeLibrary=document.querySelector('#business-route-library');
   if(routeLibrary)routeLibrary.innerHTML=MadarRoutingPolicy.routes.map(route=>{const context=MadarRoutingPolicy.ownership(route);return `<article><h4>${esc(route)}</h4><strong>${esc(context.owner)}</strong><p>${esc(context.next)}</p>${route==='Business Owner Review'?'<small>The accountable owner follows the case service journey.</small>':''}</article>`;}).join('');
   switchView('dashboard');
-  refreshWorkspace().catch(error=>showToast('Could not load the workspace: '+error.message));
+  refreshWorkspace().catch(error=>{document.querySelector('#workspace-load-status').textContent='Could not load cases. Use Refresh demo cases to retry. '+error.message;showToast('Could not load the workspace: '+error.message);});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!document.querySelector('dialog[open]')&&casePanelOpen)closeDrawer();});
 })();

@@ -206,3 +206,27 @@ body.case-drawer-open{overflow:auto}.case-drawer-scrim{display:none!important}
 #queue-view .workspace>#case-panel.case-drawer-wide{width:min(650px,calc(100vw - 300px))}
 @media(max-width:1050px){#queue-view .workspace>#case-panel{left:auto;right:26px;width:min(40vw,480px)}}
 @media(max-width:760px){#queue-view .workspace>#case-panel,#queue-view .workspace>#case-panel.case-drawer-wide{left:auto;right:8px;top:80px;bottom:8px;width:calc(100vw - 16px);height:calc(100dvh - 88px);max-height:calc(100dvh - 88px)}}
+/* One readable review journey: business context first, one set of decisions. */
+.workspace-load-status{padding:16px;margin-bottom:16px;border:1px solid var(--line);border-radius:10px;background:var(--white);color:var(--muted)}
+.workspace-loading #dashboard-metrics,.workspace-loading #executive-metrics,.workspace-loading #report-metrics,.workspace-loading #risk-distribution{visibility:hidden}
+.queue-attention-context{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:1 0 100%;font-size:12px;background:var(--blue-soft);padding:10px;border-radius:8px}.queue-attention-context[hidden]{display:none}
+.case-operational-context{font-size:11px;margin:12px 0 0;display:grid;gap:6px}.case-operational-context>div{display:grid;grid-template-columns:80px minmax(0,1fr);gap:8px}.case-operational-context dt{opacity:.85}.case-operational-context dd{margin:0;line-height:1.5}
+#case-panel .case-direct-actions{display:block}.case-action-guidance{display:block;max-width:none!important;font-size:10px!important;margin-bottom:7px}#case-panel .case-direct-actions .action-row{margin-top:0;display:grid;grid-template-columns:1fr 1fr;gap:6px}#case-panel .case-direct-actions button{width:100%;margin:0}
+#case-panel .case-direct-actions .approve-btn{background:var(--navy);color:var(--white);border:1px solid var(--navy)}#case-panel .case-direct-actions .override-btn{background:var(--bg);color:var(--navy);border:1px solid var(--line)}#case-panel .case-direct-actions .outcome-btn{background:var(--blue-soft);color:var(--ink);border:1px solid var(--line)}
+#case-panel .case-direct-actions button:disabled{opacity:.45}#case-panel .case-workflow{margin-top:12px}#case-panel .case-workflow form{grid-template-columns:1fr 1fr}#case-panel .case-workflow label:has(textarea),#case-panel .case-workflow [role=status]{grid-column:1/-1}
+#case-panel .ownership-card{display:grid;grid-template-columns:1fr}#case-panel .ownership-card>div:last-child{display:block}
+#case-technical-evidence{padding:20px;width:min(900px,calc(100vw - 32px));max-width:900px}#case-technical-evidence .model-contract-table{font-size:12px}#case-technical-evidence table{width:100%}
+#queue-view.review-open .page-heading,#queue-view.review-open .routing-strip{margin-right:496px}
+#queue-view.review-open .routing-strip{display:none}
+#queue-view.review-open .queue-panel table{min-width:0;table-layout:fixed;width:100%}
+#queue-view.review-open .queue-panel :is(th,td):is(:nth-child(2),:nth-child(4),:nth-child(5),:nth-child(6),:nth-child(8)){display:none}
+#queue-view.review-open .queue-panel :is(th,td):nth-child(1){width:26%}#queue-view.review-open .queue-panel :is(th,td):nth-child(3){width:24%}#queue-view.review-open .queue-panel :is(th,td):nth-child(7){width:30%}#queue-view.review-open .queue-panel :is(th,td):nth-child(9){width:20%}
+#queue-view.review-open .queue-panel td{padding:9px 8px;font-size:10px;overflow-wrap:anywhere}#queue-view.review-open .queue-reason-text{-webkit-line-clamp:4}
+.form-guidance{font-size:12px;line-height:1.6;color:var(--muted);padding:10px 0}.outcome-guidance{padding:10px;background:var(--blue-soft);border-radius:8px;font-size:12px;line-height:1.6}
+.executive-funnel .funnel-row>div:first-child>span{display:none}.funnel-row>div:first-child{grid-template-columns:1fr}.funnel-row strong,.funnel-row small{grid-column:1}
+@media(max-width:1050px){#queue-view.review-open .page-heading{margin-right:calc(40vw + 16px)}#case-panel .case-operational-context>div{grid-template-columns:1fr;gap:2px}}
+@media(max-width:760px){#queue-view.review-open .page-heading{margin-right:0}#case-panel .case-workflow form{grid-template-columns:1fr}#case-panel .case-workflow label{grid-column:1}#queue-view.review-open .queue-panel table{min-width:620px}#case-panel .case-operational-context>div{grid-template-columns:80px minmax(0,1fr)}}
+#case-panel .case-direct-actions .action-row .outcome-btn{grid-column:auto!important}#case-panel .case-direct-actions .action-row{grid-template-columns:1fr 1fr!important}#case-panel .case-direct-actions .action-row button{min-height:32px;padding:7px;line-height:1.3}#case-panel .case-operational-context dd{line-height:1.35}#case-panel .case-hero{padding:14px 18px}.simulation-snapshot>div{flex-wrap:wrap}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+#queue-view.review-open .queue-panel .case-id{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#queue-view.review-open .queue-panel .subtext{overflow-wrap:anywhere;white-space:normal}#queue-view.review-open .queue-panel td{font-size:11px}#queue-view.review-open .queue-panel .status-chip{max-width:100%;white-space:normal;overflow-wrap:anywhere;font-size:9px}#queue-view.review-open .queue-panel th{padding:9px 8px;font-size:9px}
+@media(min-width:761px) and (max-width:1050px){#queue-view .workspace:has(#case-panel:not([hidden])){grid-template-columns:minmax(0,1fr) minmax(320px,40vw)}}

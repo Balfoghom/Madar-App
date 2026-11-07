@@ -13,21 +13,21 @@ Requires **Node.js 22.13 or newer**. No package installation, Python training or
 3. Open [Madar](http://localhost:8090).
 4. Keep the terminal open. Stop with Control+C.
 
-The app opens on **Fraud Operations**. One server supplies the interface and API; do not start a separate frontend or model service. If the port is occupied, stop the previous app or run `PORT=8091 npm start` and open that port.
+The app opens on **Dashboard**. One server supplies the interface and API; do not start a separate frontend or model service. If the port is occupied, stop the previous app or run `PORT=8091 npm start` and open that port.
 
-For optional LLM explanations, follow [LLM_SETUP.md](LLM_SETUP.md). Case details open only after selecting a record, in a closeable side drawer. Case panels show an explicitly labeled score or pattern indicator, a concise brief with English / العربية controls, key evidence linked to source sections, and a visible state-aware review action. People/financial context, source activity, scoring and review history are grouped separately; Expand case provides a wider reading view. Case sections and model evidence are displayed directly in the right panel. Route approval, alternative routing and outcome actions are available in the recommendation section and a persistent action bar. After a brief is generated, “Ask about this case” opens an evidence-grounded conversation in the selected language. Conversations stay in browser memory and cannot change cases. The app works without them and clearly displays “API setup required.”
+For optional LLM explanations, follow [LLM_SETUP.md](LLM_SETUP.md). Case details open only after selecting a record, in a closeable side drawer. Case panels show an explicitly labeled score or pattern indicator, a concise brief with English / العربية controls, key evidence linked to source sections, and a visible state-aware review action. People/financial context, source activity, scoring and review history are grouped separately; Expand case provides a wider reading view. Business sections are displayed directly in the right panel; raw model feature tables open in a separate technical evidence dialog. Route approval, alternative routing, return for review and outcome recording share one persistent action bar. After a brief is generated, “Ask about this case” opens an evidence-grounded conversation in the selected language. Conversations stay in browser memory and cannot change cases. The app works without them and clearly displays “API setup required.”
 
 ## Business workflow
 
 Model & Governance presents the business sequence: Observe → Analyze → Explain → Recommend → Specialist decision → Feedback & improve. Each step opens its existing workspace. The route directory uses the same shared routing policy as case recommendations, including accountable teams and next steps.
 
-In the right case panel, use **Case ownership & progress** to save the owner and work stage with a reviewer and rationale. Route, work stage and specialist outcome remain separate. The backend enforces adjacent stage transitions, current revisions and resolved outcomes before closure. Saving progress does not approve a route or execute a payment action. Scenario approvals create reusable reference examples, not production model or rule releases.
+In the right case panel, use **Case ownership & progress** to save the owner and work stage with a reviewer and rationale. One visible case status distinguishes ongoing investigation, resolved outcome awaiting closure, and Closed. Historical cases without tracked work stages are explicitly labeled; opening them never resets their outcomes. Route, work-stage tracking and specialist outcome remain separate records. The backend enforces adjacent stage transitions, current revisions and resolved outcomes before closure. Saving progress does not approve a route or execute a payment action. Scenario approvals create reusable reference examples, not production model or rule releases.
 
 ## Validate the working journey
 
 Use synthetic evidence only. These checks write to your local demo session.
 
-- [ ] Open **Fraud Operations → Open connected case example → Assess demo portfolio**. Expect twelve saved connected histories, including digital-account scenarios.
+- [ ] Open **Data Intake → Inspect connected source events → Assess demo portfolio**. Expect twelve saved connected histories, including digital-account scenarios.
 - [ ] Open **Connected SANED sequence**. Expect three contributors, each with a complete linked sequence, a model review flag, quiet comparator rules and a specialist-review recommendation.
 - [ ] Compare **Routine activity** and **Legitimate restructuring**. Both should remain unflagged by the bundled model and comparator rules.
 - [ ] Open **Missing employer evidence**. Expect abstention and “Complete evidence,” without a model score.
@@ -38,7 +38,7 @@ Use synthetic evidence only. These checks write to your local demo session.
 - [ ] Record a specialist outcome. Cross-journey examples do not supply transaction amounts, so use zero financial amounts and “No financial impact”; do not claim prevented loss from these examples.
 - [ ] Close only after recording a resolved outcome. Reopen a closed case before changing its outcome.
 - [ ] Refresh. The owner, stage, reviews, outcome and original model evidence should remain.
-- [ ] Return to **Fraud Operations** and check its saved-case and work-in-progress counts.
+- [ ] Return to **Dashboard** and check its assessed-case and open-case counts.
 - [ ] Reassess unchanged evidence with the same model version. It should not create a duplicate case or discard human reviews. A model-version change creates a new assessment and retains prior reviews in history.
 - [ ] Open **Model & Governance**. The registry should include six journey models and the connected-journey model.
 - [ ] Open **Dashboard** and select **Refresh demo cases**. It stays on the dashboard, retains reviews and does not create duplicates. Activity cards open the selected saved case in a closeable drawer, including AI explanation controls.
@@ -87,3 +87,11 @@ See [solution design](AI_SOLUTION_DESIGN.md), [technical blueprint](TECHNICAL_BL
 The November 7 model adds login-location, IBAN-change and profile-update sequences (23 event-derived features; 10,300 training, 1,600 calibration and 1,300 held-out synthetic histories). New digital typologies are prototype assumptions requiring fraud-specialist validation. Ordinary travel and legitimate account-update counterexamples are included. Existing saved cross-journey cases are reassessed at workspace initialization; earlier model references and human reviews are retained.
 
 Case review opens in a non-modal right panel. Repeated BRI-031 through BRI-060 demo templates are excluded from the active workspace and indicator counts; stored assessments and reviews remain available for audit. Active demo identities are distinct and maternity beneficiaries use female names. A missing critical field forces a Low data-quality label independently of the field-completeness percentage. The shared routing policy defines six canonical routes, accountable owners and next steps; numerical model results remain immutable.
+
+## User-journey consistency
+
+The right case panel has one persistent action area, visible business sections and a separate technical evidence dialog. Its header identifies the current route, assigned owner and next step. Cross-Journey Model findings are qualitative; operational control values remain in assessment details. The compact queue keeps the reason and case status visible while reviewing.
+
+Dashboard open-case counts and executive attention filters include unresolved suspected and inconclusive classifications. Executive attention opens the matching case set with a removable filter. Recurring signals aggregate meaningful evidence categories once per case instead of positional model-reason indexes. Reports are live previews of cases assessed in the selected month, with their latest recorded outcomes; management actions are recommendations.
+
+New Assessment is labeled as demo test input. Intake offers single-case entry, batch templates and connected evidence. Outcome forms explain classification and financial consistency requirements before submission. Browser review requests and approved reference examples do not deploy production rules or models.
