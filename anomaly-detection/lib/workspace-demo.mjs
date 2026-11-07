@@ -25,6 +25,23 @@ export function caseStatus(data){
  if(data.risk==='Low')return 'Ready to proceed';
  return 'Awaiting specialist';
 }
+function hasRecordedRoute(data){return !!data.humanDecision||data.reviewHistory?.some(r=>r.type==='decision')||data.workflow?.stage==='Closed'||(!!data.outcome&&!/^(Suspected|Inconclusive)/.test(data.outcome));}
+export function retainRecordedRoute(record){
+ const data=record.caseData;if(!data||!hasRecordedRoute(data))return record;
+ if(data.recordedRoute)return {...record,caseData:{...data,route:data.recordedRoute}};
+ let route=data.route;
+ // Recover the prior deterministic recommendation for resolved scripted cases
+ // upgraded before recordedRoute was persisted. No specialist choice is inferred.
+ const scripted=data.outcomeProvenance==='Scripted demo outcome'&&!data.humanDecision&&!data.reviewHistory?.some(r=>r.type==='decision');
+ const previous=data.assessmentHistory?.at(-1);
+ if(scripted&&data.businessSimulation)route=routingPolicy.recommend(data);
+ else if(scripted&&record.assessmentSource==='cross-journey'&&data.policy==='hybrid-review-55-45-v2'&&previous&&previous.policy===undefined&&previous.modelVersion===data.modelAssessment?.modelVersion){
+  const risk=!data.modelAssessment.complete?'Incomplete':data.modelAssessment.modelFlagged||data.modelAssessment.ruleFlagged?'Medium':'Low';
+  const original=risk==='Incomplete'?'Data Verification Review':risk==='Low'?'Straight-through processing':'Eligibility Verification';
+  route=routingPolicy.recommend({...data,risk,assessmentMode:'model-separated',route:original,recommendedRoute:original});
+ }
+ return {...record,caseData:{...data,route,recordedRoute:route,...(route!==data.route?{audit:[...(data.audit||[]),'Prior recorded route restored from the previous decision policy; outcomes and reviews retained.']}: {})}};
+}
 export function enrichDemoRecord(record){
  if(!record.caseData||record.synthetic!==true)return record;
  const data={...record.caseData};const n=hash(data.subject||record.caseId),e=hash(data.entity||record.caseId);
@@ -44,7 +61,9 @@ export function enrichDemoRecord(record){
    data.controlScoreProvenance='Supplied fictional operational-control context for the demo; not a model output.';
  }
  if(data.assessmentSource==='cross-journey'&&data.assessmentMode==='hybrid'){
+  const recordedRoute=hasRecordedRoute(data)?data.recordedRoute||data.route:null;
   const policy=hybridPolicy(data,data.modelAssessment);Object.assign(data,policy,{anomalyScore:policy.scoringComponents?.anomalyScore??null,interaction:policy.scoringComponents?.patternAdjustment||0});
+  if(recordedRoute)data.route=recordedRoute;
   data.features={...data.features,missingData:!policy.decisionComplete};data.reasonCodes=[...(data.reasonCodes||[]).filter(r=>!['HYBRID_SCORE_COMPONENTS','CONTROL_SCORE_MISSING'].includes(r.code)),...hybridReasons(policy)];data.signals=data.reasonCodes.map(r=>[r.code,r.description]);
  }
 
@@ -71,7 +90,7 @@ export function applyBusinessConfig(data,config){
  const score=complete?Math.max(0,Math.min(100,Math.max(calculated,floor))):null;
  const risk=!complete?'Incomplete':score>=config.highMin?'High':score>config.lowMax?'Medium':'Low';
  const route=!complete?'Data Verification Review':risk==='Low'?'Straight-through processing':risk==='High'?'Fraud Prevention & Inspection Review':'Eligibility Verification';
- return routingPolicy.apply({...data,score,risk,interaction,anomalyScore:behavior,scoringComponents:components,rulesAssessment:{...data.rulesAssessment,complete,score,route},recommendedRoute:route,route:data.reviewHistory?.some(r=>r.type==='decision')?data.route:route});
+ return routingPolicy.apply({...data,score,risk,interaction,anomalyScore:behavior,scoringComponents:components,rulesAssessment:{...data.rulesAssessment,complete,score,route},recommendedRoute:route,route:hasRecordedRoute(data)?data.recordedRoute||data.route:route});
 }
 export function createBusinessPortfolio(now=new Date()){
  const time=now.toISOString();

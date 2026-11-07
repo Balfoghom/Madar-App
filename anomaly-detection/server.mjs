@@ -1,6 +1,6 @@
 import {HYBRID_POLICY_VERSION} from './lib/hybrid-policy.mjs';
 import {routingPolicy} from './lib/routing-policy.mjs';
-import {createWorkspacePortfolio,createDemoIntake,DEMO_INTAKE_BATCH,enrichDemoRecord,applyBusinessConfig,caseStatus,activeWorkspaceRecords} from './lib/workspace-demo.mjs';
+import {createWorkspacePortfolio,createDemoIntake,DEMO_INTAKE_BATCH,enrichDemoRecord,applyBusinessConfig,caseStatus,activeWorkspaceRecords,retainRecordedRoute} from './lib/workspace-demo.mjs';
 import {createDemoPortfolio} from './lib/demo-portfolio.mjs';
 import {withDataQuality} from './lib/data-quality.mjs';
 import {llmStatus, explanationEvidence, generateExplanation, generateCaseAnswer, validateLanguage, validateConversation, PROMPT_VERSION} from './lib/case-explainer.mjs';
@@ -72,7 +72,7 @@ async function readSavedAssessments() {
 
 function writeSavedAssessments(saved) {
   const temporaryPath = assessmentsPath + ".tmp";
-  return writeFile(temporaryPath, JSON.stringify(saved.slice(0, 200).map(withDataQuality), null, 2) + "\n")
+  return writeFile(temporaryPath, JSON.stringify(saved.slice(0, 200).map(retainRecordedRoute).map(withDataQuality), null, 2) + "\n")
     .then(() => rename(temporaryPath, assessmentsPath));
 }
 
@@ -189,6 +189,7 @@ function saveHumanReview(body, type) {
     reviews.push(review);
     data.reviewHistory = reviews.filter((entry) => entry.caseId === body.caseId);
     if(type === "decision")data.humanDecision=review;
+    if(type === "decision"||type === "outcome")data.recordedRoute=data.route;
     data.status=caseStatus(data);
     data.audit = [...(data.audit || []), `Human ${type} recorded by ${review.actorName} at ${review.recordedAt}: ${review.note}`];
     // The raw model result, version, flags, feature values and score are immutable.
@@ -469,14 +470,14 @@ export function createInferenceServer({explain = generateExplanation, answer = g
             const expectedVersion=connected?crossJourneyModel.version:old?.journey==='SANED'?model.version:journeyModelMetadata.find(m=>m.journey===old?.journey)?.version;
             if((!connected&&!modeled)||(record.modelResult?.modelVersion===expectedVersion&&old.policy===HYBRID_POLICY_VERSION))return record;
             const fresh=connected?createCrossJourneyAssessment(old.crossJourneyEvidence,{ruleScore:old.ruleScore}):createApplicationAssessment(old,{source:record.assessmentSource});
-            const preserved={};for(const key of ['customerName','employerName','subject','entity','nationalId','mobile','employerNumber','supervisorName','country','region','city','transactionAmount','amountAtRisk','preventedAmount','confirmedFraudAmount','paymentStatus','financialOutcome','financialProvenance','outcome','outcomeProvenance','decisionDate','decisionOwner','reviewHistory','humanDecision','workflow','workflowStage','demoPortfolio','demoIntakeBatch','intakeReceivedAt','scenario'])if(old[key]!==undefined)preserved[key]=old[key];
+            const preserved={};for(const key of ['customerName','employerName','subject','entity','nationalId','mobile','employerNumber','supervisorName','country','region','city','transactionAmount','amountAtRisk','preventedAmount','confirmedFraudAmount','paymentStatus','financialOutcome','financialProvenance','outcome','outcomeProvenance','decisionDate','decisionOwner','reviewHistory','humanDecision','workflow','workflowStage','demoPortfolio','recordedRoute','demoIntakeBatch','intakeReceivedAt','scenario'])if(old[key]!==undefined)preserved[key]=old[key];
             Object.assign(fresh.caseData,preserved,{assessmentHistory:[...(old.assessmentHistory||[]),{assessmentId:record.assessmentId,modelVersion:record.modelResult?.modelVersion,policy:old.policy,assessedAt:record.assessedAt}].slice(-10)});
             if(old.humanDecision||old.reviewHistory?.some(r=>r.type==='decision')||old.workflow?.stage==='Closed'||(old.outcome&&!/^(Suspected|Inconclusive)/.test(old.outcome)))fresh.caseData.route=old.route;
             fresh.caseData.audit=[...(old.audit||[]),...(fresh.caseData.audit||[]),`Decision policy updated to ${HYBRID_POLICY_VERSION}; prior assessment ${record.assessmentId} retained in history.`];
             fresh.caseData.status=caseStatus(fresh.caseData);fresh.reviewHistory=record.reviewHistory||[];
             return fresh;
           });
-          const records=[...added,...migrated].map(enrichDemoRecord).map(record=>{
+          const records=[...added,...migrated].map(retainRecordedRoute).map(enrichDemoRecord).map(record=>{
             if(!record.caseData?.businessSimulation)return record;
             const data=applyBusinessConfig(record.caseData,settings.config||defaultRiskConfig);data.status=caseStatus(data);
             const fingerprint=JSON.stringify({score:data.score,risk:data.risk,interaction:data.interaction,route:data.recommendedRoute,config:settings.config||defaultRiskConfig});

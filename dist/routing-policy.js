@@ -28,9 +28,9 @@
   }
   function apply(data){
     const recommendedRoute=recommend(data),reviewed=!!data.humanDecision||data.reviewHistory?.some(r=>r.type==='decision')||data.workflow?.stage==='Closed'||(!!data.outcome&&!/^(Suspected|Inconclusive)/.test(data.outcome));
-    const route=reviewed?normalize(data.route):recommendedRoute;
+    const route=reviewed?normalize(data.humanDecision?.action==='override'&&data.humanDecision.route?data.humanDecision.route:data.recordedRoute||data.route):recommendedRoute;
     const status=data.dataQuality?.criticalMissing&&['Ready to proceed','Awaiting specialist','Complete evidence'].includes(data.status)?'Evidence needed':data.status;
-    return {...data,status,route,recommendedRoute,routingPolicyVersion:'governed-routing-v2',...{recommendedOwner:ownership(recommendedRoute,data.journey).owner,nextStep:ownership(route,data.journey).next}};
+    return {...data,...(reviewed?{recordedRoute:route}:{}),status,route,recommendedRoute,routingPolicyVersion:'governed-routing-v3',...{recommendedOwner:ownership(recommendedRoute,data.journey).owner,nextStep:ownership(route,data.journey).next}};
   }
   globalThis.MadarRoutingPolicy=Object.freeze({routes,normalize,recommend,ownership,apply});
 })();

@@ -104,3 +104,19 @@ test('SANED model and hybrid-policy upgrade preserves existing decisions, outcom
  const repeated=(await post('/workspace-demo')).saved.find(r=>r.caseId===record.caseId);assert.equal(repeated.assessmentId,upgraded.assessmentId);
  const registry=await(await fetch(base+'/journey-models')).json(),saned=registry.models.find(m=>m.journey==='SANED');assert.equal(saned.trainingCases,2400);assert.equal(saned.treeCount,100);assert.equal(registry.models.length,7);
 });
+
+test('resolved business and connected routes survive enrichment and recover a legacy policy upgrade',async()=>{
+ const {retainRecordedRoute,applyBusinessConfig}=await import('../lib/workspace-demo.mjs');
+ const before=(await post('/workspace-demo')).saved,settings=(await(await fetch(base+'/risk-config')).json()).config;
+ const business=before.find(r=>r.caseId==='BRI-005'),b=structuredClone(business);delete b.caseData.recordedRoute;b.caseData.route='Straight-through processing';
+ const recovered=retainRecordedRoute(b);assert.equal(recovered.caseData.route,'Data Verification Review');assert.equal(applyBusinessConfig(recovered.caseData,settings).route,'Data Verification Review');
+ for(const [id,expected] of [['001','Eligibility Verification'],['009','Cybersecurity Review'],['010','Cybersecurity Review'],['011','Cybersecurity Review']]){
+  const record=structuredClone(before.find(r=>r.caseId==='CJ-SYN-enterprise-'+id));delete record.caseData.recordedRoute;record.caseData.route='Fraud Prevention & Inspection Review';record.caseData.assessmentHistory=[{modelVersion:record.modelResult.modelVersion}];
+  const restored=retainRecordedRoute(record),enriched=enrichDemoRecord(restored);assert.equal(enriched.caseData.route,expected,id);assert.deepEqual(enriched.reviewHistory,record.reviewHistory);assert.equal(enriched.caseData.outcome,record.caseData.outcome);assert.deepEqual(enriched.modelResult,record.modelResult);
+ }
+ const path=join(dir,'backend-assessments.json'),records=JSON.parse(await readFile(path,'utf8'));
+ const damaged=records.find(r=>r.caseId==='CJ-SYN-enterprise-001');delete damaged.caseData.recordedRoute;damaged.caseData.route='Fraud Prevention & Inspection Review';damaged.caseData.assessmentHistory=[{modelVersion:damaged.modelResult.modelVersion}];
+ await writeFile(path,JSON.stringify(records));
+ const repaired=(await post('/workspace-demo')).saved.find(r=>r.caseId===damaged.caseId);assert.equal(repaired.caseData.route,'Eligibility Verification');assert.equal(repaired.caseData.recordedRoute,'Eligibility Verification');assert.deepEqual(repaired.reviewHistory,damaged.reviewHistory);
+ const repeat=(await post('/workspace-demo')).saved.find(r=>r.caseId===damaged.caseId);assert.equal(repeat.caseData.route,repaired.caseData.route);assert.equal(repeat.assessmentId,repaired.assessmentId);
+});

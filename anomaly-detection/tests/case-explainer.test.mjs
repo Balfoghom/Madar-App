@@ -86,3 +86,7 @@ test('case assistant retries unwanted environment wording once without showing i
 test('expired provider credentials produce an actionable message without exposing provider details',async()=>{
  await assert.rejects(generateExplanation(record,{env,language:'ar',fetchImpl:async()=>({ok:false,status:401,json:async()=>({error:{code:'expired_secret_key',message:'PRIVATE PROVIDER DETAILS'}})})}),error=>{assert.match(error.message,/انتهت صلاحية/);assert.doesNotMatch(error.message,/PRIVATE|test-only|API_KEY/);return true;});
 });
+
+test('operational wording cannot replace the unwanted label with presentation-purpose disclaimers',()=>{
+ for(const text of ['الحالة مسجلة لأغراض عرض الحالة.','These records exist for display purposes.'])assert.throws(()=>validateExplanation({...explanation,overview:{text,evidenceIds:['assessment']}},['assessment','reason-0']),/case-language/);
+});
