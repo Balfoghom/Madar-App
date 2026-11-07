@@ -47,6 +47,12 @@
     const questions=[['risk_reason','Why is the case rated at this level?'],['evidence_review','What evidence needs review?'],['missing_data','What data is missing or conflicting?'],['next_step','What route and next step are recommended?'],['rules_compare','How does this differ from current rules?'],['journey_events','What events are linked across the journey?']];
     if(ar){const labels=['لماذا صُنفت الحالة بهذا المستوى؟','ما الأدلة التي تحتاج إلى مراجعة؟','ما البيانات الناقصة أو المتعارضة؟','ما المسار والخطوة التالية؟','كيف تختلف النتيجة عن القواعد الحالية؟','ما الأحداث المرتبطة عبر الرحلة؟'];questions.forEach((question,index)=>question[1]=labels[index]);}
     assistant.innerHTML=`<div class="assistant-title-row"><div><h3>${ar?'مساعد ذكاء الحالة':'Case Intelligence Assistant'}</h3><small class="reference-assistant-mode">${ar?'نموذج تفاعلي مقيّد · يستند إلى أدلة الحالة':'Offline interactive prototype · grounded in case evidence'}</small></div><span>${ar?'القرار البشري مطلوب':'Human decision required'}</span></div><div class="assistant-suggestions">${questions.map(([key,text])=>`<button type="button" data-assistant-question="${key}">${text}</button>`).join('')}</div><div class="assistant-chat" aria-live="polite" role="log"><div class="assistant-message assistant"><span>Madar AI</span><p>Ask about the risk score, evidence, data quality, linked events, or recommended route.</p></div></div><form class="assistant-form" id="case-assistant-form"><input id="case-assistant-input" maxlength="1200" autocomplete="off" aria-label="Ask a question about this case" placeholder="${ar?'اسأل عن هذه الحالة…':'Ask a question about this case…'}" required><button type="submit">${ar?'إرسال':'Send'}</button><button type="button" id="case-assistant-clear" class="assistant-clear">${ar?'مسح':'Clear'}</button></form><small class="assistant-boundary">The assistant uses only this case’s evidence. It does not confirm fraud or replace the specialist decision.</small>`;
+    const questionDialog=document.createElement('dialog');questionDialog.id='case-question-dialog';questionDialog.className='case-question-dialog';questionDialog.dir=ar?'rtl':'ltr';questionDialog.setAttribute('aria-labelledby','case-question-title');
+    questionDialog.innerHTML=`<header class="case-question-head"><div><p class="eyebrow">${esc(item.transactionId||item.id)}</p><h2 id="case-question-title">${ar?'اسأل عن هذه الحالة':'Ask about this case'}</h2></div><button type="button" class="icon-button" aria-label="${ar?'إغلاق':'Close'}">×</button></header><p class="case-question-intro">${ar?'تستند الإجابات إلى الأدلة المحفوظة لهذه الحالة، ولا تُجري أي تعديل عليها.':'Answers use this case’s saved evidence. They do not change the case.'}</p>`;
+    const oldInput=assistant.querySelector('input');const questionInput=document.createElement('textarea');questionInput.id=oldInput.id;questionInput.maxLength=1200;questionInput.rows=2;questionInput.required=true;questionInput.placeholder=oldInput.placeholder;questionInput.setAttribute('aria-label',oldInput.getAttribute('aria-label'));oldInput.replaceWith(questionInput);
+    questionDialog.append(assistant);document.body.append(questionDialog);
+    const askButton=document.createElement('button');askButton.type='button';askButton.className='case-ask-button';askButton.hidden=true;askButton.innerHTML=`${ar?'اسأل عن هذه الحالة':'Ask about this case'} <span aria-hidden="true">↗</span>`;summary.append(askButton);
+    askButton.onclick=()=>{questionDialog.showModal();questionInput.focus();};questionDialog.querySelector('.case-question-head>button').onclick=()=>questionDialog.close();questionDialog.addEventListener('close',()=>{if(askButton.isConnected)askButton.focus({preventScroll:true});});
     // Preserve extra working capabilities outside the reference case-review layout.
     const tools=document.createElement('dialog');tools.id='case-review-tools';tools.className='case-question-dialog reference-tools';tools.innerHTML=`<div class="dialog-head"><div><h2>Case tools</h2><p>${esc(item.transactionId)} · ${esc(state.status)}</p></div><button type="button" class="icon-button" aria-label="Close case tools">×</button></div>`;
     tools.querySelector('button').onclick=()=>tools.close();document.body.append(tools);toolsButton.onclick=()=>tools.showModal();
@@ -63,14 +69,14 @@
     controls.querySelector('#record-outcome-btn').textContent=state.resolved?'Update outcome':'Record outcome';
     if(state.resolved){const note=document.createElement('p');note.className='session-note';note.textContent=state.status+'. '+(item.workflow?.stage==='Closed'?'Reopen using Case tools before amending the outcome.':'Routing is locked because an outcome is recorded. Use Case tools for closeout.');controls.before(note);}
     if(item.workflow?.stage==='Closed')controls.querySelector('#record-outcome-btn').disabled=true;
-    const main=[identity,financial,summary,assistant,components,reasons,quality,timeline,activity,action];
+    const main=[identity,financial,summary,components,reasons,quality,timeline,activity,action];
     for(const section of sections)if(!main.includes(section))tools.append(section);
     panel.replaceChildren(hero,...main);
     flattenCaseSections(panel);
     const key=[item.id,item.assessmentId,language].join(':');
     const turns=conversations.get(key)||[];conversations.set(key,turns);
     let configured=false,draft=null,busy=false;
-    const chat=assistant.querySelector('.assistant-chat'),input=assistant.querySelector('input'),form=assistant.querySelector('form');
+    const chat=assistant.querySelector('.assistant-chat'),input=assistant.querySelector('input,textarea'),form=assistant.querySelector('form');
     const add=(role,text)=>{const message=document.createElement('div');message.className='assistant-message '+role;message.innerHTML=`<span>${role==='user'?'You':'Madar AI'}</span><p>${esc(text)}</p>`;chat.append(message);chat.scrollTop=chat.scrollHeight;};
     for(const turn of turns)add(turn.role,turn.text);
     const offline={
@@ -95,13 +101,13 @@
     explainButton.onclick=async()=>{
       explainButton.disabled=true;explainStatus.textContent=ar?'جارٍ إعداد الشرح…':'Preparing explanation…';
       try{
-        const result=await backendJSON('/case-explanation',{caseId:item.id,assessmentId:item.assessmentId,language,generate:true},55000);if(!summary.isConnected)return;draft=result.draft;sourceReferences();
+        const result=await backendJSON('/case-explanation',{caseId:item.id,assessmentId:item.assessmentId,language,generate:true},55000);if(!summary.isConnected)return;draft=result.draft;askButton.hidden=false;sourceReferences();
         const brief=draft.explanation;explainHost.innerHTML=citedItem(brief.overview,draft.facts)+`<h4>${ar?'لماذا تستحق الاهتمام':'Why it matters'}</h4>`+citedItem(brief.whyItMatters,draft.facts)+`<h4>${ar?'ما الذي ينبغي التحقق منه':'What to check next'}</h4>`+brief.nextSteps.map(step=>citedItem(step,draft.facts)).join('');bindReferences(explainHost);explainStatus.textContent=ar?'مسودة بالذكاء الاصطناعي · تحقّق قبل اتخاذ القرار':'AI draft · verify before deciding';
       }catch(error){if(summary.isConnected)explainStatus.textContent=error.message;}
       finally{if(summary.isConnected)explainButton.disabled=false;}
     };
     if(item.assessmentId)Promise.all([backendJSON('/llm/status'),backendJSON('/case-explanation',{caseId:item.id,assessmentId:item.assessmentId,language,generate:false})]).then(([status,response])=>{
-      if(!assistant.isConnected)return;configured=status.configured;draft=response.draft;explainButton.disabled=!configured;explainStatus.textContent=configured?'':(ar?'شرح الحالة بالذكاء الاصطناعي غير مُعدّ. أسئلة الأدلة أدناه متاحة.':'AI explanation is not configured. The evidence questions below remain available.');
+      if(!assistant.isConnected)return;configured=status.configured;draft=response.draft;askButton.hidden=!draft;explainButton.disabled=!configured;explainStatus.textContent=configured?'':(ar?'شرح الحالة بالذكاء الاصطناعي غير مُعدّ. أسئلة الأدلة أدناه متاحة.':'AI explanation is not configured. The evidence questions below remain available.');
       if(configured)assistant.querySelector('.reference-assistant-mode').textContent=ar?'أسئلة الأدلة · خدمة الذكاء الاصطناعي مُعدّة':'Evidence questions · AI connection configured';
     }).catch(()=>{if(summary.isConnected){explainButton.disabled=false;explainStatus.textContent='Could not check the explanation service. Try Explain this case again.';}});
     else explainStatus.textContent='Save an assessment before generating an AI explanation.';
@@ -110,17 +116,17 @@
       const known=questions.find(([,text])=>text.toLowerCase()===question.toLowerCase());
       if(known){remember('user',question);remember('assistant',offline[known[0]]());input.value='';return;}
       if(!configured){remember('user',question);const match=/missing|conflict|quality/i.test(question)?'missing_data':/route|next|owner/i.test(question)?'next_step':/rule|control/i.test(question)?'rules_compare':/event|journey|sequence/i.test(question)?'journey_events':/why|risk|score/i.test(question)?'risk_reason':/evidence/i.test(question)?'evidence_review':null;remember('assistant',match?offline[match]():'Free-text AI is not configured. Use the six evidence questions above to inspect this case.');input.value='';return;}
-      busy=true;assistant.querySelectorAll('button,input').forEach(el=>el.disabled=true);const history=turns.slice(-8).map(({role,text})=>({role,text}));remember('user',question);input.value='';
+      busy=true;assistant.querySelectorAll('button,input,textarea').forEach(el=>el.disabled=true);const history=turns.slice(-8).map(({role,text})=>({role,text}));remember('user',question);input.value='';
       try{
         if(!draft)draft=(await backendJSON('/case-explanation',{caseId:item.id,assessmentId:item.assessmentId,language,generate:true},55000)).draft;
         if(!assistant.isConnected)return;
         const response=await backendJSON('/case-question',{caseId:item.id,assessmentId:item.assessmentId,language,question,history,evidenceFingerprint:draft.evidenceFingerprint},55000);
         if(assistant.isConnected){remember('assistant',response.answer.text+'\nAI draft · verify against case evidence before deciding.');sourceReferences();const message=chat.lastElementChild;message.insertAdjacentHTML('beforeend',response.answer.evidenceIds.map(id=>`<button type="button" class="ops-evidence-link" data-evidence="${esc(id)}">[${draft.facts.findIndex(fact=>fact.id===id)+1}]</button>`).join(' '));bindReferences(message);}
       }catch(error){if(assistant.isConnected){if(turns.at(-1)?.role==='user')turns.pop();if(chat.lastElementChild?.classList.contains('user'))chat.lastElementChild.remove();input.value=question;add('assistant',error.message+' No case decision was changed.');}}
-      finally{busy=false;if(assistant.isConnected){assistant.querySelectorAll('button,input').forEach(el=>el.disabled=false);input.focus();}}
+      finally{busy=false;if(assistant.isConnected){assistant.querySelectorAll('button,input,textarea').forEach(el=>el.disabled=false);input.focus();}}
     };
   }
-  const original=renderCase;renderCase=function(){document.querySelector('#case-review-tools')?.remove();document.querySelector('#case-review-actions')?.remove();document.querySelector('#case-technical-evidence')?.remove();original();enhanceCase()};
+  const original=renderCase;renderCase=function(){document.querySelector('#case-question-dialog')?.remove();document.querySelector('#case-review-tools')?.remove();document.querySelector('#case-review-actions')?.remove();document.querySelector('#case-technical-evidence')?.remove();original();enhanceCase()};
   let workspaceRequest=null;
   async function refreshWorkspace(){
     if(workspaceRequest)return workspaceRequest;
