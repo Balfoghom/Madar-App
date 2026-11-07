@@ -230,3 +230,7 @@ body.case-drawer-open{overflow:auto}.case-drawer-scrim{display:none!important}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 #queue-view.review-open .queue-panel .case-id{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#queue-view.review-open .queue-panel .subtext{overflow-wrap:anywhere;white-space:normal}#queue-view.review-open .queue-panel td{font-size:11px}#queue-view.review-open .queue-panel .status-chip{max-width:100%;white-space:normal;overflow-wrap:anywhere;font-size:9px}#queue-view.review-open .queue-panel th{padding:9px 8px;font-size:9px}
 @media(min-width:761px) and (max-width:1050px){#queue-view .workspace:has(#case-panel:not([hidden])){grid-template-columns:minmax(0,1fr) minmax(320px,40vw)}}
+
+/* Show loading or recovery guidance consistently across every workspace view. */
+.workspace-loading .view > :not(.page-heading){visibility:hidden}
+main>.workspace-load-status{margin:16px 26px}
