@@ -94,6 +94,10 @@
     const linked=[...new Set(events.map(event=>event.journey).filter(Boolean))];return linked.length?linked:[item.journey].filter(Boolean);
   }
   function mainReason(item) {
+    if(item.accessEvidence){
+      const missing=['loginDate','loginTime'].filter(field=>!item.accessEvidence[field]);
+      if(missing.length)return (missing.length===2?'The login date and time are missing.':'The login '+(missing[0]==='loginDate'?'date':'time')+' is missing.')+' Complete the access log before relying on the event sequence.';
+    }
     if(item.assessmentSource!=='cross-journey')return item.primaryReason||item.signals?.[0]?.[1]||'Review the supplied evidence.';
     const model=item.modelAssessment||{},reasons=model.reasons||[];
     if(item.assessmentMode==='hybrid'&&item.decisionComplete===false&&item.decisionIssue?.startsWith('Existing control'))return item.decisionIssue;

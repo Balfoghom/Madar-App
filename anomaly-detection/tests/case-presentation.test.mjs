@@ -90,3 +90,10 @@ test('decision explanation distinguishes the critical-control floor and required
  assert.match(view.decisionBreakdown(guard).notes.join(' '),/requires review/);
  assert.equal(view.decisionBreakdown({assessmentSource:'rules-demo',ruleScore:85}),null);
 });
+
+test('missing login dates and times stay explicit when native inference reports generic incomplete evidence',()=>{
+ for(const field of ['loginDate','loginTime']){
+  const item={assessmentSource:'journey-prototype',primaryReason:'Required workforce or event evidence is missing.',accessEvidence:{loginDate:'2026-11-05',loginTime:'09:42',[field]:null},modelAssessment:{complete:false}};
+  const before=JSON.stringify(item);assert.match(view.mainReason(item),new RegExp('login '+(field==='loginDate'?'date':'time')+' is missing'));assert.equal(JSON.stringify(item),before);
+ }
+});
