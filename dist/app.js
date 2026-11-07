@@ -2345,6 +2345,13 @@ function renderOutsideList() {
     });
 }
 
+function renderHybridDecision(item){
+  const decision=MadarCasePresentation.decisionBreakdown(item);if(!decision)return '';
+  const number=value=>Number.isFinite(value)?String(Number(value.toFixed(2))):'—';
+  const components=decision.components.map(component=>`<div><dt>${escapeHtml(component.label)}${component.weight!==undefined?' · '+number(component.weight)+'%':''}</dt><dd>${number(component.points)} points</dd><small>${component.weight!==undefined?number(component.value)+'/100 × '+number(component.weight)+'%':component.matched?component.matched+' approved pattern'+(component.matched===1?'':'s')+' matched':'No approved adjustment matched'}</small></div>`).join('');
+  return `<div class="hybrid-explanation"><h4>How the review score is formed</h4>${decision.complete?`<dl class="hybrid-breakdown">${components}</dl><p>Final review score: <strong>${decision.score}/100</strong> · rounded and bounded to 0–100.</p>`:''}${decision.notes.map(note=>`<p>${escapeHtml(note)}</p>`).join('')}${decision.confidence?`<p>Evidence confidence: <strong>${escapeHtml(decision.confidence.label)}</strong> · ${decision.confidence.passed}/${decision.confidence.total} field checks passed. This describes supplied-data quality.</p>`:''}</div>`;
+}
+
 function renderLatestActivity() {
   const cases = portfolioCases();
   const latest = cases
@@ -2355,13 +2362,14 @@ function renderLatestActivity() {
     .slice(0, 5);
   document.querySelector("#latest-activity").innerHTML = latest
     .map(function (item) {
+      const assessment=MadarCasePresentation.score(item);
       return (
         '<button data-case-link="' +
         escapeHtml(item.id) +
         '"><span class="activity-icon ' +
         item.risk.toLowerCase() +
-        '">' +
-        (item.assessmentSource === "cross-journey" ? "◎" : item.score == null ? "—" : item.score) +
+        '" aria-label="' + escapeHtml(assessment.label+(assessment.value===null?'':': '+assessment.value+'/100')) + '" title="' + escapeHtml(assessment.label) + '">' +
+        (assessment.value===null?'—':assessment.value) +
         "</span><div><strong>" +
         escapeHtml(item.transactionId + " · " + item.journey) +
         "</strong><p>" +
@@ -2619,7 +2627,7 @@ function renderCase() {
     '<div class="mini-score"><span>Data quality</span><strong>' +
       (item.dataQuality ? item.dataQuality.label : item.confidenceScore + '% illustrative') +
       "</strong></div>",
-    '</div><div class="comparison-note">' +
+    '</div>' + renderHybridDecision(item) + '<div class="comparison-note">' +
       escapeHtml(item.comparison) +
       "</div></section>",
     '<section class="detail-section"><h3 class="detail-title">Assessment reasons</h3><ul class="reason-list">' +

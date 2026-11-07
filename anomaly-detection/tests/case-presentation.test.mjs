@@ -74,3 +74,19 @@ test('maternity explanations name the request and linked evidence',()=>{
  item.modelAssessment.maternityContributorChains=0;item.modelAssessment.reasons=['3 contributors show a login → profile update → IBAN change → request sequence within 24 hours.'];
  assert.match(view.mainReason(item),/maternity request/);assert.doesNotMatch(view.mainReason(item),/SANED/);
 });
+
+test('shared decision breakdown exposes saved contributions without recomputing model outputs',()=>{
+ const item=createDemoPortfolio().find(r=>r.caseId==='CJ-SYN-enterprise-001').caseData,before=JSON.stringify(item);
+ const breakdown=view.decisionBreakdown(item);assert.equal(breakdown.complete,true);assert.equal(breakdown.score,item.score);
+ assert.deepEqual(breakdown.components.map(c=>c.points),[item.scoringComponents.controlContribution,item.scoringComponents.anomalyContribution,item.scoringComponents.patternAdjustment]);
+ assert.equal(breakdown.confidence.label,item.dataQuality.label);assert.equal(JSON.stringify(item),before);
+ const incomplete={...item,decisionComplete:false,score:75,scoringComponents:null,decisionIssue:'Existing control score is missing.'};
+ assert.equal(view.score(incomplete).value,null);assert.equal(view.decisionBreakdown(incomplete).complete,false);assert.deepEqual(view.decisionBreakdown(incomplete).components,[]);assert.match(view.decisionBreakdown(incomplete).notes[0],/control score/);
+});
+test('decision explanation distinguishes the critical-control floor and required-review guard',()=>{
+ const base={assessmentMode:'hybrid',decisionComplete:true,score:75,risk:'High',scoringComponents:{controlScore:90,controlWeight:55,controlContribution:49.5,anomalyScore:20,anomalyWeight:45,anomalyContribution:9,patternAdjustment:0,approvedPatterns:[],controlFloor:75}};
+ assert.match(view.decisionBreakdown(base).notes.join(' '),/at least 75/);
+ const guard={...base,score:29,risk:'Medium',scoringComponents:{...base.scoringComponents,controlFloor:0}};
+ assert.match(view.decisionBreakdown(guard).notes.join(' '),/requires review/);
+ assert.equal(view.decisionBreakdown({assessmentSource:'rules-demo',ruleScore:85}),null);
+});

@@ -236,3 +236,9 @@ body.case-drawer-open{overflow:auto}.case-drawer-scrim{display:none!important}
 main>.workspace-load-status{margin:16px 26px}
 
 .saned-architecture{margin:16px 0}
+
+/* Shared decision presentation consumes saved policy components only. */
+.hybrid-explanation{margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:8px;background:#f8faff;overflow-wrap:anywhere}
+.hybrid-explanation h4{font-size:12px;margin:0 0 10px}.hybrid-explanation p{font-size:11px;line-height:1.65;margin:8px 0 0;color:var(--muted)}.hybrid-explanation p strong{color:var(--ink,#00122d)}
+.hybrid-breakdown{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0}.hybrid-breakdown>div{min-width:0}.hybrid-breakdown dt,.hybrid-breakdown small{font-size:10px;line-height:1.5;color:var(--muted)}.hybrid-breakdown dd{font-size:13px;font-weight:700;margin:5px 0}.cj-decision-breakdown{margin:0 25px 22px}.cj-hybrid-results{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:600px){.hybrid-breakdown{grid-template-columns:1fr}.cj-hybrid-results{grid-template-columns:1fr}}

@@ -3,13 +3,26 @@
   const present = value => typeof value === 'string' && value.trim() && !/^(not supplied|missing employer|—)$/i.test(value.trim());
   function score(item) {
     const connected=item.assessmentSource==='cross-journey';
-    const incomplete=item.risk==='Incomplete' || item.modelAssessment?.complete===false || item.rulesAssessment?.complete===false;
+    const incomplete=item.decisionComplete===false || item.risk==='Incomplete' || item.modelAssessment?.complete===false || item.rulesAssessment?.complete===false;
     if(incomplete)return {value:null,label:'Evidence incomplete',kind:'incomplete',note:'Complete the required evidence before relying on this assessment.'};
     if(item.assessmentMode==='hybrid')return {value:Number.isFinite(item.score)?item.score:null,label:'Hybrid review score',kind:'hybrid',note:item.scoreMeaning||'Existing controls, AI anomaly score and approved pattern adjustments. Not a fraud probability.'};
     if(connected)return {value:null,label:item.modelAssessment?.modelFlagged?'Model review suggested':'No model review flag',kind:'pattern',note:'The connected model supplies a review recommendation. Existing control score and operational risk band are separate.'};
     if(item.businessSimulation)return {value:Number.isFinite(item.score)?item.score:null,label:'Business-rule score',kind:'simulation',note:'Configured business-rule scoring weights combine operational controls, simulated behavior and pattern adjustments. No trained ML model was used.'};
     if(item.modelAssessment || item.rulesAssessment)return {value:item.businessSimulation?item.score:Number.isFinite(item.ruleScore)?item.ruleScore:null,label:item.businessSimulation?'Business-rule score':'Control score',kind:'control',note:'Existing control score. AI findings may raise the review priority without changing this number.'};
     return {value:Number.isFinite(item.score)?item.score:null,label:'Simulation score',kind:'simulation',note:'Weighted scoring simulation: existing controls, simulated behavior and pattern adjustments. Not a fraud probability.'};
+  }
+  function decisionBreakdown(item){
+    if(item.assessmentMode!=='hybrid')return null;
+    const display=score(item),c=item.scoringComponents,notes=[];
+    const complete=display.value!==null&&!!c;
+    if(!complete)notes.push(item.decisionIssue||'Complete the required evidence before calculating the review score.');
+    if(complete&&c.controlFloor>0)notes.push(`Critical controls keep the review score at least ${c.controlFloor}/100.`);
+    if(complete&&item.risk==='Medium'&&display.value<=34)notes.push('An assessment finding or source conflict still requires review even though the combined score is below 35.');
+    return {score:display.value,complete,notes,components:complete?[
+      {label:'Existing controls',value:c.controlScore,weight:c.controlWeight,points:c.controlContribution},
+      {label:'AI assessment',value:c.anomalyScore,weight:c.anomalyWeight,points:c.anomalyContribution},
+      {label:'Approved patterns',points:c.patternAdjustment,matched:c.approvedPatterns?.length||0}
+    ]:[],confidence:item.dataQuality?{label:item.dataQuality.label,passed:item.dataQuality.passed,total:item.dataQuality.total}:null};
   }
   function state(item) {
     const outcome=typeof item.outcome==='string'?item.outcome:'';
@@ -112,5 +125,5 @@
     if(Number.isFinite(item.transactionAmount))return {label:'Supplied transaction amount',amount:item.transactionAmount};
     return {label:'Financial exposure',amount:null};
   }
-  globalThis.MadarCasePresentation=Object.freeze({score,state,keyEvidence,financial,mainReason,needsReview,signals,attentionMatches,reasonLabel,journeys});
+  globalThis.MadarCasePresentation=Object.freeze({score,state,keyEvidence,financial,decisionBreakdown,mainReason,needsReview,signals,attentionMatches,reasonLabel,journeys});
 })();

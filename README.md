@@ -90,7 +90,7 @@ Case review opens in a non-modal right panel. Repeated BRI-031 through BRI-060 d
 
 ## User-journey consistency
 
-The right case panel matches the reference layout, with visible business sections and one action area beneath the recommendation. Case tools retains ownership tracking, history and technical evidence separately. Cross-Journey Model findings are qualitative; operational control values remain in assessment details. The compact queue keeps the reason and case status visible while reviewing.
+The right case panel matches the reference layout, with visible business sections and one action area beneath the recommendation. Case tools retains ownership tracking, history and technical evidence separately. Complete model-based cases show the saved hybrid review score in dashboard activity, the queue, case review and connected evidence. Component contributions and evidence confidence explain that score; native model findings remain separate technical evidence. The compact queue keeps the reason and case status visible while reviewing.
 
 Dashboard open-case counts and executive attention filters include unresolved suspected and inconclusive classifications. Executive attention opens the matching case set with a removable filter. Recurring signals aggregate meaningful evidence categories once per case instead of positional model-reason indexes. Reports are live previews of cases assessed in the selected month, with their latest recorded outcomes; management actions are recommendations.
 
