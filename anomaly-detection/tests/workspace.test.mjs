@@ -40,7 +40,7 @@ test('model upgrade reassesses saved evidence while preserving ownership, outcom
  const outcome=record.caseData.outcome,amount=record.caseData.preventedAmount,history=structuredClone(record.reviewHistory);
  await writeFile(path,JSON.stringify(records));
  const refreshed=await post('/workspace-demo'),next=refreshed.saved.find(r=>r.caseId===record.caseId);
- assert.equal(next.modelResult.modelVersion,'madar-cross-journey-rf-20261107-v3');assert.notEqual(next.assessmentId,oldId);
+ assert.equal(next.modelResult.modelVersion,'madar-cross-journey-rf-20261107-v4');assert.notEqual(next.assessmentId,oldId);
  assert.deepEqual(next.caseData.crossJourneyEvidence,record.caseData.crossJourneyEvidence);
  assert.deepEqual(next.caseData.workflow,record.caseData.workflow);assert.deepEqual(next.reviewHistory,history);
  assert.equal(next.caseData.outcome,outcome);assert.equal(next.caseData.preventedAmount,amount);assert.equal(next.caseData.status,'Closed');
@@ -69,4 +69,23 @@ test('previous repeated demo rows are hidden from the active workspace while the
  await writeFile(path,JSON.stringify([...records,duplicate]));
  const refreshed=await post('/workspace-demo');assert.equal(refreshed.saved.length,77);assert.ok(!refreshed.saved.some(r=>r.caseId==='BRI-031'));
  const archived=JSON.parse(await readFile(path,'utf8')).find(r=>r.caseId==='BRI-031');assert.equal(archived.caseData.demoDuplicateOf,'BRI-001');assert.deepEqual(archived.reviewHistory,duplicate.reviewHistory);
+});
+
+test('demo intake adds six new maternity cases to preloaded data and safely deduplicates retries',async()=>{
+ const before=await post('/workspace-demo');assert.equal(before.saved.length,77);
+ const upload=await post('/demo-intake');assert.equal(upload.added,6);assert.equal(upload.received,6);assert.equal(upload.alreadyLoaded,0);assert.equal(upload.saved.length,83);
+ assert.equal(upload.review,3);assert.equal(upload.complete,5);assert.equal(upload.incomplete,1);
+ const incoming=upload.saved.filter(r=>r.caseData.demoIntakeBatch==='maternity-v1');assert.equal(incoming.length,6);
+ for(const record of incoming){
+  assert.equal(record.journey,'Maternity Benefit');assert.equal(record.caseData.outcome,null);assert.equal(record.caseData.preventedAmount,0);assert.equal(record.caseData.confirmedFraudAmount,0);
+  assert.ok(!record.caseData.crossJourneyEvidence.events.some(e=>e.type==='claim'));
+ }
+ assert.equal(new Set(upload.saved.map(r=>r.caseData.customerName)).size,83);
+ for(const record of before.saved){const after=upload.saved.find(r=>r.caseId===record.caseId);assert.equal(after.assessmentId,record.assessmentId);assert.deepEqual(after.reviewHistory,record.reviewHistory);}
+ const pending=incoming.find(r=>r.complete&&r.modelFlagged);
+ await post('/decision',{caseId:pending.caseId,assessmentId:pending.assessmentId,actorName:'QA maternity specialist',note:'Verify linked source records.',action:'override',route:'Additional verification'});
+ const repeat=await post('/demo-intake');assert.equal(repeat.added,0);assert.equal(repeat.alreadyLoaded,6);assert.equal(repeat.saved.length,83);
+ const retained=repeat.saved.find(r=>r.caseId===pending.caseId);assert.equal(retained.assessmentId,pending.assessmentId);assert.ok(retained.reviewHistory.some(r=>r.actorName==='QA maternity specialist'));
+ const reload=await post('/workspace-demo');assert.equal(reload.saved.length,83);assert.equal(reload.added,0);assert.equal(reload.saved.find(r=>r.caseId===pending.caseId).assessmentId,pending.assessmentId);
+ await post('/demo-reset');assert.equal((await post('/workspace-demo')).saved.length,77);assert.equal((await post('/demo-intake')).added,6);
 });

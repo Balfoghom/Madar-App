@@ -144,16 +144,22 @@
     if(loadingDemo)return;loadingDemo=true;
     const buttons=[...document.querySelectorAll('[data-load-demo]')];
     const status=document.querySelector('.demo-load-status');
-    buttons.forEach(button=>{button.disabled=true;button.textContent='Preparing cases…';});
-    if(status)status.textContent='Preparing the shared case workspace…';
-    try{const response=await refreshWorkspace();if(status)status.textContent=response.saved.length+' cases ready. Existing reviews are retained.';showToast('Demo cases are ready.');}
+    buttons.forEach(button=>{button.disabled=true;button.textContent='Uploading demo data…';});
+    if(status)status.textContent='Receiving six maternity histories and assessing their connected events…';
+    try{
+      await refreshWorkspace();
+      const response=await backendJSON('/demo-intake',{},60000);
+      cases=response.saved.map(record=>({...record.caseData,assessmentId:record.assessmentId}));renderAll();
+      const message=response.added?`${response.added} new cases added · ${response.review} need review · ${response.incomplete} need evidence · ${response.saved.length} total cases.`:`This batch is already uploaded. ${response.alreadyLoaded} duplicates skipped · ${response.saved.length} total cases.`;
+      if(status)status.textContent=message;showToast(message);
+    }
     catch(error){if(status)status.textContent=error.message;showToast(error.message);}
-    finally{loadingDemo=false;buttons.forEach(button=>{button.disabled=false;button.textContent='Refresh demo cases';});}
+    finally{loadingDemo=false;buttons.forEach(button=>{button.disabled=false;button.textContent='Upload demo data';});}
   }
   document.querySelectorAll('[data-load-demo]').forEach(button=>button.addEventListener('click',loadDemo));
   const routeLibrary=document.querySelector('#business-route-library');
   if(routeLibrary)routeLibrary.innerHTML=MadarRoutingPolicy.routes.map(route=>{const context=MadarRoutingPolicy.ownership(route);return `<article><h4>${esc(route)}</h4><strong>${esc(context.owner)}</strong><p>${esc(context.next)}</p>${route==='Business Owner Review'?'<small>The accountable owner follows the case service journey.</small>':''}</article>`;}).join('');
   switchView('dashboard');
-  refreshWorkspace().catch(error=>{document.querySelector('#workspace-load-status').textContent='Could not load cases. Use Refresh demo cases to retry. '+error.message;showToast('Could not load the workspace: '+error.message);});
+  refreshWorkspace().catch(error=>{document.querySelector('#workspace-load-status').textContent='Could not load cases. Reload the page or use Upload demo data to retry. '+error.message;showToast('Could not load the workspace: '+error.message);});
   document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!document.querySelector('dialog[open]')&&casePanelOpen)closeDrawer();});
 })();

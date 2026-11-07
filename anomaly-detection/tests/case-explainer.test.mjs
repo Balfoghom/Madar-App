@@ -42,7 +42,7 @@ test('business evidence respects the assessment window and discloses omitted eve
 });
 test('business meaning is required and current route changes invalidate the brief',()=>{
  const legacy={...explanation};delete legacy.whyItMatters;assert.throws(()=>validateExplanation(legacy,['assessment','reason-0']),/validation/);
- const changed=structuredClone(record);changed.caseData.route='Data Verification Review';changed.caseData.humanDecision={action:'override'};assert.notEqual(explanationEvidence(changed).fingerprint,explanationEvidence(record).fingerprint);
+ const changed=structuredClone(record);changed.caseData.route=record.caseData.route==='Data Verification Review'?'Eligibility Verification':'Data Verification Review';changed.caseData.humanDecision={action:'override'};assert.notEqual(explanationEvidence(changed).fingerprint,explanationEvidence(record).fingerprint);
 });
 
 test('Arabic brief requests Arabic prose without translating evidence identifiers',async()=>{

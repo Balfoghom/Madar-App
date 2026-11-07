@@ -41,7 +41,7 @@ Use synthetic evidence only. These checks write to your local demo session.
 - [ ] Return to **Dashboard** and check its assessed-case and open-case counts.
 - [ ] Reassess unchanged evidence with the same model version. It should not create a duplicate case or discard human reviews. A model-version change creates a new assessment and retains prior reviews in history.
 - [ ] Open **Model & Governance**. The registry should include six journey models and the connected-journey model.
-- [ ] Open **Dashboard** and select **Refresh demo cases**. It stays on the dashboard, retains reviews and does not create duplicates. Activity cards open the selected saved case in a closeable drawer, including AI explanation controls.
+- [ ] Open **Dashboard**: 77 baseline cases load automatically. Select **Upload demo data** to add six new maternity histories (83 total). Repeating the same batch skips duplicates and retains reviews. Activity cards open the selected saved case in a closeable drawer, including AI explanation controls.
 - [ ] Change **Scoring Simulation** weights, choose **Apply to business rules**, then **Reset defaults**. Only business-rule simulation cases change; fitted ML outputs remain unchanged.
 - [ ] Confirm named identities and fictional amounts are supplied for the demonstration. These contextual fields do not alter the trained models’ source histories or inference outputs.
 - [ ] Select an empty reporting month. Expect an empty report, not fallback cases.
@@ -61,7 +61,7 @@ Data Intake’s **Reset demo workspace** asks for confirmation, clears saved ass
 
 Run `npm test`. The suite covers inference parity, synthetic holdout metrics, event grouping and validation, contributor-level sequences, duplicate imports, model-version handling, policy isolation, review and ownership persistence, stale edits, financial consistency, indicator evidence grouping, and LLM request/output validation. Provider calls are mocked in automated tests; a real configured API requires a separate smoke test.
 
-The corrected cross-journey model is `madar-cross-journey-rf-20261107-v3`. It finds 600/600 provisional review cases with 25 false alarms among 700 routine or legitimate cases in its synthetic holdout. These figures do not establish production accuracy, prevented loss or specialist time savings.
+The corrected cross-journey model is `madar-cross-journey-rf-20261107-v4`. It finds 900/900 provisional review cases with 7 false alarms among 900 routine or legitimate cases in its synthetic holdout. These figures do not establish production accuracy, prevented loss or specialist time savings.
 
 ## Hosting
 
@@ -69,7 +69,7 @@ Run as one Node service with `npm start`, `HOST=0.0.0.0`, the host’s `PORT`, a
 
 For a privately shared demonstration, configure `MADAR_DEMO_PASSWORD` through the host’s secret settings, use username `madar`, and require the host’s HTTPS endpoint. This optional shared gate is not enterprise identity or role-based access control. Put API keys in the host’s secret settings. Never commit `.env` or runtime records.
 
-Hosting the full app needs a Node-compatible server and persistent storage. A static upload of `dist/` cannot run inference or save reviews. No new deployment was made in this update.
+Hosting the full app needs a Node-compatible server and persistent storage. A static upload of `dist/` cannot run inference or save reviews.
 
 ## Current scope and next integrations
 
@@ -84,7 +84,7 @@ Hosting the full app needs a Node-compatible server and persistent storage. A st
 
 See [solution design](AI_SOLUTION_DESIGN.md), [technical blueprint](TECHNICAL_BLUEPRINT.md), [scoring methodology](SCORING_METHODOLOGY.md), and [LLM setup](LLM_SETUP.md). Component READMEs and ServiceNow import files remain supporting material; they are not live integrations.
 
-The November 7 model adds login-location, IBAN-change and profile-update sequences (23 event-derived features; 10,300 training, 1,600 calibration and 1,300 held-out synthetic histories). New digital typologies are prototype assumptions requiring fraud-specialist validation. Ordinary travel and legitimate account-update counterexamples are included. Existing saved cross-journey cases are reassessed at workspace initialization; earlier model references and human reviews are retained.
+The November 7 model covers SANED and maternity requests, login-location, IBAN-change and profile-update sequences (25 event-derived features; 13,300 training, 2,000 calibration and 1,800 held-out synthetic histories). Calibration uses the maximum per-family 97th percentile from separate legitimate examples. New digital typologies are prototype assumptions requiring fraud-specialist validation. Ordinary travel and legitimate account-update counterexamples are included. Existing saved cross-journey cases are reassessed at workspace initialization; earlier model references and human reviews are retained.
 
 Case review opens in a non-modal right panel. Repeated BRI-031 through BRI-060 demo templates are excluded from the active workspace and indicator counts; stored assessments and reviews remain available for audit. Active demo identities are distinct and maternity beneficiaries use female names. A missing critical field forces a Low data-quality label independently of the field-completeness percentage. The shared routing policy defines six canonical routes, accountable owners and next steps; numerical model results remain immutable.
 
@@ -96,4 +96,9 @@ Dashboard open-case counts and executive attention filters include unresolved su
 
 New Assessment is labeled as demo test input. Intake offers single-case entry, batch templates and connected evidence. Outcome forms explain classification and financial consistency requirements before submission. Browser review requests and approved reference examples do not deploy production rules or models.
 
-The queue’s Journey column lists services present in each cross-journey case’s assessment-window evidence, and its journey filter matches any of those linked services. Portfolio and owner reports keep one primary destination per case to avoid double-counting. The current connected demo examples end in SANED requests; new assessments derive their primary destination from the supplied request or payment evidence.
+The queue’s Journey column lists services present in each cross-journey case’s assessment-window evidence, and its journey filter matches any of those linked services. Portfolio and owner reports keep one primary destination per case to avoid double-counting. The preloaded connected examples end in SANED requests; the separate intake batch ends in maternity requests; new assessments derive their primary destination from the supplied request or payment evidence.
+
+
+## Demo data intake
+
+`POST /workspace-demo` idempotently initializes the 77 baseline cases and upgrades saved model assessments while preserving human reviews and outcomes. `POST /demo-intake` receives the fixed `maternity-v1` source batch, assesses the six connected histories through the fitted cross-journey model, appends only unseen case IDs, and reports added/duplicate/incomplete/review counts. The batch contains three provisional review patterns, two legitimate comparisons and one missing contributor link. No scripted decisions or prevention amounts are applied to incoming cases. Resetting the demo clears uploads and restores the baseline, allowing rehearsal of the same upload. Future source batches require distinct stable case IDs rather than renaming existing records on each click.

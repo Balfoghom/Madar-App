@@ -81,7 +81,7 @@ function digitalFeatures(events) {
       if(hours>0)speed=Math.max(speed,Math.min(100000,distance/hours));
     }
     let found=false;
-    for(const claim of history.filter(e=>e.type==='claim')){
+    for(const claim of history.filter(e=>['claim','maternity'].includes(e.type))){
       const ibans=history.filter(e=>e.type==='iban_change'&&e.recordedAt<claim.recordedAt);
       if(ibans.length)recencies.push((claim.recordedAt-Math.max(...ibans.map(e=>e.recordedAt)))/HOUR);
       for(const iban of ibans)for(const profile of history.filter(e=>e.type==='profile_update'&&e.recordedAt<iban.recordedAt)){
@@ -94,7 +94,7 @@ function digitalFeatures(events) {
 }
 
 /**
- * Validate a connected synthetic history and calculate the model's twenty-three
+ * Validate a connected synthetic history and calculate the model's twenty-five
  * ordered inputs. Returning null means evidence is incomplete or malformed and
  * causes an explicit abstention rather than a fabricated low-risk result.
  */
@@ -132,7 +132,8 @@ export function extractFeatures(caseRecord) {
       event.recordedAt >= caseRecord.asOf - 30 * DAY,
   );
   const claims = events.filter((event) => event.type === "claim");
-  if (claims.length === 0) return null;
+  const maternity=events.filter(event=>event.type==="maternity");
+  if (claims.length === 0 && maternity.length === 0) return null;
   const wages = events.filter((event) => event.type === "wage");
   if (
     wages.some(
@@ -198,6 +199,11 @@ export function extractFeatures(caseRecord) {
     Number(chain.found),
     chain.spanDays,
     ...digitalFeatures(events),
+    maternity.length,
+    [...new Set(events.map(e=>e.subjectId))].filter(subject=>{
+      const history=events.filter(e=>e.subjectId===subject);
+      return history.some(r=>r.type==='registration' && history.some(w=>w.type==='wage' && w.recordedAt>r.recordedAt && history.some(m=>m.type==='maternity' && m.recordedAt>w.recordedAt)));
+    }).length,
   ];
   return vector.every(Number.isFinite) ? vector : null;
 }
@@ -319,6 +325,7 @@ export function assess(caseRecord) {
       `${chainCount} linked contributors each complete a registration → wage → exclusion → SANED sequence.`,
     );
   }
+  if(vector[24]>=2)reasons.push(`${vector[24]} linked contributors each complete a registration → wage → maternity request sequence.`);
   if(vector[18]>1000)reasons.push('Verified login locations imply unusually rapid travel; verify account access and location reliability.');
   if(vector[19]>0)reasons.push(`${vector[19]} payment-account changes appear before the assessment; verify ownership before payment.`);
   if(vector[20]>0)reasons.push(`${vector[20]} profile updates appear in the connected history.`);
@@ -343,6 +350,8 @@ export function assess(caseRecord) {
       "Three or more rule overrides":"CJ_RULE_OVERRIDES",
     })[description], description})),
     completedContributorChains: chainCount,
+    maternityContributorChains: vector[24],
+    maternityRequests: vector[23],
     involvedJourneys,
     linkedContributorCount: vector[FEATURE.linkedContributors],
     route: modelFlagged || ruleReasons.length ? "Specialist review" : "Standard review",

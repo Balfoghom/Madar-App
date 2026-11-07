@@ -133,7 +133,7 @@ test('digital histories use fitted ML while ordinary travel and account changes 
  for(const family of ['account_takeover_sequence','coordinated_iban_network','rapid_profile_payment']){
   const evidence=cases.find(c=>c.family===family),result=assess(evidence);
   assert.equal(result.complete,true);assert.equal(result.modelFlagged,true);assert.equal(result.ruleFlagged,false);
-  assert.equal(extractFeatures(evidence).length,23);
+  assert.equal(extractFeatures(evidence).length,25);
  }
  for(const family of ['routine_digital','legitimate_travel','legitimate_account_update'])assert.equal(assess(cases.find(c=>c.family===family)).modelFlagged,false);
 });
@@ -147,5 +147,28 @@ test('digital sequences are contributor-specific and malformed location/account 
  assert.deepEqual(extractFeatures(future),extractFeatures(base));
  for(const change of [e=>{e.events.find(e=>e.type==='login').latitude=120;},e=>{e.events.find(e=>e.type==='iban_change').previousIdentifierId='real-account';},e=>{delete e.events.find(e=>e.type==='profile_update').changedField;}]){
   const invalid=structuredClone(base);change(invalid);assert.equal(assess(invalid).complete,false);
+ }
+});
+
+test('maternity-only histories are assessed across services without a SANED request',async()=>{
+ const {default:incoming}=await import('../data/maternity-intake-cases.json',{with:{type:'json'}});
+ for(const c of incoming){assert.ok(!c.events.some(e=>e.type==='claim'));assert.ok(c.events.some(e=>e.type==='maternity'));}
+ for(const c of incoming.slice(0,3)){
+  const result=assess(c);assert.equal(result.complete,true);assert.equal(result.modelFlagged,true,c.family);
+  assert.ok(result.involvedJourneys.includes('Maternity Benefit'));
+ }
+ for(const c of incoming.slice(3,5)){assert.equal(assess(c).complete,true);assert.equal(assess(c).modelFlagged,false,c.family);assert.equal(assess(c).ruleFlagged,false);}
+ assert.equal(assess(incoming[5]).complete,false);assert.equal(assess(incoming[5]).score,undefined);
+ const c=structuredClone(incoming[0]);assert.equal(assess(c).maternityContributorChains,3);
+ const subjects=[...new Set(c.events.map(e=>e.subjectId))];
+ for(const event of c.events)event.subjectId=subjects[{registration:0,wage:1,maternity:2}[event.type]];
+ assert.equal(assess(c).maternityContributorChains,0);
+});
+test('held-out maternity performance includes legitimate comparisons and preserves prior pattern coverage',()=>{
+ for(const family of ['maternity_coordinated_wage','maternity_shared_account','maternity_source_conflict','coordinated_claim_sequence','account_takeover_sequence','coordinated_iban_network','rapid_profile_payment']){
+  const row=evaluation.byScenario[family];assert.ok(row.aiFlagged/row.count>=.95,family);
+ }
+ for(const family of ['maternity_routine','maternity_legitimate_account_update']){
+  const row=evaluation.byScenario[family];assert.ok(row.aiFlagged/row.count<=.05,family);
  }
 });

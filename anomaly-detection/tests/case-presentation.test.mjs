@@ -67,3 +67,10 @@ test('linked journey labels describe source services without changing the destin
  const future=structuredClone(record);future.crossJourneyEvidence.events.push({...future.crossJourneyEvidence.events[0],journey:'Future service',recordedAt:future.crossJourneyEvidence.asOf+1});
  assert.deepEqual(view.journeys(future),linked);assert.equal(JSON.stringify(record),original);
 });
+
+test('maternity explanations name the request and linked evidence',()=>{
+ const item={assessmentSource:'cross-journey',journey:'Maternity Benefit',modelAssessment:{complete:true,modelFlagged:true,maternityContributorChains:3,reasons:[]}};
+ assert.match(view.mainReason(item),/registration and wage changes preceded maternity requests/);
+ item.modelAssessment.maternityContributorChains=0;item.modelAssessment.reasons=['3 contributors show a login → profile update → IBAN change → request sequence within 24 hours.'];
+ assert.match(view.mainReason(item),/maternity request/);assert.doesNotMatch(view.mainReason(item),/SANED/);
+});

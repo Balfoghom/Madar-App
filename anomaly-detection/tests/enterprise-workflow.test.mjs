@@ -56,7 +56,7 @@ test('saved evidence reassessment does not replace it with the bundled example',
  const again=(await post('/cross-journey/assess',{evidence:record.caseData.crossJourneyEvidence})).saved[0];assert.equal(record.assessmentId,again.assessmentId);assert.notEqual(record.evidenceFingerprint,createCrossJourneyAssessment(demoCases[1]).evidenceFingerprint);
 });
 test('capability registry includes the current cross-journey model',async()=>{
- const registry=await(await fetch(base+'/journey-models')).json();assert.equal(registry.models.length,7);assert.equal(registry.models[0].version,'madar-cross-journey-rf-20261107-v3');assert.equal(registry.models[0].evaluation.testCount,1300);
+ const registry=await(await fetch(base+'/journey-models')).json();assert.equal(registry.models.length,7);assert.equal(registry.models[0].version,'madar-cross-journey-rf-20261107-v4');assert.equal(registry.models[0].evaluation.testCount,1800);
 });
 test('LLM setup absence is explicit and does not alter model evidence',async()=>{
  const record=(await post('/cross-journey/assess',{case_id:demoCases[0].id})).saved[0];

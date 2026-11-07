@@ -1,45 +1,45 @@
 {
-  "modelVersion": "madar-cross-journey-rf-20261107-v3",
-  "artifactSha256": "0ecb4cf4a6a814b0b20d1f0f4bcbea58a725dcf01d49ed2d78b79d2c56c39841",
+  "modelVersion": "madar-cross-journey-rf-20261107-v4",
+  "artifactSha256": "042e148522ec17664eb67c5a8360127ebf3d0f24d9d38e87a58e02a132d9cd89",
   "validation": "Synthetic prototype with contributor-level sequence correction; business validation and real-data evaluation required",
-  "train": 10300,
-  "calibration": 1600,
-  "test": 1300,
-  "routineOrLegitimate": 700,
-  "review": 600,
-  "threshold": 0.0037405151630602556,
-  "thresholdMethod": "97th percentile of a separate routine and legitimate calibration population",
+  "train": 13300,
+  "calibration": 2000,
+  "test": 1800,
+  "routineOrLegitimate": 900,
+  "review": 900,
+  "threshold": 0.01386256615421172,
+  "thresholdMethod": "Maximum per-family 97th percentile of a separate routine and legitimate calibration population",
   "splitMethod": "Disjoint synthetic case, employer, contributor, and identifier IDs; common generator; no real-world generalisation claim",
   "metrics": {
     "Provisional rules only": {
-      "tp": 150,
+      "tp": 250,
       "fp": 0,
-      "fn": 450,
-      "tn": 700,
-      "accuracy": 0.6538461538461539,
+      "fn": 650,
+      "tn": 900,
+      "accuracy": 0.6388888888888888,
       "precision": 1.0,
-      "recall": 0.25,
+      "recall": 0.2777777777777778,
       "falsePositiveRate": 0.0
     },
     "Cross-journey pattern model only": {
-      "tp": 600,
-      "fp": 25,
+      "tp": 900,
+      "fp": 7,
       "fn": 0,
-      "tn": 675,
-      "accuracy": 0.9807692307692307,
-      "precision": 0.96,
+      "tn": 893,
+      "accuracy": 0.9961111111111111,
+      "precision": 0.9922822491730982,
       "recall": 1.0,
-      "falsePositiveRate": 0.03571428571428571
+      "falsePositiveRate": 0.0077777777777777776
     },
     "Rules OR cross-journey AI": {
-      "tp": 600,
-      "fp": 25,
+      "tp": 900,
+      "fp": 7,
       "fn": 0,
-      "tn": 675,
-      "accuracy": 0.9807692307692307,
-      "precision": 0.96,
+      "tn": 893,
+      "accuracy": 0.9961111111111111,
+      "precision": 0.9922822491730982,
       "recall": 1.0,
-      "falsePositiveRate": 0.03571428571428571
+      "falsePositiveRate": 0.0077777777777777776
     }
   },
   "byScenario": {
@@ -50,12 +50,12 @@
     },
     "legitimate_growth": {
       "count": 75,
-      "aiFlagged": 0,
+      "aiFlagged": 4,
       "ruleFlagged": 0
     },
     "legitimate_restructuring": {
       "count": 75,
-      "aiFlagged": 19,
+      "aiFlagged": 0,
       "ruleFlagged": 0
     },
     "coordinated_claim_sequence": {
@@ -85,7 +85,7 @@
     },
     "legitimate_account_update": {
       "count": 100,
-      "aiFlagged": 5,
+      "aiFlagged": 1,
       "ruleFlagged": 0
     },
     "account_takeover_sequence": {
@@ -102,6 +102,31 @@
       "count": 100,
       "aiFlagged": 100,
       "ruleFlagged": 0
+    },
+    "maternity_routine": {
+      "count": 100,
+      "aiFlagged": 0,
+      "ruleFlagged": 0
+    },
+    "maternity_legitimate_account_update": {
+      "count": 100,
+      "aiFlagged": 1,
+      "ruleFlagged": 0
+    },
+    "maternity_coordinated_wage": {
+      "count": 100,
+      "aiFlagged": 100,
+      "ruleFlagged": 0
+    },
+    "maternity_shared_account": {
+      "count": 100,
+      "aiFlagged": 100,
+      "ruleFlagged": 0
+    },
+    "maternity_source_conflict": {
+      "count": 100,
+      "aiFlagged": 100,
+      "ruleFlagged": 100
     }
   }
 }

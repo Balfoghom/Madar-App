@@ -38,6 +38,7 @@ FEATURE_NAMES = [
     "Login events", "Verified login locations", "Maximum verified travel speed (km/h)",
     "IBAN changes", "Profile updates", "Login-profile-IBAN-request sequences",
     "Hours from latest IBAN change to request (log1p)",
+    "Maternity requests in 30 days", "Registration-wage-maternity contributor chains",
 ]
 
 JOURNEYS = {
@@ -54,6 +55,8 @@ JOURNEYS = {
 
 DIGITAL_FAMILIES = ["routine_digital", "legitimate_travel", "legitimate_account_update", "account_takeover_sequence", "coordinated_iban_network", "rapid_profile_payment"]
 REVIEW_DIGITAL = set(DIGITAL_FAMILIES[3:])
+MATERNITY_FAMILIES = ["maternity_routine", "maternity_legitimate_account_update", "maternity_coordinated_wage", "maternity_shared_account", "maternity_source_conflict"]
+REVIEW_MATERNITY = set(MATERNITY_FAMILIES[2:])
 
 def digital_features(events):
     logins = [e for e in events if e["type"] == "login"]
@@ -71,7 +74,7 @@ def digital_features(events):
             hours = (b["recordedAt"]-a["recordedAt"])/HOUR
             if hours > 0: speed=max(speed,min(100000,distance/hours))
         found=False
-        for claim in [e for e in history if e["type"] == "claim"]:
+        for claim in [e for e in history if e["type"] in ("claim", "maternity")]:
             ibans=[e for e in history if e["type"] == "iban_change" and e["recordedAt"] < claim["recordedAt"]]
             if ibans: recencies.append((claim["recordedAt"]-max(e["recordedAt"] for e in ibans))/HOUR)
             for iban in ibans:
@@ -110,6 +113,20 @@ def make_case(rng, index, family="routine", split="train"):
         "events": [],
     }
     subjects = [f"CTR-SYN-{split}-{index:05d}-{n:02d}" for n in range(1, 13)]
+
+    if family in MATERNITY_FAMILIES or family == "maternity_missing":
+        source = {"maternity_routine":"routine", "maternity_legitimate_account_update":"legitimate_account_update", "maternity_coordinated_wage":"coordinated_claim_sequence", "maternity_shared_account":"coordinated_iban_network", "maternity_source_conflict":"retroactive_source_conflict", "maternity_missing":"routine"}[family]
+        case = make_case(rng, index, source, split)
+        case["family"] = family
+        for event in case["events"]:
+            if event["type"] == "claim":
+                event["type"], event["journey"] = "maternity", JOURNEYS["maternity"]
+        if family == "maternity_coordinated_wage":
+            case["events"] = [e for e in case["events"] if e["type"] != "exclusion"]
+        if family == "maternity_missing":
+            # A missing link causes abstention rather than a fabricated risk result.
+            next(e for e in case["events"] if e["type"] == "maternity")["subjectId"] = ""
+        return case
 
     if family in DIGITAL_FAMILIES:
         # Vary event timing between entities without changing event order.
@@ -301,9 +318,21 @@ def ordered_chain(events):
     return False, 30.0
 
 
+def maternity_chains(events):
+    count = 0
+    for subject in {e["subjectId"] for e in events}:
+        history = [e for e in events if e["subjectId"] == subject]
+        if any(r["recordedAt"] < w["recordedAt"] < m["recordedAt"]
+               for r in history if r["type"] == "registration"
+               for w in history if w["type"] == "wage"
+               for m in history if m["type"] == "maternity"):
+            count += 1
+    return count
+
+
 def features(case):
-    """Convert a connected history into the model's sixteen ordered features."""
-    if not case.get("employerId") or not case.get("events"):
+    """Convert a connected history into the model's twenty-five ordered features."""
+    if not case.get("employerId") or not case.get("events") or any(not e.get("subjectId") for e in case["events"]):
         return None
     events = [
         event
@@ -312,7 +341,8 @@ def features(case):
         and event["recordedAt"] >= case["asOf"] - 30 * DAY
     ]
     claims = [event for event in events if event["type"] == "claim"]
-    if not claims:
+    maternity = [e for e in events if e["type"] == "maternity"]
+    if not claims and not maternity:
         return None
     wages = [event for event in events if event["type"] == "wage"]
     exclusions = [event for event in events if event["type"] == "exclusion"]
@@ -358,7 +388,7 @@ def features(case):
         chain_count,
         int(chain),
         chain_span,
-    ] + digital_features(events)
+    ] + digital_features(events) + [len(maternity), maternity_chains(events)]
 
 
 def comparator_rules(vector):
@@ -469,7 +499,7 @@ def write_demo_csvs(cases):
                     "family": case["family"],
                     "expected_review_provisional": int(
                         case["family"]
-                        in REVIEW_DIGITAL | {
+                        in REVIEW_DIGITAL | REVIEW_MATERNITY | {
                             "coordinated_claim_sequence",
                             "identifier_reuse_network",
                             "retroactive_source_conflict",
@@ -478,7 +508,7 @@ def write_demo_csvs(cases):
                     "business_validation_status": (
                         "Digital typology and threshold require specialist validation" if case["family"] in DIGITAL_FAMILIES else "Original business pattern confirmed; model threshold remains a prototype assumption"
                     ),
-                    "primary_journey": "SANED",
+                    "primary_journey": "Maternity Benefit" if case["family"].startswith("maternity_") else "SANED",
                     "employer_id": case.get("employerId") or "",
                     "event_count": len(case["events"]),
                     "journey_count": int(vector[0]) if vector else "",
@@ -498,7 +528,7 @@ def main():
         ("identifier_reuse_network", 600),
         ("retroactive_source_conflict", 600),
     ]
-    train_counts += [(family, 600) for family in DIGITAL_FAMILIES]
+    train_counts += [(family, 600) for family in DIGITAL_FAMILIES + MATERNITY_FAMILIES]
     train = generate_population(
         rng,
         "train",
@@ -507,7 +537,7 @@ def main():
     calibration = generate_population(
         rng,
         "calibration",
-        [("routine", 800), ("legitimate_growth", 100), ("legitimate_restructuring", 100)] + [(family,200) for family in DIGITAL_FAMILIES[:3]],
+        [("routine", 800), ("legitimate_growth", 100), ("legitimate_restructuring", 100)] + [(family,200) for family in DIGITAL_FAMILIES[:3] + MATERNITY_FAMILIES[:2]],
     )
     test_counts = [
         ("routine", 250),
@@ -517,7 +547,7 @@ def main():
         ("identifier_reuse_network", 75),
         ("retroactive_source_conflict", 75),
     ]
-    test_counts += [(family,100) for family in DIGITAL_FAMILIES]
+    test_counts += [(family,100) for family in DIGITAL_FAMILIES + MATERNITY_FAMILIES]
     test = generate_population(rng, "test", test_counts)
 
     review_families = {
@@ -525,7 +555,7 @@ def main():
         "identifier_reuse_network",
         "retroactive_source_conflict",
     }
-    review_families |= REVIEW_DIGITAL
+    review_families |= REVIEW_DIGITAL | REVIEW_MATERNITY
     train_x = np.asarray([features(case) for case in train], dtype=np.float32)
     train_y = np.asarray([case["family"] in review_families for case in train], dtype=np.int8)
     calibration_x = np.asarray([features(case) for case in calibration], dtype=np.float32)
@@ -541,7 +571,11 @@ def main():
         n_jobs=1,
     ).fit(train_x, train_y)
     calibration_scores = sorted(model.predict_proba(calibration_x)[:, 1].tolist())
-    threshold = float(np.quantile(calibration_scores, 0.97) + 1e-10)
+    # Balance calibration across legitimate scenario families so the larger SANED
+    # population cannot set a disproportionately sensitive maternity threshold.
+    calibration_predictions = model.predict_proba(calibration_x)[:, 1]
+    calibration_thresholds = {family: float(np.quantile([calibration_predictions[i] for i,c in enumerate(calibration) if c["family"] == family], .97)) for family in sorted({c["family"] for c in calibration})}
+    threshold = max(calibration_thresholds.values()) + 1e-10
 
     trees = []
     for estimator in model.estimators_:
@@ -560,7 +594,7 @@ def main():
         )
 
     artifact = {
-        "version": "madar-cross-journey-rf-20261107-v3",
+        "version": "madar-cross-journey-rf-20261107-v4",
         "algorithm": "Random Forest cross-journey pattern classifier",
         "sklearnVersion": sklearn.__version__,
         "seed": 20261017,
@@ -570,6 +604,7 @@ def main():
         "calibrationScores": calibration_scores,
         "trainCount": len(train),
         "calibrationCount": len(calibration),
+        "calibrationThresholds": calibration_thresholds,
         "referenceMedian": np.median(train_x, axis=0).tolist(),
         "referenceP05": np.quantile(train_x, 0.05, axis=0).tolist(),
         "referenceP95": np.quantile(train_x, 0.95, axis=0).tolist(),
@@ -593,7 +628,7 @@ def main():
         "routineOrLegitimate": expected.count(False),
         "review": expected.count(True),
         "threshold": threshold,
-        "thresholdMethod": "97th percentile of a separate routine and legitimate calibration population",
+        "thresholdMethod": "Maximum per-family 97th percentile of a separate routine and legitimate calibration population",
         "splitMethod": "Disjoint synthetic case, employer, contributor, and identifier IDs; common generator; no real-world generalisation claim",
         "metrics": {
             "Provisional rules only": metric_counts(expected, rules),
@@ -626,17 +661,13 @@ def main():
         )
     )
 
-    demo_families = [
-        "routine",
-        "coordinated_claim_sequence",
-        "legitimate_restructuring",
-        "identifier_reuse_network",
-        "retroactive_source_conflict",
-        "missing",
-    ]
-    demo_families += DIGITAL_FAMILIES
-    demos = [make_case(rng, index, family, "demo") for index, family in enumerate(demo_families)]
+    # Preserve the curated baseline source histories across model upgrades.
+    # Their evidence is versioned independently of training populations.
+    demos = json.loads((OUT / "demo-cases.json").read_text())
     (OUT / "demo-cases.json").write_text(json.dumps(demos, separators=(",", ":")))
+    incoming_rng = np.random.default_rng(20261107)
+    incoming = [make_case(incoming_rng, index, family, "intake-maternity-v1") for index, family in enumerate(MATERNITY_FAMILIES[2:] + MATERNITY_FAMILIES[:2] + ["maternity_missing"])]
+    (OUT / "maternity-intake-cases.json").write_text(json.dumps(incoming, separators=(",", ":")))
     write_demo_csvs(demos)
 
     parity = []

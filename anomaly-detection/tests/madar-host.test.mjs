@@ -26,7 +26,7 @@ test('single-server hosting supplies assets and same-origin API behind optional 
  const {readFile}=await import('node:fs/promises');
  assert.equal(await sample.text(),await readFile(new URL('../examples/synthetic-model-evidence.csv',import.meta.url),'utf8'));
  assert.equal((await fetch(base+'/synthetic-model-evidence.csv',{method:'POST',headers})).status,404);
- const health=await(await fetch(base+'/api/health',{headers})).json();assert.equal(health.crossJourneyModelVersion,'madar-cross-journey-rf-20261107-v3');
+ const health=await(await fetch(base+'/api/health',{headers})).json();assert.equal(health.crossJourneyModelVersion,'madar-cross-journey-rf-20261107-v4');
  assert.equal((await fetch(base+'/anomaly-detection/data/backend-assessments.json',{headers})).status,404);
  assert.equal((await fetch(base+'/api/cross-journey/assess',{method:'POST',headers:{...headers,Origin:'https://unrelated.example'},body:'{}'})).status,403);
 });

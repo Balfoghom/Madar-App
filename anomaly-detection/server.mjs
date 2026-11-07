@@ -1,5 +1,5 @@
 import {routingPolicy} from './lib/routing-policy.mjs';
-import {createWorkspacePortfolio,enrichDemoRecord,applyBusinessConfig,caseStatus,activeWorkspaceRecords} from './lib/workspace-demo.mjs';
+import {createWorkspacePortfolio,createDemoIntake,DEMO_INTAKE_BATCH,enrichDemoRecord,applyBusinessConfig,caseStatus,activeWorkspaceRecords} from './lib/workspace-demo.mjs';
 import {createDemoPortfolio} from './lib/demo-portfolio.mjs';
 import {withDataQuality} from './lib/data-quality.mjs';
 import {llmStatus, explanationEvidence, generateExplanation, generateCaseAnswer, validateLanguage, validateConversation, PROMPT_VERSION} from './lib/case-explainer.mjs';
@@ -464,7 +464,7 @@ export function createInferenceServer({explain = generateExplanation, answer = g
           const migrated=previous.map(record=>{
             if(record.assessmentSource!=='cross-journey'||!record.caseData?.crossJourneyEvidence||record.modelResult?.modelVersion===crossJourneyModel.version)return record;
             const fresh=createCrossJourneyAssessment(record.caseData.crossJourneyEvidence),old=record.caseData;
-            const preserved={};for(const key of ['customerName','employerName','subject','entity','nationalId','mobile','employerNumber','supervisorName','country','region','city','transactionAmount','amountAtRisk','preventedAmount','confirmedFraudAmount','paymentStatus','financialOutcome','financialProvenance','outcome','outcomeProvenance','decisionDate','decisionOwner','reviewHistory','humanDecision','workflow','workflowStage','demoPortfolio'])if(old[key]!==undefined)preserved[key]=old[key];
+            const preserved={};for(const key of ['customerName','employerName','subject','entity','nationalId','mobile','employerNumber','supervisorName','country','region','city','transactionAmount','amountAtRisk','preventedAmount','confirmedFraudAmount','paymentStatus','financialOutcome','financialProvenance','outcome','outcomeProvenance','decisionDate','decisionOwner','reviewHistory','humanDecision','workflow','workflowStage','demoPortfolio','demoIntakeBatch','intakeReceivedAt','scenario'])if(old[key]!==undefined)preserved[key]=old[key];
             Object.assign(fresh.caseData,preserved,{assessmentHistory:[...(old.assessmentHistory||[]),{assessmentId:record.assessmentId,modelVersion:record.modelResult?.modelVersion,assessedAt:record.assessedAt}].slice(-10)});
             if(old.humanDecision)fresh.caseData.route=old.route;
             fresh.caseData.status=caseStatus(fresh.caseData);fresh.reviewHistory=record.reviewHistory||[];
@@ -486,6 +486,17 @@ export function createInferenceServer({explain = generateExplanation, answer = g
           return {saved:activeWorkspaceRecords(records).map(withDataQuality),added:added.length,syntheticOnly:true};
         });assessmentWrites=operation;return send(200,await operation);
       }catch{return send(500,{error:'Could not prepare the demo workspace. Existing records are retained.'});}
+    }
+    if(req.method === 'POST' && path === '/demo-intake'){
+      try{
+        const operation=assessmentWrites.catch(()=>{}).then(async()=>{
+          const previous=await readSavedAssessments(),known=new Set(previous.map(r=>r.caseId));
+          const incoming=createDemoIntake(),added=incoming.filter(r=>!known.has(r.caseId));
+          const records=[...added,...previous];
+          if(added.length)await writeSavedAssessments(records);
+          return {batchId:DEMO_INTAKE_BATCH,received:incoming.length,added:added.length,alreadyLoaded:incoming.length-added.length,complete:added.filter(r=>r.complete).length,incomplete:added.filter(r=>!r.complete).length,review:added.filter(r=>r.complete&&(r.modelFlagged||r.ruleFlagged)).length,saved:activeWorkspaceRecords(records).map(withDataQuality),syntheticOnly:true};
+        });assessmentWrites=operation;return send(200,await operation);
+      }catch{return send(500,{error:'Could not assess the demo upload. Retry the same batch safely; existing cases and reviews are retained.'});}
     }
     if(req.method === 'POST' && path === '/demo-portfolio'){
       try{

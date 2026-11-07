@@ -15,7 +15,7 @@ test('expanded event CSV round-trips all twelve genuine model assessments',()=>{
  const grouped=parseEventCSV(csv);assert.equal(grouped.length,12);assert.equal(grouped.reduce((n,c)=>n+c.events.length,0),demoCases.reduce((n,c)=>n+c.events.length,0));
  const results=grouped.map(createCrossJourneyAssessment);
  for (let i=0;i<results.length;i++) assert.equal(results[i].evidenceFingerprint,createCrossJourneyAssessment(demoCases[i]).evidenceFingerprint);
- assert.deepEqual(results.map(r=>r.modelFlagged??null),[false,true,true,true,true,null,false,false,false,true,true,true]);
+ assert.deepEqual(results.map(r=>r.modelFlagged??null),[false,true,false,true,true,null,false,false,false,true,true,true]);
  assert.deepEqual(results.map(r=>r.ruleFlagged??null),[false,false,false,true,true,null,false,false,false,false,false,false]);
  const proof=results[1];assert.equal(proof.caseData.sourceTimeline.length,12);assert.equal(proof.linkedContributorCount,3);assert.equal(proof.caseData.score,null);assert.equal(proof.caseData.entity,grouped[1].employerId);
  assert.equal(results[5].caseData.risk,'Incomplete');assert.equal(results[5].percentile,null);
@@ -45,7 +45,7 @@ test('connected import is idempotent, decisions persist, changed evidence requir
  const restored=(await(await fetch(base+'/assessments')).json()).find(r=>r.caseId===proof.caseId);assert.equal(restored.reviewHistory.length,1);assert.equal(restored.caseData.status,'Route approved');
  const changed=csv.replaceAll('1792195200000','1792195200001');const updated=await(await post('/cross-journey/assess',{csv:changed})).json();const next=updated.saved.find(r=>r.caseId===proof.caseId);assert.notEqual(next.assessmentId,proof.assessmentId);assert.equal(next.reviewHistory.length,1);assert.equal(next.caseData.status,'Awaiting specialist');
  assert.equal((await post('/decision',{caseId:proof.caseId,assessmentId:proof.assessmentId,action:'approve',note:'Stale review',actorName:'Test'})).status,409);
- const health=await(await fetch(base+'/health')).json();assert.equal(health.crossJourneyModelVersion,'madar-cross-journey-rf-20261107-v3');
+ const health=await(await fetch(base+'/health')).json();assert.equal(health.crossJourneyModelVersion,'madar-cross-journey-rf-20261107-v4');
 });
 
 test('reported source conflicts require verification without changing the model flag',()=>{

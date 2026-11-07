@@ -82,8 +82,10 @@
   function mainReason(item) {
     if(item.assessmentSource!=='cross-journey')return item.primaryReason||item.signals?.[0]?.[1]||'Review the supplied evidence.';
     const model=item.modelAssessment||{},reasons=model.reasons||[];
-    const request=item.journey==='SANED'?'SANED request':'service request';
+    const request=item.journey==='SANED'?'SANED request':item.journey==='Maternity Benefit'?'maternity request':'service request';
     if(model.complete===false)return 'The connected source evidence is incomplete: '+(reasons[0]||'required event or employer records are missing.');
+    if(!model.modelFlagged&&!model.ruleFlagged)return 'The connected activity remained below the model and comparator review thresholds.';
+    if(model.maternityContributorChains>=2)return `Repeated registration and wage changes preceded maternity requests across ${model.maternityContributorChains} linked contributors.`;
     const chains=model.completedContributorChains;
     if(chains>=2)return `Repeated registration, wage and employment-exclusion changes preceded SANED requests across ${chains} linked contributors.`;
     const sequence=reasons.find(reason=>/contributors show a login →/.test(reason));
@@ -95,7 +97,6 @@
     if(reasons.some(reason=>/Wage increase of 80/i.test(reason)))return `A wage increase of at least 80% appears in the linked records before the ${request}.`;
     const accounts=reasons.find(reason=>/payment-account changes appear/i.test(reason));
     if(accounts){const count=Number(accounts.match(/^\d+/)?.[0]);return `Payment-account details changed before the ${request}: ${count} IBAN change${count===1?' requires':'s require'} ownership verification.`;}
-    if(!model.modelFlagged&&!model.ruleFlagged)return 'The connected activity remained below the model and comparator review thresholds.';
     const evidence=item.crossJourneyEvidence,events=(evidence?.events||[]).filter(event=>Number.isFinite(event.recordedAt)&&event.recordedAt<=evidence.asOf&&event.recordedAt>=evidence.asOf-30*86400000);
     const exclusions=events.filter(event=>event.type==='exclusion').length;
     if(exclusions)return `Employment exclusions preceded the ${request}: ${exclusions} exclusion record${exclusions===1?' appears':'s appear'} in the linked history.`;

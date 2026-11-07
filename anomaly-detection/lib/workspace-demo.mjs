@@ -4,6 +4,8 @@ import {withDataQuality} from './data-quality.mjs';
 import {createApplicationAssessment} from './assessment-adapter.mjs';
 import {routingPolicy} from './routing-policy.mjs';
 import {createDemoPortfolio} from './demo-portfolio.mjs';
+import maternityIntake from '../cross-journey/data/maternity-intake-cases.json' with {type:'json'};
+import {createCrossJourneyAssessment} from './cross-journey-adapter.mjs';
 const names=['Mohammed Alotaibi','Noura Alharbi','Abdullah Alqahtani','Abeer Alasmari','Faisal Aldosari','Reem Alzahrani','Khalid Alghamdi','Hessa Alenezi','Saad Almutairi','Maha Alsubaie','Sultan Alrasheed','Jawaher Albalawi','Ahmed Aljuhani','Nouf Alasmari','Saleh Almarri','Ghada Almutairi'];
 const employers=['Al Manar Services Co.','Riyadh Horizon Trading','Najd Technical Solutions','Eastern Gate Contracting','Al Waha Logistics','Arabian Field Services','Mada Operations Co.','Rowad Business Support','Takamul Industrial Services','Bunyan Facilities Management'];
 const hash=value=>parseInt(createHash('sha256').update(String(value)).digest('hex').slice(0,7),16);
@@ -87,3 +89,18 @@ export function createLoginQualityExamples(now=new Date()){
 }
 export function createWorkspacePortfolio(now=new Date()){return [...createBusinessPortfolio(now),...createDemoPortfolio(now),...createLoginQualityExamples(now)].map(enrichDemoRecord);}
 export function activeWorkspaceRecords(records){return records.filter((r,i,a)=>r.caseData&&!r.caseData.demoDuplicateOf&&a.findIndex(x=>x.caseId===r.caseId)===i);}
+
+// This fixed source batch is separate from the preloaded portfolio. Stable source
+// IDs make retries safe; every new history goes through the fitted model.
+export const DEMO_INTAKE_BATCH='maternity-v1';
+export function createDemoIntake(now=new Date()){
+ const names=['Latifah Saad Alharbi','Dania Omar Alqahtani','Bayan Fahad Alotaibi','Wijdan Khalid Alzahrani','Raghad Nasser Alghamdi','Basma Hamad Almutairi'];
+ const scenarios=['Registration and wage changes before linked maternity requests','Shared payment account before maternity requests','Conflicting wage records before a maternity request','Routine maternity request with linked employment history','Maternity request after a legitimate account update','Maternity request missing a contributor link'];
+ return maternityIntake.map((evidence,index)=>{
+  const record=createCrossJourneyAssessment(structuredClone(evidence));
+  Object.assign(record.caseData,{demoPortfolio:true,demoIntakeBatch:DEMO_INTAKE_BATCH,intakeReceivedAt:now.toISOString(),customerName:names[index],scenario:scenarios[index],country:'Saudi Arabia',region:index%2?'Makkah':'Riyadh',city:index%2?'Jeddah':'Riyadh',transactionAmount:24000+index*2000,amountAtRisk:!record.complete?null:(record.modelFlagged||record.ruleFlagged)?24000+index*2000:0,financialProvenance:'Supplied synthetic maternity request amount; not an inferred entitlement or confirmed loss.',detectionMethod:'Cross-journey AI + comparator rules'});
+  const enriched=enrichDemoRecord(record);
+  if(!record.complete)enriched.caseData.amountAtRisk=null;
+  return enriched;
+ });
+}

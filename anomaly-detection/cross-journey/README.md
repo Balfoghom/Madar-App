@@ -12,7 +12,8 @@ The model connects events through the same synthetic employer and contributors a
 
 1. Employer Registration
 2. Contribution & Wage
-3. SANED
+3. SANED or Maternity Benefit
+4. Digital Access, Account Maintenance and Benefit Payments where supplied
 
 The main proof case contains three contributors who follow a registration → wage change → retroactive exclusion → SANED request sequence. Each individual signal remains below the included comparator-rule thresholds. The trained cross-journey model recommends specialist review.
 
@@ -24,28 +25,28 @@ The SANED model in the parent directory remains an unsupervised Isolation Forest
 
 This design is deliberate. A broad Isolation Forest was tested first, but legitimate high-volume activity was more globally unusual than the coordinated below-threshold sequence. A supervised pattern model is more suitable for proving detection of a specific business typology. Haitham confirmed the typology; Data & AI validation is still required before the fitted threshold or metrics can be treated as production evidence.
 
-The model uses 23 derived features, including journey count, event volume, linked contributors, registration/wage/exclusion/SANED counts, wage and retroactivity values, identifier reuse, conflicts, overrides, and the count and timing of completed cross-journey sequences.
+The model uses 25 derived features, including journey count, event volume, linked contributors, registration/wage/exclusion/SANED/maternity counts, wage and retroactivity values, identifier reuse, conflicts, overrides, and the count and timing of completed cross-journey sequences.
 
 The model score measures similarity to the provisional synthetic review patterns. It is not a fraud probability.
 
 ## Data and evaluation
 
-- Training: 10,300 synthetic connected histories
-- Calibration: 1,600 separate routine or legitimate histories
-- Test: 1,300 separate histories
-- Test population: 700 routine/legitimate and 600 provisional review cases
+- Training: 13,300 synthetic connected histories
+- Calibration: 2,000 separate routine or legitimate histories
+- Test: 1,800 separate histories
+- Test population: 900 routine/legitimate and 900 provisional review cases
 - Model: 180-tree Random Forest
-- Model version: `madar-cross-journey-rf-20261107-v3`
+- Model version: `madar-cross-journey-rf-20261107-v4`
 
 | Method | Review cases found | Missed | Legitimate cases flagged | Accuracy |
 |---|---:|---:|---:|---:|
-| Provisional rules | 150 / 600 | 450 | 0 / 700 | 65.4% |
-| Cross-journey model | 600 / 600 | 0 | 25 / 700 | 98.1% |
-| Rules OR model | 600 / 600 | 0 | 25 / 700 | 98.1% |
+| Provisional rules | 250 / 900 | 650 | 0 / 900 | 63.9% |
+| Cross-journey model | 900 / 900 | 0 | 7 / 900 | 99.6% |
+| Rules OR model | 900 / 900 | 0 | 7 / 900 | 99.6% |
 
 The key proof family contains 150 coordinated-sequence test cases. The model flags all 150 while the comparator rules flag none. These results are against the same synthetic generator families used to design training data. They do not establish production fraud accuracy, savings, fairness, or generalisation to real GOSI activity.
 
-The false alarms are retained by scenario in `data/evaluation.json` and should be discussed as specialist review workload. One legitimate-restructuring demo also crosses the model threshold: it illustrates why a flag requires human review. They are retained in the report and should be discussed as review workload.
+The false alarms are retained by scenario in `data/evaluation.json` and should be discussed as specialist review workload. Legitimate calibration families are balanced by choosing the maximum per-family 97th percentile. Held-out false alarms remain visible as review workload.
 
 ## Files for Manal
 
@@ -103,3 +104,10 @@ Version 3 adds Digital Access and Account Maintenance events before benefit requ
 The model is retrained offline, not a renamed business rule. Three new suspicious families (account-takeover-like sequence, coordinated shared-IBAN changes, repeated profile/payment-account updates) and three legitimate families (routine digital access, plausible travel, legitimate account updates) are included across disjoint training/calibration/test entity namespaces. The new digital scenarios require specialist validation; confirmation of the original employment typology does not validate them. Synthetic financial context does not feed the classifier. A model review recommendation does not confirm fraud or automatically stop payment.
 
 The comparator rules are unchanged to preserve an explicit ML-only demonstration. Twelve bundled examples include the original six histories and six digital histories. Event CSV columns now support `latitude`, `longitude`, `location_verified`, `previous_identifier_id`, and `changed_field`. Login coordinates must be bounded numbers; IBAN changes require distinct synthetic previous/new account identifiers; profile fields use mobile/email/address/identity.
+
+
+## Maternity intake extension
+
+Version 4 accepts maternity requests without requiring a SANED claim. It adds maternity-request count and contributor-level registration → wage → maternity chains, and generalizes digital request sequences to both terminal services. Existing SANED features and comparator rules retain their meaning. Maternity is not itself a risk indicator: training, calibration and holdout include routine histories and legitimate account changes. Three provisional review families cover coordinated wage histories, shared-account digital sequences and conflicting retroactive source records. These new typologies need business validation.
+
+`data/maternity-intake-cases.json` is a reproducible separate six-case intake batch (three review examples, two legitimate and one incomplete). It never enters the automatic 77-case baseline. Uploading it appends new cases; stable IDs prevent duplicates on retry. Curated baseline histories remain unchanged by retraining. Python/JavaScript parity checks cover both services, and malformed links abstain. Training is reproducible with the pinned requirements and `python training/train.py`.

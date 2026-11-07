@@ -70,6 +70,7 @@ export function createCrossJourneyAssessment(evidence) {
   const primaryJourney=destination?.journey||events.at(-1)?.journey||"Cross-journey";
   const reasonCodes = [{code: !result.complete ? 'EVIDENCE_INCOMPLETE' : result.modelFlagged ? 'CROSS_JOURNEY_PATTERN' : 'MODEL_NOT_FLAGGED', description:result.reasons[0]}];
   if (result.completedContributorChains >= 2) reasonCodes.push({code:'CJ_COMPLETED_CONTRIBUTOR_SEQUENCE',description:result.reasons[1]});
+  if(result.maternityContributorChains>=2)reasonCodes.push({code:'CJ_MATERNITY_CONTRIBUTOR_SEQUENCE',description:result.reasons.find(r=>r.includes('registration → wage → maternity'))});
   for(const [index,description] of result.reasons.entries())if(index>0&&!reasonCodes.some(r=>r.description===description))reasonCodes.push({code:'CROSS_JOURNEY_EVIDENCE_'+index,description});
   reasonCodes.push(...(result.ruleFindings || []));
   const caseData = {
