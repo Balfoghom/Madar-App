@@ -23,7 +23,7 @@
     host.querySelectorAll('[data-evidence]').forEach(button=>button.onclick=()=>{
       const article=[...sourceHost.querySelectorAll('.ops-brief-evidence article')].find(node=>node.id==='brief-fact-'+button.dataset.evidence);
       if(!article)return;
-      article.closest('details').open=true;
+      const disclosure=article.closest('details');if(disclosure)disclosure.open=true;
       article.scrollIntoView({behavior:'smooth',block:'center'});article.focus({preventScroll:true});
     });
   }
@@ -60,7 +60,14 @@
   function renderAssistant(draft,host,item,language){
     const t=copy[language],brief=draft.explanation;
     host.innerHTML=`<div class="case-brief-overview">${citedItem(brief.overview,draft.facts)}</div><div class="case-brief-point"><h4>${t.why}</h4>${citedItem(brief.whyItMatters,draft.facts)}</div>${brief.nextSteps.length?`<div class="case-brief-point"><h4>${t.next}</h4>${brief.nextSteps.slice(0,1).map(step=>citedItem(step,draft.facts)).join('')}</div>`:''}<p class="case-draft-note">${t.draft}</p><button type="button" class="case-ask-button">${t.ask} <span aria-hidden="true">↗</span></button><details class="ops-brief-evidence"><summary>${t.sources}</summary><h4>${t.more}</h4>${[...brief.findings,...brief.questions,...brief.nextSteps.slice(1)].map(part=>citedItem(part,draft.facts)).join('')}${evidenceMarkup(draft.facts)}<p class="case-draft-note">${esc(draft.provider)} · ${esc(draft.model)} · ${esc(new Date(draft.generatedAt).toLocaleString(language==='ar'?'ar-SA':'en-GB'))}</p></details>`;
-    wireCitations(host,host);host.querySelector('.case-ask-button').onclick=()=>openConversation(item,draft,language);
+    flattenCaseSections(host);wireCitations(host,host);host.querySelector('.case-ask-button').onclick=()=>openConversation(item,draft,language);
+  }
+  function flattenCaseSections(host){
+    host.querySelectorAll('details').forEach(details=>{
+      const section=document.createElement('section');section.className=details.className;section.id=details.id;
+      const summary=details.querySelector(':scope > summary');if(summary){const heading=document.createElement('h4');heading.textContent=summary.textContent;summary.replaceWith(heading);}
+      section.append(...details.childNodes);details.replaceWith(section);
+    });
   }
   function enhanceCase(){
     const item=portfolioCases().find(c=>c.id===selectedId),panel=document.querySelector('#case-panel');panel.hidden=!casePanelOpen;document.body.classList.toggle('case-drawer-open',casePanelOpen);if(!item||!casePanelOpen)return;
@@ -85,41 +92,46 @@
     }
     const action=panel.querySelector('.recommendation')?.closest('section'),controls=action?.querySelector('.action-row');
     const sourceSections=[...panel.children].filter(node=>node.matches('section.detail-section')&&node!==action);
-    const groupNames={context:ar?'الأطراف والسياق المالي':'People & financial context',activity:ar?'تسلسل الأحداث والمصادر':'Activity & source records',assessment:ar?'التقييم واحتساب الدرجة':'Assessment & scoring',history:ar?'سجل المراجعات':'Review history'};
-    const sourceHost=document.createElement('div');sourceHost.className='case-source-groups';
-    const groups={};for(const [key,title] of Object.entries(groupNames)){const group=document.createElement('details');group.id='case-source-'+key;group.className='case-source-group';group.innerHTML=`<summary>${title}</summary>`;groups[key]=group;sourceHost.append(group);}
+    const groups={};
     for(const section of sourceSections){
       const heading=section.querySelector('h3')?.textContent||'';
-      const key=/context/i.test(heading)?'context':/timeline|Connected journey/i.test(heading)?'activity':/history|scenario|governance|approval/i.test(heading)?'history':'assessment';
-      if(/processing steps/i.test(heading)){const inner=document.createElement('details');inner.className='case-processing';inner.innerHTML='<summary>Processing details</summary>';inner.append(section);groups.assessment.append(inner);}else groups[key].append(section);
+      if(/processing steps/i.test(heading))section.querySelector('h3').textContent='Assessment activity';
+      if(/context/i.test(heading))groups.context=section;
+      if(/timeline|Connected journey/i.test(heading))groups.activity=section;
+      if(/Assessment components/i.test(heading))groups.assessment=section;
+      if(/review history/i.test(heading))groups.history=section;
     }
-    const scoreNote=document.createElement('p');scoreNote.className='case-score-note';scoreNote.textContent=score.note;groups.assessment.querySelector('summary').after(scoreNote);
-    if(!groups.activity.querySelector('section'))groups.activity.insertAdjacentHTML('beforeend','<p class="case-source-empty">No separate source timeline is supplied for this example.</p>');
-    if(!groups.history.querySelector('section'))groups.history.insertAdjacentHTML('beforeend','<p class="case-source-empty">No specialist review has been recorded.</p>');
-    const trace=groups.assessment.querySelector('.agent-trace')?.children[1];if(trace&&(item.rulesAssessment||!item.modelAssessment?.complete)){trace.querySelector('strong').textContent=item.rulesAssessment?.complete?'Business control checked':'Assessment deferred';trace.querySelector('small').textContent=item.rulesAssessment?.complete?'Supplied records checked against the illustrative business rule; no AI model used.':'Complete the required evidence before model review.';}
-    action?.remove();
-    const keyFacts=document.createElement('section');keyFacts.className='detail-section case-key-facts';keyFacts.innerHTML=`<h3>${ar?'أبرز الأدلة':'Key evidence'}</h3>${view.keyEvidence(item).map(fact=>`<button type="button" class="case-fact" data-source="${fact.target}"><strong>${esc(fact.title)}</strong><span>${esc(fact.text)}</span><small>${ar?'عرض المصدر':'View source'} ↗</small></button>`).join('')}<div class="case-exposure-line"><span>${esc(financial.label)}</span><strong>${financial.amount===null?(ar?'غير متاح':'Not supplied'):formatSar(financial.amount)}</strong></div>`;
-    keyFacts.querySelectorAll('[data-source]').forEach(button=>button.onclick=()=>{const group=groups[button.dataset.source];group.open=true;group.scrollIntoView({behavior:'smooth',block:'start'});group.querySelector('summary').focus();});
-    const next=document.createElement('section');next.className='detail-section case-next-step';
-    const owner=routeOwnership(item);
-    next.innerHTML=`<h3>${esc(state.resolved?(ar?'النتيجة المسجلة':'Recorded outcome'):state.incomplete?(ar?'الأدلة المطلوبة':'Evidence needed'):(ar?'الخطوة التالية':'Next step'))}</h3><strong class="case-next-title">${esc(state.resolved?item.outcome:item.route)}</strong><p>${esc(state.resolved?(item.financialOutcome||'Outcome recorded. Review the history for supporting notes.'):owner.next)}</p><dl><div><dt>${state.resolved?'Recorded by':'Recommended team'}</dt><dd>${esc(state.resolved?item.decisionOwner||'See review history':owner.owner)}</dd></div></dl>${state.scripted?'<small>Scripted demonstration outcome · not an actual finding or realised saving.</small>':''}`;
-    const workflow=document.createElement('details');workflow.className='case-workflow';
+    const trace=panel.querySelector('.agent-trace')?.children[1];
+    if(trace&&(item.rulesAssessment||!item.modelAssessment?.complete)){trace.querySelector('strong').textContent=item.rulesAssessment?.complete?'Business control checked':'Assessment deferred';trace.querySelector('small').textContent=item.rulesAssessment?.complete?'Supplied records checked against the illustrative business rule; no AI model used.':'Complete the required evidence before model review.';}
+    const next=action;
+    const workflow=document.createElement('section');workflow.className='case-workflow';
     const stages=['New','Triage','Investigation','Decision pending','Closed'],current=item.workflow||{stage:'New',revision:0,assignedTo:''},stageIndex=stages.indexOf(current.stage);
-    workflow.innerHTML=`<summary>${ar?'متابعة الحالة':'Case ownership & progress'} · ${esc(current.stage)}</summary><p>${ar?'الفريق المقترح':'Recommended team'}: ${esc(MadarRoutingPolicy.ownership(item.route,item.journey).owner)}</p><p>${ar?'النتيجة والمسار ومرحلة العمل حقول منفصلة.':'The recommended route, specialist outcome and work stage are tracked separately.'}</p><form><label>Case owner<input name="assignedTo" maxlength="120" required value="${esc(current.assignedTo)}"></label><label>Work stage<select name="workflowStage">${stages.map((stage,index)=>`<option ${stage===current.stage?'selected':''} ${Math.abs(index-stageIndex)>1?'disabled':''}>${stage}</option>`).join('')}</select></label><label>Reviewer<input name="actorName" maxlength="120" required></label><label>Rationale<textarea name="note" maxlength="2000" required rows="2"></textarea></label><button class="secondary-btn" type="submit" ${!item.assessmentId?'disabled':''}>Save case progress</button><p role="status" aria-live="polite"></p></form>`;
+    workflow.innerHTML=`<h3>${ar?'متابعة الحالة':'Case ownership & progress'} · ${esc(current.stage)}</h3><p>${ar?'الفريق المقترح':'Recommended team'}: ${esc(MadarRoutingPolicy.ownership(item.route,item.journey).owner)}</p><p>${ar?'النتيجة والمسار ومرحلة العمل حقول منفصلة.':'The recommended route, specialist outcome and work stage are tracked separately.'}</p><form><label>Case owner<input name="assignedTo" maxlength="120" required value="${esc(current.assignedTo)}"></label><label>Work stage<select name="workflowStage">${stages.map((stage,index)=>`<option ${stage===current.stage?'selected':''} ${Math.abs(index-stageIndex)>1?'disabled':''}>${stage}</option>`).join('')}</select></label><label>Reviewer<input name="actorName" maxlength="120" required></label><label>Rationale<textarea name="note" maxlength="2000" required rows="2"></textarea></label><button class="secondary-btn" type="submit" ${!item.assessmentId?'disabled':''}>Save case progress</button><p role="status" aria-live="polite"></p></form>`;
     next.append(workflow);
     workflow.querySelector('form').onsubmit=async event=>{
       event.preventDefault();const form=event.currentTarget,button=form.querySelector('button'),status=form.querySelector('[role="status"]');button.disabled=true;status.textContent='Saving…';
       try{const fields=Object.fromEntries(new FormData(form));const saved=await backendJSON('/case-workflow',{...fields,caseId:item.id,assessmentId:item.assessmentId,expectedRevision:current.revision});const index=cases.findIndex(c=>c.id===item.id);if(index>=0)cases[index]={...saved.caseData,assessmentId:saved.assessmentId};renderAll();showToast('Case owner and progress saved.');}
       catch(error){status.textContent=error.message;button.disabled=false;}
     };
-    const footer=document.createElement('footer');footer.className='case-review-footer';footer.innerHTML=`<small>${ar?'القرار النهائي للمختص':'The specialist retains the final decision.'}</small><button type="button" class="primary-btn">${esc(ar?(state.resolved?'تحديث النتيجة':'تسجيل المراجعة'):state.action)}</button>`;
-    footer.querySelector('button').disabled=!item.assessmentId;
-    const chooser=document.createElement('dialog');chooser.id='case-review-actions';chooser.className='case-review-dialog';chooser.setAttribute('aria-labelledby','case-review-heading');chooser.innerHTML=`<div class="dialog-head"><div><h2 id="case-review-heading">${ar?'تسجيل المراجعة':'Record review'}</h2><p>${esc(item.transactionId)} · ${esc(state.status)}</p></div><button type="button" class="icon-button" aria-label="Close">×</button></div><p>Choose how to proceed. Your name and rationale are required when saving.</p>`;
-    if(controls){controls.querySelector('#record-outcome-btn').textContent=state.resolved?'Update outcome':'Record outcome';if(state.resolved)controls.querySelectorAll('#approve-route,#override-route-btn,#reject-route').forEach(button=>button.hidden=true);controls.querySelector('#record-outcome-btn').addEventListener('click',()=>{const heading=document.querySelector('#outcome-dialog h2');if(heading)heading.textContent=state.resolved?'Update specialist outcome':'Record specialist outcome';},true);chooser.append(controls);controls.addEventListener('click',event=>{if(event.target.closest('button:not(:disabled)'))chooser.close();},true);}
-    chooser.querySelector('.icon-button').onclick=()=>chooser.close();document.body.append(chooser);footer.querySelector('button').onclick=()=>{if(state.resolved){chooser.querySelector('#record-outcome-btn').click();}else chooser.showModal();};
+    if(controls){
+      controls.querySelector('#record-outcome-btn').textContent=state.resolved?'Update outcome':'Record outcome';
+      if(state.resolved){const notice=document.createElement('p');notice.className='session-note';notice.textContent='A specialist outcome is recorded. Route actions are unavailable; update the outcome when new evidence changes the conclusion.';controls.before(notice);}
+    }
     const assistant=document.createElement('section');assistant.className='detail-section ops-assistant';assistant.lang=language;assistant.dir=ar?'rtl':'ltr';
-    assistant.innerHTML=`<div class="case-brief-heading"><h3>${t.title}</h3><div class="case-language-switch" role="group" aria-label="Explanation language"><button type="button" data-language="en" aria-pressed="${language==='en'}">English</button><button type="button" data-language="ar" aria-pressed="${language==='ar'}" lang="ar">العربية</button></div></div><div class="ops-llm-draft"><p class="case-brief-intro">${t.intro}</p></div><button class="primary-btn case-explain-button" disabled>${t.loading}</button><p class="ops-llm-status" role="status"></p>`;
-    hero.after(assistant);assistant.after(keyFacts);keyFacts.after(next);next.after(sourceHost);sourceHost.after(footer);
+    assistant.innerHTML=`<div class="case-brief-heading"><h3>${ar?'ملخص الحالة ومساعد ذكاء الحالة':'Case summary & intelligence assistant'}</h3><div class="case-language-switch" role="group" aria-label="Explanation language"><button type="button" data-language="en" aria-pressed="${language==='en'}">English</button><button type="button" data-language="ar" aria-pressed="${language==='ar'}" lang="ar">العربية</button></div></div><div class="ops-llm-draft"><p class="case-brief-intro">${t.intro}</p></div><button class="primary-btn case-explain-button" disabled>${t.loading}</button><p class="ops-llm-status" role="status"></p>`;
+    const financialSection=panel.querySelector('.financial-context-section');
+    (financialSection||hero).after(assistant);
+    const brief=document.createElement('section');brief.className='detail-section case-evidence-brief';brief.innerHTML=`<h3>${ar?'ملخص أدلة الحالة':'Case evidence summary'}</h3><p>${esc(MadarCasePresentation.mainReason(item))}</p><p>${esc(item.comparison||'')} ${esc(item.dataQuality?.criticalMissing?'Complete missing critical evidence before relying on this assessment.':'')}</p>`;
+    assistant.before(brief);
+    panel.append(next);
+    flattenCaseSections(panel);
+    const quickActions=document.createElement('footer');quickActions.className='case-review-footer case-direct-actions';
+    for(const id of ['approve-route','override-route-btn','record-outcome-btn']){
+      const originalButton=controls?.querySelector('#'+id);if(!originalButton)continue;
+      const button=document.createElement('button');button.type='button';button.className=originalButton.className;button.textContent=originalButton.textContent;button.disabled=originalButton.disabled;button.title=originalButton.title;button.onclick=()=>originalButton.click();quickActions.append(button);
+    }
+    panel.append(quickActions);
+
     assistant.querySelectorAll('[data-language]').forEach(button=>button.onclick=()=>{if(caseSummaryLanguage===button.dataset.language)return;translateOnLoad=!!assistant.querySelector('.case-ask-button');caseSummaryLanguage=button.dataset.language;renderCase();});
     const button=assistant.querySelector('.case-explain-button'),message=assistant.querySelector('[role="status"]'),host=assistant.querySelector('.ops-llm-draft');
     if(!item.assessmentId || (!item.modelAssessment&&!item.rulesAssessment)){button.hidden=true;message.textContent=t.unsaved;return;}

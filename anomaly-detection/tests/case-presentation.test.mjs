@@ -27,3 +27,16 @@ test('resolved outcomes, unknown financial values and actual linked evidence are
  const future=structuredClone(linked);future.crossJourneyEvidence.events.push({...future.crossJourneyEvidence.events[0],recordedAt:future.crossJourneyEvidence.asOf+1,subjectId:'future'});
  assert.deepEqual(view.keyEvidence(future),facts);
 });
+
+test('queue reasons describe connected evidence and preserve assessment outputs',()=>{
+ const records=createDemoPortfolio().filter(r=>r.caseData.assessmentSource==='cross-journey').map(r=>r.caseData);
+ const original=JSON.stringify(records);
+ const sequence=records.find(r=>r.id==='CJ-SYN-enterprise-001');
+ assert.match(view.mainReason(sequence),/3 linked contributors.*registration → wage → exclusion → SANED/);
+ const digital=records.find(r=>r.id==='CJ-SYN-enterprise-009');
+ assert.match(view.mainReason(digital),/1 contributor shows a login → profile update → IBAN change → request/);
+ assert.notEqual(view.mainReason(sequence),view.mainReason(digital));
+ const missing=records.find(r=>r.modelAssessment.complete===false);
+ assert.equal(view.mainReason(missing),missing.modelAssessment.reasons[0]);
+ assert.equal(JSON.stringify(records),original);
+});

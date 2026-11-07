@@ -45,11 +45,25 @@
     if(item.dataQuality?.criticalMissing)facts.unshift({title:'Required evidence missing',text:'Required source fields are missing or invalid. Complete them before relying on the assessment.',target:'assessment'});
     return facts.slice(0,3);
   }
+  function mainReason(item) {
+    if(item.assessmentSource!=='cross-journey')return item.primaryReason||item.signals?.[0]?.[1]||'Review the supplied evidence.';
+    const model=item.modelAssessment||{};
+    if(model.complete===false)return model.reasons?.[0]||'Required connected-event evidence is missing; complete it before assessment.';
+    const reasons=(model.reasons||[]).filter(reason=>!/^The trained cross-journey model/i.test(reason));
+    const sequence=reasons.find(reason=>/login →|linked contributors each complete/.test(reason));
+    if(sequence)return sequence.replace(/^1 contributors show/,'1 contributor shows');
+    if(reasons.length)return reasons.slice(0,2).join(' ');
+    const events=(item.crossJourneyEvidence?.events||[]).filter(event=>Number.isFinite(event.recordedAt)&&event.recordedAt<=item.crossJourneyEvidence.asOf&&event.recordedAt>=item.crossJourneyEvidence.asOf-30*86400000);
+    const counts=new Map();for(const event of events)counts.set(event.type,(counts.get(event.type)||0)+1);
+    const names={login:'login',profile_update:'profile update',iban_change:'IBAN change',registration:'registration',wage:'wage',exclusion:'exclusion',request:'request'};
+    const activity=[...counts].map(([type,count])=>`${count} ${names[type]||type.replaceAll('_',' ')} event${count===1?'':'s'}`).join(', ');
+    return `${model.modelFlagged?'Connected activity requires specialist review':'No model review threshold crossed'}${activity?': '+activity:'. No additional event detail supplied.'}`;
+  }
   function financial(item){
     if(item.outcomeProvenance==='Scripted demo outcome' && Number.isFinite(item.preventedAmount)&&item.preventedAmount>0)return {label:'Recorded prevention · scripted demo',amount:item.preventedAmount};
     if(Number.isFinite(item.amountAtRisk))return {label:'Supplied potential exposure',amount:item.amountAtRisk};
     if(Number.isFinite(item.transactionAmount))return {label:'Supplied transaction amount',amount:item.transactionAmount};
     return {label:'Financial exposure',amount:null};
   }
-  globalThis.MadarCasePresentation=Object.freeze({score,state,keyEvidence,financial});
+  globalThis.MadarCasePresentation=Object.freeze({score,state,keyEvidence,financial,mainReason});
 })();

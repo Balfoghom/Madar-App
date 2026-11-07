@@ -2471,7 +2471,7 @@ function renderQueue() {
               '</span><span class="subtext">' +
               (item.dataQuality ? (item.dataQuality.criticalMissing ? "Critical information missing · " : item.dataQuality.score + "% complete · ") + item.dataQuality.passed + "/" + item.dataQuality.total + " field checks" : item.confidenceScore + "% illustrative estimate") +
               "</span></td>",
-            '<td class="reason"><span class="queue-reason-text" title="' + escapeHtml(item.signals[0][1]) + '">' + escapeHtml(item.signals[0][1]) + "</span></td>",
+            '<td class="reason"><span class="queue-reason-text" title="' + escapeHtml(MadarCasePresentation.mainReason(item)) + '">' + escapeHtml(MadarCasePresentation.mainReason(item)) + "</span></td>",
             '<td class="route">' + escapeHtml(item.route) + "</td>",
             '<td><span class="status-chip">' +
               escapeHtml(item.status) +
