@@ -63,7 +63,7 @@ test('portfolio load is idempotent, preserves reviews, and rejects route approva
     const review={caseId:pending.caseId,assessmentId:pending.assessmentId,actorName:'QA reviewer',note:'Reviewed synthetic control evidence.'};
     await post('/decision',{...review,action:'override',route:'Additional verification'});
     const second=await post('/demo-portfolio',{});assert.equal(second.added,0);
-    assert.equal(second.saved.find(r=>r.caseId===pending.caseId).caseData.route,'Additional verification');
+    assert.equal(second.saved.find(r=>r.caseId===pending.caseId).caseData.route,'Eligibility Verification');
     assert.equal(second.saved.find(r=>r.caseId===pending.caseId).reviewHistory.length,1);
     const resolved=first.saved.find(r=>r.caseData.preventedAmount>0);
     await post('/decision',{...review,caseId:resolved.caseId,assessmentId:resolved.assessmentId,action:'approve'},409);

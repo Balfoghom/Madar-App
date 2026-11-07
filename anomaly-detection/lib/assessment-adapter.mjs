@@ -1,3 +1,4 @@
+import {withRouting} from './routing-policy.mjs';
 // Application adapter only. Imports fitted artifacts; never trains or changes models.
 import { assess as assessSaned, model as sanedModel } from './detector.mjs';
 import { assessJourney, modeledJourneys } from './journey-detector.mjs';
@@ -20,17 +21,17 @@ export function validateContext(input) {
   for (const field of ['transactionAmount', 'amountAtRisk']) if (input[field] != null && (!Number.isFinite(input[field]) || input[field] < 0)) throw new InputError('Financial values must be finite and nonnegative.');
 }
 function mediumRoute(journey) {
-  return { 'Benefit Payments': 'Payment & IBAN Verification', Retirement: 'Eligibility Verification', 'Maternity Benefit': 'Benefit Operations Review' }[journey] || 'Insurance Operations Audit';
+  return 'Eligibility Verification';
 }
 export function separatedPolicy(context, result, config = {}) {
   const lowMax = Number.isFinite(config.lowMax) ? config.lowMax : 34;
   const highMin = Number.isFinite(config.highMin) ? config.highMin : 75;
-  if (result.complete !== true) return { score: null, risk: 'Incomplete', route: 'Complete evidence', status: 'Complete evidence', controlScore: context.ruleScore, reviewRequired: true, scoreMeaning: 'No model score: evidence incomplete', policy: 'separate-controls-and-model-v1' };
+  if (result.complete !== true) return { score: null, risk: 'Incomplete', route: 'Data Verification Review', status: 'Complete evidence', controlScore: context.ruleScore, reviewRequired: true, scoreMeaning: 'No model score: evidence incomplete', policy: 'separate-controls-and-model-v1' };
   // No anomaly percentile or model score enters the existing operational score.
   let risk = context.ruleScore >= highMin ? 'High' : context.ruleScore > lowMax ? 'Medium' : 'Low';
   const componentReview = result.modelFlagged === true || result.ruleFlagged === true;
   if ((componentReview || context.features?.crossSourceConflict) && risk === 'Low') risk = 'Medium';
-  return { score: context.ruleScore, controlScore: context.ruleScore, risk, route: risk === 'High' ? 'Fraud Prevention & Inspection Review' : risk === 'Medium' ? (context.features?.crossSourceConflict ? 'Additional verification' : mediumRoute(context.journey)) : 'Straight-through processing', status: risk === 'Low' ? 'Ready to proceed' : 'Awaiting specialist', reviewRequired: risk !== 'Low', scoreMeaning: 'Existing control score; model output is separate', policy: 'separate-controls-and-model-v1' };
+  return { score: context.ruleScore, controlScore: context.ruleScore, risk, route: risk === 'High' ? 'Fraud Prevention & Inspection Review' : risk === 'Medium' ? (context.features?.crossSourceConflict ? 'Data Verification Review' : mediumRoute(context.journey)) : 'Straight-through processing', status: risk === 'Low' ? 'Ready to proceed' : 'Awaiting specialist', reviewRequired: risk !== 'Low', scoreMeaning: 'Existing control score; model output is separate', policy: 'separate-controls-and-model-v1' };
 }
 function explain(result, context) {
   if (!result.complete) return [{ code: 'EVIDENCE_INCOMPLETE', description: result.reasons?.join(' ') || 'Required model evidence is incomplete.' }];
@@ -86,12 +87,12 @@ export function createApplicationAssessment(context, options = {}) {
     audit: [`Model ${modelResult.modelVersion} assessed at ${assessedAt}; existing control score kept separate.`],
     outcome: null, financialOutcome: null, confirmedFraudAmount: 0, preventedAmount: 0,
   };
-  return {
+  return withRouting({
     assessmentId, assessedAt, caseId: context.id, transactionId: context.transactionId,
     journey: context.journey, scenario: context.scenario, synthetic: true,
     assessmentSource: options.source || 'journey-prototype', validation: 'Synthetic evidence only; not business validated.',
     ...modelResult, mainReason: reasonCodes[0].description, reasonCodes,
     risk: policy.risk, applicationAssessment: policy, businessAssessment: policy,
     caseData, modelResult: modelSnapshot,
-  };
+  });
 }

@@ -1,3 +1,4 @@
+import {withRouting} from './routing-policy.mjs';
 import { createHash, randomUUID } from 'node:crypto';
 import { assess, model } from '../cross-journey/inference/detector.mjs';
 import demoCases from '../cross-journey/data/demo-cases.json' with { type: 'json' };
@@ -88,5 +89,5 @@ export function createCrossJourneyAssessment(evidence) {
   };
   const keys=['eventId','recordedAt','effectiveAt','journey','type','subjectId','employerId','identifierId','amount','previousAmount','sourceConflict','ruleOverride','latitude','longitude','locationVerified','previousIdentifierId','changedField'];
   const canonical={id:evidence.id,employerId:evidence.employerId || '',asOf:evidence.asOf,events:[...evidence.events].sort((a,b)=>a.eventId.localeCompare(b.eventId)).map(e=>Object.fromEntries(keys.map(key=>[key,e[key] === "" ? null : e[key] ?? null])))};
-  return {assessmentId,assessedAt,caseId:evidence.id,transactionId:evidence.id,synthetic:true,assessmentSource:'cross-journey',journey:'SANED',scenario,...result,risk,modelResult:caseData.modelAssessment,caseData,evidenceFingerprint:createHash('sha256').update(JSON.stringify(canonical)).digest('hex')};
+  return withRouting({assessmentId,assessedAt,caseId:evidence.id,transactionId:evidence.id,synthetic:true,assessmentSource:'cross-journey',journey:'SANED',scenario,...result,risk,modelResult:caseData.modelAssessment,caseData,evidenceFingerprint:createHash('sha256').update(JSON.stringify(canonical)).digest('hex')});
 }

@@ -1,9 +1,17 @@
 import {randomUUID,createHash} from 'node:crypto';
 import bundledBusiness from '../data/business-demo-cases.json' with {type:'json'};
+import {withDataQuality} from './data-quality.mjs';
+import {createApplicationAssessment} from './assessment-adapter.mjs';
+import {routingPolicy} from './routing-policy.mjs';
 import {createDemoPortfolio} from './demo-portfolio.mjs';
 const names=['Mohammed Alotaibi','Noura Alharbi','Abdullah Alqahtani','Abeer Alasmari','Faisal Aldosari','Reem Alzahrani','Khalid Alghamdi','Hessa Alenezi','Saad Almutairi','Maha Alsubaie','Sultan Alrasheed','Jawaher Albalawi','Ahmed Aljuhani','Nouf Alasmari','Saleh Almarri','Ghada Almutairi'];
 const employers=['Al Manar Services Co.','Riyadh Horizon Trading','Najd Technical Solutions','Eastern Gate Contracting','Al Waha Logistics','Arabian Field Services','Mada Operations Co.','Rowad Business Support','Takamul Industrial Services','Bunyan Facilities Management'];
 const hash=value=>parseInt(createHash('sha256').update(String(value)).digest('hex').slice(0,7),16);
+const maleNames=['Mohammed','Abdullah','Faisal','Khalid','Saad','Sultan','Ahmed','Saleh','Omar','Turki','Nasser','Ibrahim','Yousef','Abdulaziz','Majed','Bader','Fahad','Hamad','Rakan','Waleed','Abdulrahman','Mansour','Ziyad','Nawaf'];
+const femaleNames=['Noura','Abeer','Reem','Hessa','Maha','Jawaher','Nouf','Ghada','Sara','Lama','Shahad','Mona','Rana','Alanoud','Hind','Amal','Haifa','Razan','Dalal','Hanan','Mariam','Fatimah','Afnan','Wadha'];
+const fathers=['Abdullah','Mohammed','Ibrahim','Abdulaziz','Hamad','Nasser','Khalid','Fahad'];
+const families=['Alotaibi','Alharbi','Alqahtani','Alasmari','Aldosari','Alzahrani','Alghamdi','Alenezi','Almutairi','Alsubaie','Alrasheed','Albalawi','Aljuhani','Almarri'];
+const demoIds=[...Array.from({length:30},(_,i)=>'BRI-'+String(i+1).padStart(3,'0')),...Array.from({length:30},(_,i)=>'SYN-ENTERPRISE-RULE-'+String(i+1).padStart(3,'0')),...Array.from({length:3},(_,i)=>'NEW-ENTERPRISE-SANED-'+i),...Array.from({length:12},(_,i)=>'CJ-SYN-enterprise-'+String(i).padStart(3,'0')),'NEW-SANED-DQ-LOGIN-DATE','NEW-SANED-DQ-LOGIN-TIME'];
 export function caseStatus(data){
  if(data.workflow?.stage==='Closed')return 'Closed';
  if(data.outcome&&!/^(Suspected|Inconclusive)/.test(data.outcome))return 'Outcome recorded';
@@ -18,7 +26,10 @@ export function enrichDemoRecord(record){
  if(!record.caseData||record.synthetic!==true)return record;
  const data={...record.caseData};const n=hash(data.subject||record.caseId),e=hash(data.entity||record.caseId);
  const replace=v=>!v||/^(Synthetic |SYN-|EMP-SYN|CTR-SYN|\d+ linked contributor|Not supplied|Missing employer)/i.test(v);
- if(replace(data.customerName))data.customerName=names[n%names.length];
+ const index=demoIds.indexOf(record.caseId);
+ if(index>=0){const pool=data.journey==='Maternity Benefit'?femaleNames:(index%3===1?femaleNames:maleNames);data.customerName=pool[index%pool.length]+' '+fathers[Math.floor(index/pool.length)%fathers.length]+' '+families[index%families.length];data.demoIdentityVersion='distinct-saudi-names-v2';}
+ else if(replace(data.customerName))data.customerName=names[n%names.length];
+ if(/^BRI-0(3[1-9]|[45][0-9]|60)$/.test(record.caseId))data.demoDuplicateOf='BRI-'+String(Number(record.caseId.slice(4))-30).padStart(3,'0');
  if(replace(data.employerName))data.employerName=employers[e%employers.length];
  if(replace(data.nationalIdMasked))data.nationalIdMasked= '10******'+String(n%100).padStart(2,'0');if(replace(data.mobileMasked))data.mobileMasked= '050***'+String(n%10000).padStart(4,'0');
  data.employerNumber ||= '700'+String(e%1000000).padStart(6,'0');data.supervisorName ||=names[(e+7)%names.length];data.supervisorUserId ||= 'USR-'+String(e%1000).padStart(3,'0');data.supervisorMobileMasked ||= '055***'+String(e%10000).padStart(4,'0');
@@ -32,7 +43,7 @@ export function enrichDemoRecord(record){
  if(data.assessmentSource==='cross-journey'&&data.modelAssessment?.complete){data.score=data.ruleScore;data.scoreMeaning='Supplied demo control score; cross-journey model finding remains separate.';}
  data.financialProvenance ||= 'Fictional supplied scenario amount; not inferred from model output.';
  data.status=caseStatus(data);
- return {...record,caseData:data};
+ return withDataQuality({...record,caseData:data});
 }
 export function applyBusinessConfig(data,config){
  const components=data.scoringComponents||{behavior:data.anomalyScore||0,pattern:data.interaction||0};
@@ -52,12 +63,12 @@ export function applyBusinessConfig(data,config){
  const complete=!data.features?.missingData;
  const score=complete?Math.max(0,Math.min(100,Math.max(calculated,floor))):null;
  const risk=!complete?'Incomplete':score>=config.highMin?'High':score>config.lowMax?'Medium':'Low';
- const route=!complete?'Complete evidence':risk==='Low'?'Straight-through processing':risk==='High'?'Fraud Prevention & Inspection Review':'Additional verification';
- return {...data,score,risk,interaction,anomalyScore:behavior,scoringComponents:components,rulesAssessment:{...data.rulesAssessment,complete,score,route},recommendedRoute:route,route:data.reviewHistory?.some(r=>r.type==='decision')?data.route:route};
+ const route=!complete?'Data Verification Review':risk==='Low'?'Straight-through processing':risk==='High'?'Fraud Prevention & Inspection Review':'Eligibility Verification';
+ return routingPolicy.apply({...data,score,risk,interaction,anomalyScore:behavior,scoringComponents:components,rulesAssessment:{...data.rulesAssessment,complete,score,route},recommendedRoute:route,route:data.reviewHistory?.some(r=>r.type==='decision')?data.route:route});
 }
 export function createBusinessPortfolio(now=new Date()){
  const time=now.toISOString();
- return bundledBusiness.map(original=>{
+ return bundledBusiness.filter((item,index,array)=>array.findIndex(other=>other.journey===item.journey&&other.scenario===item.scenario)===index).map(original=>{
   const data=structuredClone(original),assessmentId=randomUUID();
   Object.assign(data,{assessmentId,assessedAt:time,requested:time,assessmentSource:'rules-demo',assessmentMode:'business-rule-simulation',businessSimulation:true,detectionMethod:'Business rules',comparison:'Business-rule scoring; no trained ML model used.',scoringComponents:{behavior:data.anomalyScore,pattern:data.interaction},reasonCodes:data.signals.map(([code,description])=>({code,description})),rulesEvidence:{requiredFields:['sourceRecordDate','referenceRecord','recordStatus'],fields:{sourceRecordDate:time,referenceRecord:'Bundled business scenario',recordStatus:'Active'},ruleCode:data.primaryCode,measure:'Configured business indicators',threshold:null,observed:data.features.velocity},rulesAssessment:{complete:!data.features.missingData,score:data.score,ruleFlagged:data.risk!=='Low',route:data.route,reasons:[data.primaryReason],version:'business-scoring-v1'}});
   if(data.features.missingData){data.risk='Incomplete';data.score=null;data.rulesAssessment.complete=false;data.rulesEvidence.fields.referenceRecord=null;data.route='Complete evidence';}
@@ -66,4 +77,13 @@ export function createBusinessPortfolio(now=new Date()){
   return {caseId:data.id,assessmentId,assessedAt:time,synthetic:true,assessmentSource:'rules-demo',journey:data.journey,complete:data.rulesAssessment.complete,ruleFlagged:data.rulesAssessment.ruleFlagged,caseData:data,reviewHistory,applicationAssessment:{route:data.route},reasonCodes:data.reasonCodes};
  });
 }
-export function createWorkspacePortfolio(now=new Date()){return [...createBusinessPortfolio(now),...createDemoPortfolio(now)].map(enrichDemoRecord);}
+export function createLoginQualityExamples(now=new Date()){
+ return ['DATE','TIME'].map((field,index)=>{
+  const record=createApplicationAssessment({id:'NEW-SANED-DQ-LOGIN-'+field,transactionId:'SANED-DQ-'+(index+1),synthetic:true,journey:'SANED',scenario:index===0?'Login date missing before a SANED request':'Login time missing before a SANED request',subject:'SYN-DQ-LOGIN-'+field,entity:'SYN-DQ-EMPLOYER-'+index,country:'Saudi Arabia',region:index?'Makkah':'Riyadh',city:index?'Jeddah':'Riyadh',ruleScore:25,transactionAmount:18000+index*6000,amountAtRisk:0,features:{missingData:1},accessEvidence:{loginDate:index===0?null:'2026-11-05',loginTime:index===1?null:'09:42',source:'Synthetic access-log extract'},modelInput:{case_id:'SYN-demo-00000'}});
+  Object.assign(record.caseData,{demoPortfolio:true,assessedAt:now.toISOString(),requested:now.toISOString(),primaryCode:'LOGIN_'+field+'_MISSING',primaryReason:'The login '+field.toLowerCase()+' is missing. Complete the access log before relying on event chronology or the risk assessment.',reasonCodes:[{code:'LOGIN_'+field+'_MISSING',description:'Required login '+field.toLowerCase()+' is missing.'}],paymentStatus:'Pending',detectionStage:'Before payment'});
+  record.caseData.signals=record.caseData.reasonCodes.map(r=>[r.code,r.description]);record.assessedAt=now.toISOString();
+  return record;
+ });
+}
+export function createWorkspacePortfolio(now=new Date()){return [...createBusinessPortfolio(now),...createDemoPortfolio(now),...createLoginQualityExamples(now)].map(enrichDemoRecord);}
+export function activeWorkspaceRecords(records){return records.filter((r,i,a)=>r.caseData&&!r.caseData.demoDuplicateOf&&a.findIndex(x=>x.caseId===r.caseId)===i);}

@@ -21,9 +21,9 @@ test('provider failure, refusal and incomplete output never become a completed d
  for(const response of [{ok:false,status:429},{ok:true,json:async()=>({status:'incomplete'})},{ok:true,json:async()=>({status:'completed',output:[{content:[{type:'refusal',refusal:'Cannot complete'}]}]})},{ok:true,json:async()=>({status:'completed',output:[{content:[{type:'output_text',text:'not json'}]}]})}])await assert.rejects(generateExplanation(record,{env,fetchImpl:async()=>response}));
 });
 test('business evidence includes anonymous, ordered service activity and current decision context',()=>{
- const changed=structuredClone(record);changed.caseData.route='Additional verification';
+ const changed=structuredClone(record);changed.caseData.route='Eligibility Verification';changed.caseData.humanDecision={action:'override'};
  const {facts}=explanationEvidence(changed);
- assert.equal(facts.find(f=>f.id==='business-context').value.currentRecordedRoute,'Additional verification');
+ assert.equal(facts.find(f=>f.id==='business-context').value.currentRecordedRoute,'Eligibility Verification');
  const activity=facts.filter(f=>f.id.startsWith('activity-'));
  assert.equal(activity.length,3);assert.equal(activity[0].value.contributor,'Contributor 1');
  assert.deepEqual(activity[0].value.events.map(e=>e.activity),['Employment registered','Wage updated','Employment ended in the register','SANED request submitted']);
@@ -42,7 +42,7 @@ test('business evidence respects the assessment window and discloses omitted eve
 });
 test('business meaning is required and current route changes invalidate the brief',()=>{
  const legacy={...explanation};delete legacy.whyItMatters;assert.throws(()=>validateExplanation(legacy,['assessment','reason-0']),/validation/);
- const changed=structuredClone(record);changed.caseData.route='Complete evidence';assert.notEqual(explanationEvidence(changed).fingerprint,explanationEvidence(record).fingerprint);
+ const changed=structuredClone(record);changed.caseData.route='Data Verification Review';changed.caseData.humanDecision={action:'override'};assert.notEqual(explanationEvidence(changed).fingerprint,explanationEvidence(record).fingerprint);
 });
 
 test('Arabic brief requests Arabic prose without translating evidence identifiers',async()=>{

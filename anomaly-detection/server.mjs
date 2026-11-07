@@ -1,4 +1,5 @@
-import {createWorkspacePortfolio,enrichDemoRecord,applyBusinessConfig,caseStatus} from './lib/workspace-demo.mjs';
+import {routingPolicy} from './lib/routing-policy.mjs';
+import {createWorkspacePortfolio,enrichDemoRecord,applyBusinessConfig,caseStatus,activeWorkspaceRecords} from './lib/workspace-demo.mjs';
 import {createDemoPortfolio} from './lib/demo-portfolio.mjs';
 import {withDataQuality} from './lib/data-quality.mjs';
 import {llmStatus, explanationEvidence, generateExplanation, generateCaseAnswer, validateLanguage, validateConversation, PROMPT_VERSION} from './lib/case-explainer.mjs';
@@ -178,8 +179,8 @@ function saveHumanReview(body, type) {
       if (!["approve", "override", "reject"].includes(body.action)) throw new InputError("Unknown review decision.");
       if (body.action === "override" && (typeof body.route !== "string" || !body.route.trim() || body.route.length > 200)) throw new InputError("Select a proposed alternative route.");
       data.status = { approve: "Route approved", override: "Route overridden", reject: "Recommendation rejected" }[body.action];
-      if (body.action === "approve") data.route = current.applicationAssessment?.route || current.modelResult?.route || current.route;
-      if (body.action === "override") data.route = body.route;
+      if (body.action === "approve") data.route = data.recommendedRoute || current.applicationAssessment?.route || current.modelResult?.route || current.route;
+      if (body.action === "override") {if(!routingPolicy.routes.includes(body.route)&&routingPolicy.normalize(body.route)==='Business Owner Review')throw new InputError("Select a supported review route.");data.route=routingPolicy.normalize(body.route);}
       if (body.action === "reject") data.route = "Specialist review — recommendation rejected";
     }
     const reviews = await readJsonFile(humanReviewsPath, []);
@@ -189,7 +190,7 @@ function saveHumanReview(body, type) {
     data.status=caseStatus(data);
     data.audit = [...(data.audit || []), `Human ${type} recorded by ${review.actorName} at ${review.recordedAt}: ${review.note}`];
     // The raw model result, version, flags, feature values and score are immutable.
-    saved[index] = { ...current, caseData: data, ...(type === "decision" ? {humanDecision:review} : {}), reviewHistory: data.reviewHistory };
+    saved[index] = withDataQuality({ ...current, caseData: data, ...(type === "decision" ? {humanDecision:review} : {}), reviewHistory: data.reviewHistory });
     await writeJsonFile(humanReviewsPath, reviews);
     await writeSavedAssessments(saved);
     return saved[index];
@@ -481,7 +482,7 @@ export function createInferenceServer({explain = generateExplanation, answer = g
           });
           await writeJsonFile(humanReviewsPath,[...reviews,...added.flatMap(r=>r.reviewHistory||[])]);
           await writeSavedAssessments(records);
-          return {saved:records.filter((r,i,a)=>r.caseData&&a.findIndex(x=>x.caseId===r.caseId)===i),added:added.length,syntheticOnly:true};
+          return {saved:activeWorkspaceRecords(records).map(withDataQuality),added:added.length,syntheticOnly:true};
         });assessmentWrites=operation;return send(200,await operation);
       }catch{return send(500,{error:'Could not prepare the demo workspace. Existing records are retained.'});}
     }
@@ -708,7 +709,7 @@ export function createInferenceServer({explain = generateExplanation, answer = g
         await migrateSavedJourneyAssessments();
         const saved = await readSavedAssessments();
         const latestCases = [...new Map([...saved].reverse().map((item) => [item.caseId, item])).values()];
-        const confirmed = latestCases.filter((item) => /confirmed violation|confirmed fraud/i.test(item.caseData?.outcome || item.outcome || ""));
+        const confirmed = latestCases.filter((item) => !item.caseData?.demoDuplicateOf && /confirmed violation|confirmed fraud/i.test(item.caseData?.outcome || item.outcome || ""));
         const counts = new Map();
         for (const item of confirmed) {
           const seen = new Set();

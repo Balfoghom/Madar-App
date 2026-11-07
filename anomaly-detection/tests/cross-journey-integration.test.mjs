@@ -51,5 +51,5 @@ test('connected import is idempotent, decisions persist, changed evidence requir
 test('reported source conflicts require verification without changing the model flag',()=>{
  const model={complete:true,modelFlagged:false,ruleFlagged:false};
  const policy=separatedPolicy({journey:'SANED',ruleScore:10,features:{crossSourceConflict:true}},model);
- assert.equal(policy.route,'Additional verification');assert.equal(policy.risk,'Medium');assert.equal(model.modelFlagged,false);assert.equal(policy.score,10);
+ assert.equal(policy.route,'Data Verification Review');assert.equal(policy.risk,'Medium');assert.equal(model.modelFlagged,false);assert.equal(policy.score,10);
 });

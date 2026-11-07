@@ -41,6 +41,7 @@
       if(!facts.length && item.primaryReason)facts.push({title:'Assessment finding',text:item.primaryReason,target:'assessment'});
       if(!facts.length && item.signals?.length)facts.push({title:'Review signal',text:item.signals[0][1],target:'assessment'});
     }
+    if(item.accessEvidence){const missing=['loginDate','loginTime'].filter(field=>!item.accessEvidence[field]);if(missing.length)return [{title:'Login evidence missing',text:'Missing '+missing.map(field=>field==='loginDate'?'login date':'login time').join(' and ')+'. The event sequence cannot be verified; complete the access log and reassess.',target:'assessment'},{title:'Assessment deferred',text:'Low data quality: a critical event timestamp is unavailable. No model risk score was produced.',target:'assessment'}];}
     if(item.dataQuality?.criticalMissing)facts.unshift({title:'Required evidence missing',text:'Required source fields are missing or invalid. Complete them before relying on the assessment.',target:'assessment'});
     return facts.slice(0,3);
   }

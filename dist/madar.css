@@ -163,3 +163,13 @@ body{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-se
 @media(max-width:850px){#dashboard-metrics,#executive-metrics,#report-metrics{grid-template-columns:repeat(6,minmax(145px,1fr));overflow-x:auto;padding-bottom:5px}.funnel-row{grid-template-columns:minmax(0,1.6fr) minmax(20px,1fr) 24px}}
 @media(max-width:600px){#case-panel{inset:8px 8px 8px auto;width:calc(100vw - 16px);height:calc(100dvh - 16px);max-height:calc(100dvh - 16px)}.case-drawer-wide .identity-grid{grid-template-columns:1fr}.report-summary #monthly-ai-summary{padding-inline:16px}}
 #executive-view .heading-actions{flex-shrink:0}#executive-view .heading-actions button{white-space:nowrap}#executive-metrics .metric-card strong,#report-metrics .metric-card strong{white-space:nowrap;font-size:clamp(15px,1.55vw,22px);overflow-wrap:normal}
+
+/* Non-modal case review: keep the queue sharp, visible and usable. */
+body.case-drawer-open{overflow:auto}.case-drawer-scrim{display:none!important}
+.workspace:has(#case-panel:not([hidden])){grid-template-columns:minmax(360px,440px) minmax(0,1fr);align-items:start;gap:16px}
+.workspace:has(#case-panel.case-drawer-wide:not([hidden])){grid-template-columns:minmax(400px,560px) minmax(0,1fr)}
+.workspace:has(#case-panel:not([hidden]))>.queue-panel{grid-column:2;grid-row:1;min-width:0}
+.workspace #case-panel{position:sticky;inset:auto;top:88px;grid-column:1;grid-row:1;width:100%;height:auto;max-height:calc(100dvh - 104px);margin:0;box-shadow:0 4px 20px #00004e0a}
+.workspace #case-panel.case-drawer-wide{width:100%}.queue-panel .table-wrap{overflow-x:auto}
+@media(max-width:1050px){.workspace:has(#case-panel:not([hidden])),.workspace:has(#case-panel.case-drawer-wide:not([hidden])){grid-template-columns:minmax(330px,40%) minmax(0,1fr)}}
+@media(max-width:760px){.workspace:has(#case-panel:not([hidden])),.workspace:has(#case-panel.case-drawer-wide:not([hidden])){grid-template-columns:minmax(0,1fr)}.workspace #case-panel{position:relative;top:auto;max-height:75dvh;grid-column:1;grid-row:1}.workspace:has(#case-panel:not([hidden]))>.queue-panel{grid-column:1;grid-row:2}}

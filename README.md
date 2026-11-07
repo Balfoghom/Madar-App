@@ -2,7 +2,7 @@
 
 Madar’s proposed value is a shared operating layer for existing fraud capabilities: receive findings, explain evidence, assign ownership, investigate, record outcomes and track governance. Cross-journey detection is one example input, not the novelty of the enterprise proposal.
 
-This repository is a working **synthetic prototype** of that process. English is the default interface, with Madar / مدار branding. The interface now uses one persisted workspace: 60 named business-rule scenarios plus 45 rule/ML portfolio cases, alongside retained imported cases. There is no workspace data switch. It has seven bundled model artifacts, saved cases and human reviews, a staged investigation workflow and an optional API-based LLM case explainer. It has no live enterprise integrations or payment actions.
+This repository is a working **synthetic prototype** of that process. English is the default interface, with Madar / مدار branding. The interface now uses one persisted workspace: 30 distinct named business-rule scenarios, 45 rule/ML portfolio cases and two SANED access-log data-quality examples (77 active demo cases), alongside retained imported cases. There is no workspace data switch. It has seven bundled model artifacts, saved cases and human reviews, a staged investigation workflow and an optional API-based LLM case explainer. It has no live enterprise integrations or payment actions.
 
 ## Run it yourself
 
@@ -79,3 +79,5 @@ Hosting the full app needs a Node-compatible server and persistent storage. A st
 See [solution design](AI_SOLUTION_DESIGN.md), [technical blueprint](TECHNICAL_BLUEPRINT.md), [scoring methodology](SCORING_METHODOLOGY.md), and [LLM setup](LLM_SETUP.md). Component READMEs and ServiceNow import files remain supporting material; they are not live integrations.
 
 The November 7 model adds login-location, IBAN-change and profile-update sequences (23 event-derived features; 10,300 training, 1,600 calibration and 1,300 held-out synthetic histories). New digital typologies are prototype assumptions requiring fraud-specialist validation. Ordinary travel and legitimate account-update counterexamples are included. Existing saved cross-journey cases are reassessed at workspace initialization; earlier model references and human reviews are retained.
+
+Case review opens in a non-modal left panel. Repeated BRI-031 through BRI-060 demo templates are excluded from the active workspace and indicator counts; stored assessments and reviews remain available for audit. Active demo identities are distinct and maternity beneficiaries use female names. A missing critical field forces a Low data-quality label independently of the field-completeness percentage. The shared routing policy defines six canonical routes, accountable owners and next steps; numerical model results remain immutable.

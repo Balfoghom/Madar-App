@@ -1,3 +1,4 @@
+import {withRouting} from './routing-policy.mjs';
 // Transparent field checks, not a probability that the case or model is correct.
 const supplied = value => typeof value === 'string' && value.trim() && !/^(not supplied|missing employer|—)$/i.test(value.trim());
 const number = value => typeof value === 'number' && Number.isFinite(value);
@@ -9,6 +10,11 @@ export function dataQuality(data) {
   if(data.assessmentSource!=='cross-journey')check('existingControlScore',number(data.ruleScore)&&data.ruleScore>=0&&data.ruleScore<=100,true);
   // Linked-event conflicts are counted at their source cell, not again in the aggregate flag.
   if(!data.crossJourneyEvidence)check('sourceConsistency',!data.features?.crossSourceConflict);
+  if(data.accessEvidence){
+    const access=data.accessEvidence;
+    check('access.loginDate',typeof access.loginDate==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(access.loginDate)&&Number.isFinite(Date.parse(access.loginDate+'T00:00:00Z')),true);
+    check('access.loginTime',typeof access.loginTime==='string'&&/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test(access.loginTime),true);
+  }
   const linked=data.crossJourneyEvidence;
   const saned=data.modelInput?.sanedCase;
   if(linked || saned || (data.journey==='SANED' && data.modelAssessment)) {
@@ -41,10 +47,10 @@ export function dataQuality(data) {
   }
   if(data.features?.missingData && !checks.some(c=>c.critical&&!c.valid))check('reportedRequiredInformation',false,true);
   const passed=checks.filter(c=>c.valid).length, score=Math.round(100*passed/checks.length);
-  return {version:'field-quality-v1',score,label:score>=90?'High':score>=75?'Medium':'Low',passed,total:checks.length,issues:checks.filter(c=>!c.valid),criticalMissing:checks.some(c=>!c.valid&&c.critical),method:'Valid applicable field checks ÷ all applicable field checks × 100. Each required source cell is checked separately; optional fields are excluded. This measures supplied-data completeness, basic validity and reported consistency, not source accuracy or fraud probability.'};
+  return {version:'field-quality-v1',score,label:checks.some(c=>!c.valid&&c.critical)?'Low':score>=90?'High':score>=75?'Medium':'Low',passed,total:checks.length,issues:checks.filter(c=>!c.valid),criticalMissing:checks.some(c=>!c.valid&&c.critical),method:'Valid applicable field checks ÷ all applicable field checks × 100. Each required source cell is checked separately; optional fields are excluded. A missing critical field forces the quality label to Low regardless of the completeness percentage. This measures supplied-data completeness, basic validity and reported consistency, not source accuracy or fraud probability.'};
 }
 export function withDataQuality(record){
   if(!record.caseData)return record;
   const quality=dataQuality(record.caseData);
-  return {...record,caseData:{...record.caseData,dataQuality:quality,confidenceScore:quality.score,confidence:quality.label}};
+  return withRouting({...record,caseData:{...record.caseData,dataQuality:quality,confidenceScore:quality.score,confidence:quality.label}});
 }

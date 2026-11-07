@@ -15,7 +15,7 @@ test('sandbox drafts cannot change new assessment risk or routing',async()=>{
 test('approval after override restores the original recommendation and requires named current review',async()=>{
  const record=(await post('/cross-journey/assess',{case_id:demoCases[1].id})).saved[0];const review=reviewer(record);
  await post('/decision',{...review,action:'override',route:'Additional verification'});
- const result=await post('/decision',{...review,action:'approve'});assert.equal(result.caseData.route,record.modelResult.route);assert.deepEqual(result.modelResult,record.modelResult);
+ const result=await post('/decision',{...review,action:'approve'});assert.equal(result.caseData.route,record.caseData.recommendedRoute);assert.deepEqual(result.modelResult,record.modelResult);
  await post('/decision',{caseId:record.caseId,action:'approve',note:'No version or reviewer'},400);
  await post('/decision',{...review,actorName:' ',action:'approve'},400);
 });

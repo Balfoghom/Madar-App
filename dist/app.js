@@ -1147,49 +1147,10 @@ function isSaudi(country) {
   );
 }
 
-function recommendedRoute(journey, risk) {
-  if (risk === "Low") return "Straight-through processing";
-  if (risk === "High") return "Fraud Prevention & Inspection Review";
-  if (journey === "Benefit Payments") return "Payment & IBAN Verification";
-  if (journey === "Retirement") return "Eligibility Verification";
-  if (journey === "Maternity Benefit") return "Benefit Operations Review";
-  return "Insurance Operations Audit";
-}
-
-function routeOwnership(item) {
-  if(item.outcome && !/^(Suspected|Inconclusive)/.test(item.outcome))return {owner:item.decisionOwner || 'Recorded specialist',next:'Outcome recorded. Retain the supporting evidence and amend the outcome only if new information changes the finding.'};
-  if (item.features.missingData || ["Data Verification Review","Complete evidence"].includes(item.route))
-    return {
-      owner: "Data Owner / Data Quality",
-      next: "Verify missing or conflicting source data, then return the case for reassessment.",
-    };
-  if (["Straight-through processing","Standard review"].includes(item.route))
-    return {
-      owner: "Service Operations",
-      next: "Continue the normal journey while retaining the assessment audit trail.",
-    };
-  if (item.route === "Payment & IBAN Verification")
-    return {
-      owner: "Payment Operations",
-      next: "Verify beneficiary ownership and payment-account evidence before proceeding.",
-    };
-  if (item.route === "Eligibility Verification")
-    return {
-      owner: "Eligibility Operations",
-      next: "Validate eligibility evidence and employment status before proceeding.",
-    };
-  if (
-    item.route === "Benefit Operations Review" ||
-    item.route === "Insurance Operations Audit"
-  )
-    return {
-      owner: "Insurance Operations Audit",
-      next: "Complete targeted verification and record the reviewed outcome.",
-    };
-  return {
-    owner: "Fraud Prevention, Detection & Inspection",
-    next: "Prioritize specialist review, determine the required investigation route, and record the outcome.",
-  };
+function recommendedRoute(journey,risk){return MadarRoutingPolicy.recommend({journey,risk});}
+function routeOwnership(item){
+ if(item.outcome&&!/^(Suspected|Inconclusive)/.test(item.outcome))return {owner:item.decisionOwner||'Recorded specialist',next:'Outcome recorded. Retain the supporting evidence and amend the outcome only if new information changes the finding.'};
+ return MadarRoutingPolicy.ownership(item.route,item.journey);
 }
 
 function businessOwnerForJourney(journey) {
@@ -2499,7 +2460,7 @@ function renderQueue() {
               '">' +
               item.confidence +
               '</span><span class="subtext">' +
-              (item.dataQuality ? item.dataQuality.score + "% · " + item.dataQuality.passed + "/" + item.dataQuality.total + " field checks" : item.confidenceScore + "% illustrative estimate") +
+              (item.dataQuality ? (item.dataQuality.criticalMissing ? "Critical information missing · " : item.dataQuality.score + "% complete · ") + item.dataQuality.passed + "/" + item.dataQuality.total + " field checks" : item.confidenceScore + "% illustrative estimate") +
               "</span></td>",
             '<td class="reason"><span class="queue-reason-text" title="' + escapeHtml(item.signals[0][1]) + '">' + escapeHtml(item.signals[0][1]) + "</span></td>",
             '<td class="route">' + escapeHtml(item.route) + "</td>",
@@ -2640,7 +2601,7 @@ function renderCase() {
       (item.modelAssessment || item.rulesAssessment ? 'Not applied' : '+' + item.interaction) +
       "</strong></div>",
     '<div class="mini-score"><span>Data quality</span><strong>' +
-      (item.dataQuality ? item.dataQuality.score+'%' : item.confidenceScore + '% illustrative') +
+      (item.dataQuality ? item.dataQuality.label : item.confidenceScore + '% illustrative') +
       "</strong></div>",
     '</div><div class="comparison-note">' +
       escapeHtml(item.comparison) +
@@ -4672,6 +4633,7 @@ async function restoreSavedJourneyAssessments() {
       .filter(
         (entry) =>
           !!entry.assessmentSource &&
+          !entry.caseData?.demoDuplicateOf &&
           entry.caseData &&
           entry.caseData.synthetic === true,
       )
@@ -4714,6 +4676,7 @@ function renderPrototypeSavedAssessment(result) {
 }
 
 function renderBackendHistory(assessments) {
+  assessments=assessments.filter(item=>!item.caseData?.demoDuplicateOf);
   const list = document.querySelector("#backend-history-list");
   if (!assessments.length) {
     list.innerHTML =
@@ -4771,9 +4734,9 @@ async function loadBackendHistory() {
       throw new Error(assessments.error || "Could not load history");
     }
 
-    backendSavedAssessments = assessments;
-    renderBackendHistory(assessments);
-    status.textContent = "Saved assessments: " + assessments.length;
+    backendSavedAssessments = assessments.filter(item=>!item.caseData?.demoDuplicateOf);
+    renderBackendHistory(backendSavedAssessments);
+    status.textContent = "Saved assessments: " + backendSavedAssessments.length;
   } catch (error) {
     status.textContent = "Could not load history: " + error.message;
   }
