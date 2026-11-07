@@ -1804,7 +1804,7 @@ function switchView(name) {
     document.querySelector("#team-dialog").close();
   }
 
-  if(name!=='queue'){casePanelOpen=false;document.querySelector('#case-panel').hidden=true;document.querySelector('#queue-view').classList.remove('review-open');document.body.classList.remove('case-drawer-open');}
+  if(name!=='queue'){const caseTools=document.querySelector('#case-tools-button');if(caseTools)caseTools.hidden=true;casePanelOpen=false;document.querySelector('#case-panel').hidden=true;document.querySelector('#queue-view').classList.remove('review-open');document.body.classList.remove('case-drawer-open');}
 
   document.querySelectorAll(".nav-item").forEach(function (item) {
     item.classList.toggle("active", item.dataset.view === ({connected:"intake",indicators:"method","ai-demo":"method"}[name] || name));

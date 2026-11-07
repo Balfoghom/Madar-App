@@ -10,7 +10,7 @@ await mkdir(process.env.ASSESSMENT_DATA_DIR, {recursive:true});
 const { createInferenceServer } = await import('./anomaly-detection/server.mjs');
 const api = createInferenceServer();
 const types = {'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.csv':'text/csv; charset=utf-8'};
-const allowed = new Set(['index.html','app.js','styles.css','madar.js','madar.css','madar-mark.svg','favicon.svg','operations.js','case-presentation.js','routing-policy.js','synthetic-model-evidence.csv']);
+const allowed = new Set(['index.html','app.js','styles.css','madar.js','madar.css','madar-mark.svg','favicon.svg','operations.js','case-reference.css','case-presentation.js','routing-policy.js','synthetic-model-evidence.csv']);
 const server = createServer(async(req,res)=>{
   if (process.env.MADAR_DEMO_PASSWORD) {
     const expected = Buffer.from('Basic '+Buffer.from('madar:'+process.env.MADAR_DEMO_PASSWORD).toString('base64'));
