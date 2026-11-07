@@ -10,17 +10,17 @@ import {explanationEvidence} from '../lib/case-explainer.mjs';
 
 test('enterprise demo covers six journeys with honest detection and outcome provenance',()=>{
   const records=createDemoPortfolio();
-  assert.equal(records.length,39);
+  assert.equal(records.length,45);
   assert.equal(new Set(records.map(r=>r.journey)).size,6);
   const rules=records.filter(r=>r.assessmentSource==='rules-demo');
   assert.equal(rules.length,30);
   assert.ok(rules.every(r=>!r.modelResult&&!r.caseData.modelAssessment));
   assert.equal(new Set(records.map(r=>r.caseData.region)).size,13);
   const prevented=records.filter(r=>r.caseData.preventedAmount>0);
-  assert.equal(prevented.length,7);
+  assert.equal(prevented.length,10);
   const ai=prevented.filter(r=>r.modelFlagged);
-  assert.equal(ai.length,2);
-  assert.equal(ai.reduce((n,r)=>n+r.caseData.preventedAmount,0),72000);
+  assert.equal(ai.length,5);
+  assert.equal(ai.reduce((n,r)=>n+r.caseData.preventedAmount,0),378000);
   for(const r of prevented){assert.ok(r.caseData.preventedAmount<=r.caseData.transactionAmount);assert.equal(r.caseData.outcomeProvenance,'Scripted demo outcome');assert.equal(r.reviewHistory[0].syntheticExample,true);}
   for(const r of records.filter(r=>!r.complete)){assert.equal(r.caseData.risk,'Incomplete');assert.equal(r.caseData.preventedAmount,0);assert.equal(r.caseData.amountAtRisk,null);}
 });
@@ -37,7 +37,7 @@ test('data quality counts individual missing cells; zero is valid; critical gaps
   assert.ok(q1.score>q10.score);assert.equal(q1.criticalMissing,true);
   const zero={...base,transactionAmount:0,ruleScore:0};assert.equal(dataQuality(zero).score,100);
   const linked=createDemoPortfolio().find(r=>r.caseId==='CJ-SYN-enterprise-001').caseData;
-  assert.equal(linked.dataQuality.issues.filter(i=>i.field.includes('sourceConsistency')).length,1);
+  assert.equal(linked.dataQuality.issues.filter(i=>i.field.includes('sourceConsistency')).length,linked.crossJourneyEvidence.events.filter(e=>e.sourceConflict).length);
   const rules=createDemoPortfolio().filter(r=>r.assessmentSource==='rules-demo');
   assert.ok(rules[4].caseData.dataQuality.score>rules[5].caseData.dataQuality.score);
 });
@@ -58,7 +58,7 @@ test('portfolio load is idempotent, preserves reviews, and rejects route approva
   const base='http://127.0.0.1:'+server.address().port;
   const post=async(path,body,status=200)=>{const r=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json();assert.equal(r.status,status,JSON.stringify(j));return j;};
   try{
-    const first=await post('/demo-portfolio',{});assert.equal(first.added,39);
+    const first=await post('/demo-portfolio',{});assert.equal(first.added,45);
     const pending=first.saved.find(r=>r.assessmentSource==='rules-demo'&&!r.caseData.outcome&&r.complete);
     const review={caseId:pending.caseId,assessmentId:pending.assessmentId,actorName:'QA reviewer',note:'Reviewed synthetic control evidence.'};
     await post('/decision',{...review,action:'override',route:'Additional verification'});

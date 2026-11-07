@@ -6,7 +6,7 @@ const output = cases.map((caseRecord) => ({
   caseId: caseRecord.id,
   scenario: caseRecord.family,
   synthetic: true,
-  businessValidation: "Business pattern confirmed; model threshold remains a prototype assumption",
+  businessValidation: ["routine_digital","legitimate_travel","legitimate_account_update","account_takeover_sequence","coordinated_iban_network","rapid_profile_payment"].includes(caseRecord.family) ? "Digital typology and threshold require specialist validation" : "Original business pattern confirmed; model threshold remains a prototype assumption",
   ...assess(caseRecord),
 }));
 

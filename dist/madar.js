@@ -5,7 +5,7 @@
   let catalog = [], records = new Map(), selected = 'CJ-SYN-demo-00001', busy = false, error = '', activeModelVersion = '';
   const esc = escapeHtml;
   const date = value => new Date(value).toLocaleString('en-GB',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Riyadh'});
-  const eventNames = {registration:'Registration',wage:'Wage change',exclusion:'Employment exclusion',claim:'SANED request',payment:'Payment',retirement:'Retirement',maternity:'Maternity'};
+  const eventNames = {registration:'Registration',wage:'Wage change',exclusion:'Employment exclusion',claim:'SANED request',payment:'Payment',retirement:'Retirement',maternity:'Maternity',login:'Account login',iban_change:'IBAN change',profile_update:'Profile update'};
   function merge(saved) {
     for (const record of saved) {
       records.set(record.caseId,record);

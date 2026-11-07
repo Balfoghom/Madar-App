@@ -79,7 +79,6 @@
           </div>
         </header>
 
-        <div class="portfolio-bar"><label>Workspace data <select id="portfolio-scope"><option value="assessed">Assessed synthetic cases</option><option value="illustrative">Illustrative portfolio</option></select></label><small id="portfolio-scope-note"></small></div>
 
 <section id="connected-view" class="view"><button class="text-btn" data-go-view="intake">← Data Intake</button><div id="madar-workspace"></div></section>
 <section id="dashboard-view" class="view active-view">
@@ -88,13 +87,11 @@
               <p class="eyebrow">OPERATIONAL OVERVIEW</p>
               <h2>Behavioral risk command center</h2>
               <p>
-                Illustrative portfolio and assessed synthetic cases across benefit, contribution, employer, and payment journeys.
+                One case workspace across benefit, contribution, employer, and payment journeys.
               </p>
             </div>
-            <div class="heading-actions"><button class="primary-btn" data-load-demo>Load & assess demo cases</button>
-              <button class="secondary-btn" id="dashboard-upload-btn">
-                Upload assessment data</button
-              ><button class="primary-btn" id="dashboard-assessment-btn">
+            <div class="heading-actions"><button class="primary-btn" data-load-demo>Refresh demo cases</button>
+<button class="primary-btn" id="dashboard-assessment-btn">
                 ＋ New assessment
               </button>
             </div>
@@ -111,7 +108,7 @@
                   <h3>Current behavioral assessments</h3>
                 </div>
                 <span class="data-badge" id="dataset-badge"
-                  >60 synthetic cases</span
+                  >Cases</span
                 >
               </div>
               <div id="risk-distribution"></div>
@@ -133,7 +130,7 @@
             <article class="panel map-card">
               <div class="card-heading map-heading">
                 <div>
-                  <p class="eyebrow">SYNTHETIC GEOGRAPHIC VIEW</p>
+                  <p class="eyebrow">GEOGRAPHIC VIEW</p>
                   <h3>Saudi Arabia case concentration</h3>
                   <p>
                     Accurate country outline; marker size reflects volume and
@@ -171,8 +168,8 @@
           <article class="panel activity-card">
             <div class="card-heading">
               <div>
-                <p class="eyebrow">EXPLAINABLE AI ACTIVITY</p>
-                <h3>Latest assessment decisions</h3>
+                <p class="eyebrow">LATEST CASE ACTIVITY</p>
+                <h3>Recent case assessments</h3>
               </div>
               <button class="text-btn" data-go-view="queue">
                 Open full queue
@@ -193,8 +190,7 @@
               </p>
             </div>
             <div class="heading-actions">
-              <span class="data-badge">Synthetic / session evidence</span
-              ><button class="secondary-btn" data-go-view="business-report">
+              <button class="secondary-btn" data-go-view="business-report">
                 Open monthly report
               </button>
             </div>
@@ -207,10 +203,7 @@
                 intervention during the transaction journey.</strong
               >
             </div>
-            <div class="executive-principles">
-              <span>Proactive</span><span>Risk-based</span
-              ><span>Explainable</span><span>Human-governed</span>
-            </div>
+
           </div>
           <div
             id="executive-metrics"
@@ -486,15 +479,15 @@
       <section id="intake-view" class="view">
         <div class="page-heading">
           <div><p class="eyebrow">LIVE PROTOTYPE INPUT</p><h2>Load a new assessment dataset</h2><p>Use explicitly synthetic CSV evidence. The local backend runs the saved model and retains its original fields; missing evidence is not classified as low risk.</p></div>
-          <div class="page-actions"><button class="secondary-btn" id="download-template-btn">Download CSV template</button><button class="secondary-btn danger-outline" id="demo-reset-btn" type="button">Demo Reset</button></div>
+          <div class="page-actions"><button class="secondary-btn" id="download-template-btn">Download CSV template</button><button class="secondary-btn danger-outline" id="demo-reset-btn" type="button">Reset demo workspace</button></div>
         </div>
         <p class="session-note">SANED CSV: use a bundled <code>saned_case_id</code>, or provide <code>workforce</code>, <code>as_of</code>, and <code>events_json</code>. Other journeys require <code>journey_features_json</code>. Missing evidence is saved as incomplete. The <code>synthetic</code> flag is a declaration, not a data-provenance check.</p>
-        <article class="panel demo-intake"><p class="eyebrow">READY-TO-USE DEMO</p><h3>Enterprise demo portfolio</h3><p>Load rules-based examples across all journeys, with the trained SANED and cross-journey models. Madar assesses them together and opens the Intelligence Queue, ready for specialist review. Previously saved demo cases and decisions are retained.</p><button class="primary-btn" data-load-demo>Load & assess demo cases</button><button class="text-btn" data-go-view="connected" data-view="connected">Inspect connected source events</button><p class="demo-load-status" role="status"></p></article><div class="intake-grid">
+        <article class="panel demo-intake"><p class="eyebrow">READY-TO-USE DEMO</p><h3>Enterprise demo portfolio</h3><p>Load rules-based examples across all journeys, with the trained SANED and cross-journey models. Madar prepares one shared workspace for specialist review. Previously saved demo cases and decisions are retained.</p><button class="primary-btn" data-load-demo>Refresh demo cases</button><button class="text-btn" data-go-view="connected" data-view="connected">Inspect connected source events</button><p class="demo-load-status" role="status"></p></article><div class="intake-grid">
           <article class="panel upload-card">
             <div class="card-heading"><div><p class="eyebrow">OPTION 1</p><h3>Upload a CSV file</h3></div></div>
             <label class="drop-zone" id="drop-zone" for="csv-file-input">
               <input id="csv-file-input" type="file" accept=".csv,text/csv" />
-              <span class="upload-icon">⇧</span><strong>Choose a CSV file or drop it here</strong><small>Fully synthetic or approved sandbox data only</small>
+              <span class="upload-icon">⇧</span><strong>Choose a CSV file or drop it here</strong><small>Demo records only</small>
             </label>
             <div class="import-mode-row">
               <label>Import mode<select id="file-import-mode"><option value="append">Append to current data</option><option value="replace">Replace CSV-imported cases</option></select></label>
@@ -555,7 +548,7 @@
                   <p class="eyebrow">MODEL MIX</p>
                   <h3>Assessment weights and thresholds</h3>
                   <p>
-                    Explore the proposed behavioral scoring method on the illustrative portfolio. The fitted SANED and cross-journey models retain their own assessment results.
+                    Apply these weights to the business-rule scoring cases in the shared queue. Trained journey and Cross-Journey Model results remain unchanged. Reset default restores the original weights.
                   </p>
                 </div>
               </div>
@@ -573,7 +566,7 @@
                 /></label>
                 <label class="model-slider"
                   ><span
-                    ><strong>AI anomaly weight</strong
+                    ><strong>Simulated behavioral weight</strong
                     ><output id="anomaly-weight-value">45%</output></span
                   ><input
                     id="anomaly-weight"
@@ -635,7 +628,7 @@
                 <button class="secondary-btn" id="reset-model-btn">
                   Reset defaults</button
                 ><button class="primary-btn" id="apply-simulation-btn">
-                  Apply to sandbox
+                  Apply to business rules
                 </button>
               </div>
             </article>
@@ -774,7 +767,7 @@
                 ><span><i class="high-dot"></i>High 75–100</span>
               </div>
               <p>
-                This formula applies only to illustrative cases. Current fitted models keep their output separate from operational controls. Sandbox drafts cannot change their routing policy.
+                This formula drives business-rule demonstration scores in the shared queue. Journey and Cross-Journey Model outputs remain separate and are not changed by these weights.
               </p>
             </article>
             <article class="panel governance-card">
@@ -1584,6 +1577,6 @@
     <script src="app.js?v=2.0.0"></script>
 <script src="madar.js?v=2.0.0"></script>
   <script src="case-presentation.js?v=1"></script>
-  <script src="operations.js?v=5"></script>
+  <script src="operations.js?v=7"></script>
 </body>
 </html>

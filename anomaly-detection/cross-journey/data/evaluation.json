@@ -1,61 +1,61 @@
 {
-  "modelVersion": "madar-cross-journey-rf-20261019-v2",
-  "artifactSha256": "8966a9575c4ba0b25e9c26b2bcd6a0a7d24de42cee9b37a76825c26088d080b6",
+  "modelVersion": "madar-cross-journey-rf-20261107-v3",
+  "artifactSha256": "0ecb4cf4a6a814b0b20d1f0f4bcbea58a725dcf01d49ed2d78b79d2c56c39841",
   "validation": "Synthetic prototype with contributor-level sequence correction; business validation and real-data evaluation required",
-  "train": 6700,
-  "calibration": 1000,
-  "test": 700,
-  "routineOrLegitimate": 400,
-  "review": 300,
-  "threshold": 0.00017636189085619078,
+  "train": 10300,
+  "calibration": 1600,
+  "test": 1300,
+  "routineOrLegitimate": 700,
+  "review": 600,
+  "threshold": 0.0037405151630602556,
   "thresholdMethod": "97th percentile of a separate routine and legitimate calibration population",
   "splitMethod": "Disjoint synthetic case, employer, contributor, and identifier IDs; common generator; no real-world generalisation claim",
   "metrics": {
     "Provisional rules only": {
       "tp": 150,
       "fp": 0,
-      "fn": 150,
-      "tn": 400,
-      "accuracy": 0.7857142857142857,
+      "fn": 450,
+      "tn": 700,
+      "accuracy": 0.6538461538461539,
       "precision": 1.0,
-      "recall": 0.5,
+      "recall": 0.25,
       "falsePositiveRate": 0.0
     },
     "Cross-journey pattern model only": {
-      "tp": 300,
-      "fp": 18,
+      "tp": 600,
+      "fp": 25,
       "fn": 0,
-      "tn": 382,
-      "accuracy": 0.9742857142857143,
-      "precision": 0.9433962264150944,
+      "tn": 675,
+      "accuracy": 0.9807692307692307,
+      "precision": 0.96,
       "recall": 1.0,
-      "falsePositiveRate": 0.045
+      "falsePositiveRate": 0.03571428571428571
     },
     "Rules OR cross-journey AI": {
-      "tp": 300,
-      "fp": 18,
+      "tp": 600,
+      "fp": 25,
       "fn": 0,
-      "tn": 382,
-      "accuracy": 0.9742857142857143,
-      "precision": 0.9433962264150944,
+      "tn": 675,
+      "accuracy": 0.9807692307692307,
+      "precision": 0.96,
       "recall": 1.0,
-      "falsePositiveRate": 0.045
+      "falsePositiveRate": 0.03571428571428571
     }
   },
   "byScenario": {
     "routine": {
       "count": 250,
-      "aiFlagged": 7,
+      "aiFlagged": 1,
       "ruleFlagged": 0
     },
     "legitimate_growth": {
       "count": 75,
-      "aiFlagged": 11,
+      "aiFlagged": 0,
       "ruleFlagged": 0
     },
     "legitimate_restructuring": {
       "count": 75,
-      "aiFlagged": 0,
+      "aiFlagged": 19,
       "ruleFlagged": 0
     },
     "coordinated_claim_sequence": {
@@ -72,6 +72,36 @@
       "count": 75,
       "aiFlagged": 75,
       "ruleFlagged": 75
+    },
+    "routine_digital": {
+      "count": 100,
+      "aiFlagged": 0,
+      "ruleFlagged": 0
+    },
+    "legitimate_travel": {
+      "count": 100,
+      "aiFlagged": 0,
+      "ruleFlagged": 0
+    },
+    "legitimate_account_update": {
+      "count": 100,
+      "aiFlagged": 5,
+      "ruleFlagged": 0
+    },
+    "account_takeover_sequence": {
+      "count": 100,
+      "aiFlagged": 100,
+      "ruleFlagged": 0
+    },
+    "coordinated_iban_network": {
+      "count": 100,
+      "aiFlagged": 100,
+      "ruleFlagged": 0
+    },
+    "rapid_profile_payment": {
+      "count": 100,
+      "aiFlagged": 100,
+      "ruleFlagged": 0
     }
   }
 }

@@ -11,10 +11,10 @@ const ALLOWED_TYPES = new Set([
   "claim",
   "payment",
   "retirement",
-  "maternity",
+  "maternity", "login", "iban_change", "profile_update",
 ]);
 
-const JOURNEY_FOR_TYPE = {registration:'Employer Registration', wage:'Contribution & Wage', exclusion:'Employer Registration', claim:'SANED', payment:'Benefit Payments', retirement:'Retirement', maternity:'Maternity Benefit'};
+const JOURNEY_FOR_TYPE = {registration:'Employer Registration', wage:'Contribution & Wage', exclusion:'Employer Registration', claim:'SANED', payment:'Benefit Payments', retirement:'Retirement', maternity:'Maternity Benefit', login:'Digital Access', iban_change:'Benefit Payments', profile_update:'Account Maintenance'};
 
 // Named positions keep rule logic readable while preserving the model's fixed feature order.
 const FEATURE = Object.freeze({
@@ -69,8 +69,32 @@ function findOrderedChain(events) {
   return { found: false, spanDays: 30 };
 }
 
+
+function digitalFeatures(events) {
+  const logins=events.filter(e=>e.type==='login'), verified=logins.filter(e=>e.locationVerified===true), changes=events.filter(e=>e.type==='iban_change');
+  let speed=0,sequences=0;const recencies=[];
+  for(const subject of new Set(events.map(e=>e.subjectId))){
+    const history=events.filter(e=>e.subjectId===subject),sessions=verified.filter(e=>e.subjectId===subject).sort((a,b)=>a.recordedAt-b.recordedAt);
+    for(let i=1;i<sessions.length;i++){
+      const a=sessions[i-1],b=sessions[i],rad=x=>x*Math.PI/180,lat1=rad(a.latitude),lat2=rad(b.latitude),h=Math.sin((lat2-lat1)/2)**2+Math.cos(lat1)*Math.cos(lat2)*Math.sin(rad(b.longitude-a.longitude)/2)**2;
+      const distance=6371*2*Math.asin(Math.min(1,Math.sqrt(h))),hours=(b.recordedAt-a.recordedAt)/HOUR;
+      if(hours>0)speed=Math.max(speed,Math.min(100000,distance/hours));
+    }
+    let found=false;
+    for(const claim of history.filter(e=>e.type==='claim')){
+      const ibans=history.filter(e=>e.type==='iban_change'&&e.recordedAt<claim.recordedAt);
+      if(ibans.length)recencies.push((claim.recordedAt-Math.max(...ibans.map(e=>e.recordedAt)))/HOUR);
+      for(const iban of ibans)for(const profile of history.filter(e=>e.type==='profile_update'&&e.recordedAt<iban.recordedAt)){
+        if(history.some(e=>e.type==='login'&&e.recordedAt>=claim.recordedAt-DAY&&e.recordedAt<profile.recordedAt))found=true;
+      }
+    }
+    sequences+=Number(found);
+  }
+  return [logins.length,new Set(verified.map(e=>`${e.latitude},${e.longitude}`)).size,speed,changes.length,events.filter(e=>e.type==='profile_update').length,sequences,Math.log1p(recencies.length?Math.min(...recencies):720)];
+}
+
 /**
- * Validate a connected synthetic history and calculate the model's sixteen
+ * Validate a connected synthetic history and calculate the model's twenty-three
  * ordered inputs. Returning null means evidence is incomplete or malformed and
  * causes an explicit abstention rather than a fabricated low-risk result.
  */
@@ -124,6 +148,11 @@ export function extractFeatures(caseRecord) {
     return null;
   }
 
+  if(events.some(e=>
+    (e.type==='login' && (!Number.isFinite(e.latitude)||Math.abs(e.latitude)>90||!Number.isFinite(e.longitude)||Math.abs(e.longitude)>180||typeof e.locationVerified!=='boolean')) ||
+    (e.type==='iban_change' && (!validSyntheticId(e.identifierId,'IBAN-SYN-')||!validSyntheticId(e.previousIdentifierId,'IBAN-SYN-')||e.identifierId===e.previousIdentifierId)) ||
+    (e.type==='profile_update' && !['mobile','email','address','identity'].includes(e.changedField))
+  )) return null;
   const exclusions = events.filter((event) => event.type === "exclusion");
   const identifierSubjects = new Map();
   for (const event of events) {
@@ -168,6 +197,7 @@ export function extractFeatures(caseRecord) {
     chainCount,
     Number(chain.found),
     chain.spanDays,
+    ...digitalFeatures(events),
   ];
   return vector.every(Number.isFinite) ? vector : null;
 }
@@ -230,10 +260,10 @@ export function evaluateRules(vector) {
  */
 function contextualFeatures(vector) {
   return vector.map((internalValue, index) => {
-    const recency = index === 9;
+    const recency = index === 9 || index === 22;
     const display = (value) => recency ? Math.expm1(value) : value;
     return {
-      name: recency ? "Hours since latest wage change" : model.features[index],
+      name: index===9 ? "Hours since latest wage change" : index===22 ? "Hours from latest IBAN change to request" : model.features[index],
       value: display(internalValue),
       median: display(model.referenceMedian[index]),
       low: display(model.referenceP05[index]),
@@ -289,6 +319,10 @@ export function assess(caseRecord) {
       `${chainCount} linked contributors each complete a registration → wage → exclusion → SANED sequence.`,
     );
   }
+  if(vector[18]>1000)reasons.push('Verified login locations imply unusually rapid travel; verify account access and location reliability.');
+  if(vector[19]>0)reasons.push(`${vector[19]} payment-account changes appear before the assessment; verify ownership before payment.`);
+  if(vector[20]>0)reasons.push(`${vector[20]} profile updates appear in the connected history.`);
+  if(vector[21]>0)reasons.push(`${vector[21]} contributors show a login → profile update → IBAN change → request sequence within 24 hours.`);
   reasons.push(...ruleReasons);
 
   return {

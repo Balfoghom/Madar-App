@@ -2,7 +2,7 @@
 
 Madar’s proposed value is a shared operating layer for existing fraud capabilities: receive findings, explain evidence, assign ownership, investigate, record outcomes and track governance. Cross-journey detection is one example input, not the novelty of the enterprise proposal.
 
-This repository is a working **synthetic prototype** of that process. English is the default interface, with Madar / مدار branding. It has seven bundled model artifacts, saved cases and human reviews, a staged investigation workflow and an optional API-based LLM case explainer. It has no live enterprise integrations or payment actions.
+This repository is a working **synthetic prototype** of that process. English is the default interface, with Madar / مدار branding. The interface now uses one persisted workspace: 60 named business-rule scenarios plus 45 rule/ML portfolio cases, alongside retained imported cases. There is no workspace data switch. It has seven bundled model artifacts, saved cases and human reviews, a staged investigation workflow and an optional API-based LLM case explainer. It has no live enterprise integrations or payment actions.
 
 ## Run it yourself
 
@@ -15,13 +15,13 @@ Requires **Node.js 22.13 or newer**. No package installation, Python training or
 
 The app opens on **Fraud Operations**. One server supplies the interface and API; do not start a separate frontend or model service. If the port is occupied, stop the previous app or run `PORT=8091 npm start` and open that port.
 
-For optional LLM explanations, follow [LLM_SETUP.md](LLM_SETUP.md). Case panels show an explicitly labeled score or pattern indicator, a concise brief with English / العربية controls, key evidence linked to source sections, and a visible state-aware review action. People/financial context, source activity, scoring and review history are grouped separately; Expand case provides a wider reading view. Detailed model evidence stays collapsed. After a brief is generated, “Ask about this case” opens an evidence-grounded conversation in the selected language. Conversations stay in browser memory and cannot change cases. The app works without them and clearly displays “API setup required.”
+For optional LLM explanations, follow [LLM_SETUP.md](LLM_SETUP.md). Case details open only after selecting a record, in a closeable side drawer. Case panels show an explicitly labeled score or pattern indicator, a concise brief with English / العربية controls, key evidence linked to source sections, and a visible state-aware review action. People/financial context, source activity, scoring and review history are grouped separately; Expand case provides a wider reading view. Detailed model evidence stays collapsed. After a brief is generated, “Ask about this case” opens an evidence-grounded conversation in the selected language. Conversations stay in browser memory and cannot change cases. The app works without them and clearly displays “API setup required.”
 
 ## Validate the working journey
 
 Use synthetic evidence only. These checks write to your local demo session.
 
-- [ ] Open **Fraud Operations → Open connected case example → Assess demo portfolio**. Expect six saved cases from 35 events.
+- [ ] Open **Fraud Operations → Open connected case example → Assess demo portfolio**. Expect twelve saved connected histories, including digital-account scenarios.
 - [ ] Open **Connected SANED sequence**. Expect three contributors, each with a complete linked sequence, a model review flag, quiet comparator rules and a specialist-review recommendation.
 - [ ] Compare **Routine activity** and **Legitimate restructuring**. Both should remain unflagged by the bundled model and comparator rules.
 - [ ] Open **Missing employer evidence**. Expect abstention and “Complete evidence,” without a model score.
@@ -35,7 +35,9 @@ Use synthetic evidence only. These checks write to your local demo session.
 - [ ] Return to **Fraud Operations** and check its saved-case and work-in-progress counts.
 - [ ] Reassess unchanged evidence with the same model version. It should not create a duplicate case or discard human reviews. A model-version change creates a new assessment and retains prior reviews in history.
 - [ ] Open **Model & Governance**. The registry should include six journey models and the connected-journey model.
-- [ ] Switch **Workspace data** between **Assessed synthetic cases** and **Illustrative portfolio**. Dashboards, queue and reports must not mix their results.
+- [ ] Open **Dashboard** and select **Refresh demo cases**. It stays on the dashboard, retains reviews and does not create duplicates. Activity cards open the selected saved case in a closeable drawer, including AI explanation controls.
+- [ ] Change **Scoring Simulation** weights, choose **Apply to business rules**, then **Reset defaults**. Only business-rule simulation cases change; fitted ML outputs remain unchanged.
+- [ ] Confirm named identities and fictional amounts are supplied for the demonstration. These contextual fields do not alter the trained models’ source histories or inference outputs.
 - [ ] Select an empty reporting month. Expect an empty report, not fallback cases.
 - [ ] With an LLM configured, generate a brief from a saved case. Inspect its evidence references, missing-evidence questions and suggested checks. Verify every claim before relying on the draft.
 
@@ -47,13 +49,13 @@ The launcher uses `.madar-data/`, excluded from Git. Set `ASSESSMENT_DATA_DIR` t
 
 Manal’s October 19 session is preserved as a historical fixture in [demo-sessions/manal-20261019](demo-sessions/manal-20261019/README.md). It uses the earlier model version. Shared example data belongs there; live rehearsal writes belong in `.madar-data/` and should not be committed.
 
-Data Intake’s reset clears the selected local session. Case notes, model evidence and generated LLM drafts are local prototype records, not an enterprise immutable audit store. Governance roles are named demo roles rather than authenticated permissions. Candidate indicators and scenario review stages do not deploy rules or retrain models.
+Data Intake’s **Reset demo workspace** asks for confirmation, clears saved assessments, human reviews, AI drafts, proposals and settings, then restores the original demo examples. Scripted example outcomes are restored; previous session decisions are not. Case notes, model evidence and generated LLM drafts are local prototype records, not an enterprise immutable audit store. Governance roles are named demo roles rather than authenticated permissions. Candidate indicators and scenario review stages do not deploy rules or retrain models.
 
 ## Automated checks
 
 Run `npm test`. The suite covers inference parity, synthetic holdout metrics, event grouping and validation, contributor-level sequences, duplicate imports, model-version handling, policy isolation, review and ownership persistence, stale edits, financial consistency, indicator evidence grouping, and LLM request/output validation. Provider calls are mocked in automated tests; a real configured API requires a separate smoke test.
 
-The corrected cross-journey model is `madar-cross-journey-rf-20261019-v2`. It finds 300/300 provisional review cases with 18 false alarms among 400 routine or legitimate cases in its synthetic holdout. These figures do not establish production accuracy, prevented loss or specialist time savings.
+The corrected cross-journey model is `madar-cross-journey-rf-20261107-v3`. It finds 600/600 provisional review cases with 25 false alarms among 700 routine or legitimate cases in its synthetic holdout. These figures do not establish production accuracy, prevented loss or specialist time savings.
 
 ## Hosting
 
@@ -75,3 +77,5 @@ Hosting the full app needs a Node-compatible server and persistent storage. A st
 | Local JSON persistence | Transactional database, concurrency, backup, immutable audit and retention policies |
 
 See [solution design](AI_SOLUTION_DESIGN.md), [technical blueprint](TECHNICAL_BLUEPRINT.md), [scoring methodology](SCORING_METHODOLOGY.md), and [LLM setup](LLM_SETUP.md). Component READMEs and ServiceNow import files remain supporting material; they are not live integrations.
+
+The November 7 model adds login-location, IBAN-change and profile-update sequences (23 event-derived features; 10,300 training, 1,600 calibration and 1,300 held-out synthetic histories). New digital typologies are prototype assumptions requiring fraud-specialist validation. Ordinary travel and legitimate account-update counterexamples are included. Existing saved cross-journey cases are reassessed at workspace initialization; earlier model references and human reviews are retained.

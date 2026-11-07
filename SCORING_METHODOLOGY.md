@@ -6,13 +6,13 @@ The interface contains three different assessment modes. Their numbers must not 
 |---|---|---|
 | Six journey-specific fitted models | Isolation Forest anomaly score and rank against synthetic reference data | Model/comparator flags can require review; the supplied operational control score remains separate |
 | Connected-journey fitted model | Random Forest similarity to provisional synthetic review patterns | A model or comparator-rule flag recommends specialist review; missing evidence causes abstention |
-| Illustrative legacy portfolio | Median/MAD statistical demonstration with configurable weighted control and pattern adjustments | Browser sandbox only; never changes the fitted-model policy or retrains a model |
+| Illustrative legacy portfolio | Median/MAD statistical demonstration with configurable weighted control and pattern adjustments | Persisted business-rule scenarios in the shared workspace; configured weights never change fitted-model inference or policy |
 
 ## Case-panel score labels
 
-The case header retains a score indicator but labels its origin. Illustrative cases show the existing weighted **Simulation score**; the default mix is 55% existing control plus 45% simulated behavioral score plus pattern adjustments, rounded, capped at 100, with the existing critical-control floor. Scoring Simulation can change the illustrative configuration only.
+The case header retains a score indicator but labels its origin. Business-rule simulation cases show the existing weighted **Business-rule score**; the default mix is 55% existing control plus 45% simulated behavioral score plus pattern adjustments, rounded, capped at 100, with the existing critical-control floor. Apply to business rules saves the configuration and versions changed business-rule assessments in the shared queue. Reset defaults restores their original configured scores while retaining review history. Fitted-model outputs remain unchanged.
 
-Assessed journey/rules cases show **Control score**. AI or comparator findings can raise review priority while that number stays unchanged (for example, control score 20 with Medium review priority). Connected cases show a qualitative pattern indicator, without inventing a combined numeric score. Incomplete assessments show no numeric score. Resolved cases retain the original assessment indicator alongside a separate outcome status.
+Assessed journey/rules cases show **Control score**. AI or comparator findings can raise review priority while that number stays unchanged (for example, control score 20 with Medium review priority). Connected demo cases carry explicitly supplied fictional operational-control scores in addition to the separate Cross-Journey Model finding. The control score is not derived from model similarity or blended with it. Incomplete assessments show no numeric score. Resolved cases retain the original assessment indicator alongside a separate outcome status.
 
 The visual redesign does not change detector inference, thresholds, scoring, routing policy or stored specialist decisions.
 
@@ -24,9 +24,9 @@ The prototype operational-control bands are Low 0–34, Medium 35–74 and High 
 
 Events are assessed within a 30-day window. A completed sequence requires the same contributor to have registration → wage change → exclusion → SANED request, in order. Counts represent distinct contributors with completed sequences; unrelated contributors cannot collectively supply one sequence. Inputs with unsupported journey/type combinations or invalid wages cause abstention.
 
-A complete unflagged case routes to Standard review. Model or comparator flags route to Specialist review. No operational control score or transaction amount is supplied in the bundled connected examples; these fields display “Not supplied.” Pattern similarity and reference percentiles are technical model outputs, not fraud probability or calibrated case risk percentages.
+A complete unflagged case routes to Standard review. Model or comparator flags route to Specialist review. The original inference fixtures do not supply operational-control or financial context. The shared presentation workspace adds fictional names, operational-control scores and amounts, with provenance, without altering source event histories or ML inference. Pattern similarity and reference percentiles are technical model outputs, not fraud probability or calibrated case risk percentages.
 
-Model `madar-cross-journey-rf-20261019-v2` uses 16 derived features and 180 trees. Its held-out synthetic evaluation records 300 true positives, 18 false positives, zero false negatives and 382 true negatives (97.4% accuracy). Generator-based evaluation does not establish performance on real enterprise cases.
+Model `madar-cross-journey-rf-20261107-v3` uses 23 derived features and 180 trees. Its held-out synthetic evaluation records 600 true positives, 25 false positives, zero false negatives and 675 true negatives (98.1% accuracy). Generator-based evaluation does not establish performance on real enterprise cases.
 
 ## Explanation and governance
 

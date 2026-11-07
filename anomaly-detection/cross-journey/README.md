@@ -24,28 +24,28 @@ The SANED model in the parent directory remains an unsupervised Isolation Forest
 
 This design is deliberate. A broad Isolation Forest was tested first, but legitimate high-volume activity was more globally unusual than the coordinated below-threshold sequence. A supervised pattern model is more suitable for proving detection of a specific business typology. Haitham confirmed the typology; Data & AI validation is still required before the fitted threshold or metrics can be treated as production evidence.
 
-The model uses 16 derived features, including journey count, event volume, linked contributors, registration/wage/exclusion/SANED counts, wage and retroactivity values, identifier reuse, conflicts, overrides, and the count and timing of completed cross-journey sequences.
+The model uses 23 derived features, including journey count, event volume, linked contributors, registration/wage/exclusion/SANED counts, wage and retroactivity values, identifier reuse, conflicts, overrides, and the count and timing of completed cross-journey sequences.
 
 The model score measures similarity to the provisional synthetic review patterns. It is not a fraud probability.
 
 ## Data and evaluation
 
-- Training: 6,700 synthetic connected histories
-- Calibration: 1,000 separate routine or legitimate histories
-- Test: 700 separate histories
-- Test population: 400 routine/legitimate and 300 provisional review cases
+- Training: 10,300 synthetic connected histories
+- Calibration: 1,600 separate routine or legitimate histories
+- Test: 1,300 separate histories
+- Test population: 700 routine/legitimate and 600 provisional review cases
 - Model: 180-tree Random Forest
-- Model version: `madar-cross-journey-rf-20261019-v2`
+- Model version: `madar-cross-journey-rf-20261107-v3`
 
 | Method | Review cases found | Missed | Legitimate cases flagged | Accuracy |
 |---|---:|---:|---:|---:|
-| Provisional rules | 150 / 300 | 150 | 0 / 400 | 78.6% |
-| Cross-journey model | 300 / 300 | 0 | 18 / 400 | 97.4% |
-| Rules OR model | 300 / 300 | 0 | 18 / 400 | 97.4% |
+| Provisional rules | 150 / 600 | 450 | 0 / 700 | 65.4% |
+| Cross-journey model | 600 / 600 | 0 | 25 / 700 | 98.1% |
+| Rules OR model | 600 / 600 | 0 | 25 / 700 | 98.1% |
 
 The key proof family contains 150 coordinated-sequence test cases. The model flags all 150 while the comparator rules flag none. These results are against the same synthetic generator families used to design training data. They do not establish production fraud accuracy, savings, fairness, or generalisation to real GOSI activity.
 
-The 18 false alarms include seven routine cases and eleven legitimate-growth cases. They are retained in the report and should be discussed as review workload.
+The false alarms are retained by scenario in `data/evaluation.json` and should be discussed as specialist review workload. One legitimate-restructuring demo also crosses the model threshold: it illustrates why a flag requires human review. They are retained in the report and should be discussed as review workload.
 
 ## Files for Manal
 
@@ -95,3 +95,11 @@ Inference has no npm dependencies. Retraining requires the pinned Python package
 - Exact model threshold and production performance remain unvalidated
 
 Any feedback loop must store authorized outcomes, accumulate evidence, propose a candidate rule or model version, evaluate it offline, and obtain governance approval before activation.
+
+## Digital-account extension (November 7)
+
+Version 3 adds Digital Access and Account Maintenance events before benefit requests: verified login location changes, payment-account changes and profile updates. Seven additional inputs capture event counts, distinct verified locations, same-contributor travel speed, ordered login → profile → IBAN → request sequences within 24 hours, and payment-account-change recency. Coordinates never identify a real person; all identifiers and coordinates belong to generated examples. Unverified location events do not contribute travel speed.
+
+The model is retrained offline, not a renamed business rule. Three new suspicious families (account-takeover-like sequence, coordinated shared-IBAN changes, repeated profile/payment-account updates) and three legitimate families (routine digital access, plausible travel, legitimate account updates) are included across disjoint training/calibration/test entity namespaces. The new digital scenarios require specialist validation; confirmation of the original employment typology does not validate them. Synthetic financial context does not feed the classifier. A model review recommendation does not confirm fraud or automatically stop payment.
+
+The comparator rules are unchanged to preserve an explicit ML-only demonstration. Twelve bundled examples include the original six histories and six digital histories. Event CSV columns now support `latitude`, `longitude`, `location_verified`, `previous_identifier_id`, and `changed_field`. Login coordinates must be bounded numbers; IBAN changes require distinct synthetic previous/new account identifiers; profile fields use mobile/email/address/identity.

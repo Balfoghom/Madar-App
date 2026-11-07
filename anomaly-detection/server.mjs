@@ -1,3 +1,4 @@
+import {createWorkspacePortfolio,enrichDemoRecord,applyBusinessConfig,caseStatus} from './lib/workspace-demo.mjs';
 import {createDemoPortfolio} from './lib/demo-portfolio.mjs';
 import {withDataQuality} from './lib/data-quality.mjs';
 import {llmStatus, explanationEvidence, generateExplanation, generateCaseAnswer, validateLanguage, validateConversation, PROMPT_VERSION} from './lib/case-explainer.mjs';
@@ -184,6 +185,8 @@ function saveHumanReview(body, type) {
     const reviews = await readJsonFile(humanReviewsPath, []);
     reviews.push(review);
     data.reviewHistory = reviews.filter((entry) => entry.caseId === body.caseId);
+    if(type === "decision")data.humanDecision=review;
+    data.status=caseStatus(data);
     data.audit = [...(data.audit || []), `Human ${type} recorded by ${review.actorName} at ${review.recordedAt}: ${review.note}`];
     // The raw model result, version, flags, feature values and score are immutable.
     saved[index] = { ...current, caseData: data, ...(type === "decision" ? {humanDecision:review} : {}), reviewHistory: data.reviewHistory };
@@ -448,6 +451,39 @@ export function createInferenceServer({explain = generateExplanation, answer = g
         return send(200,result);
       }catch(error){return send(error.status || (error instanceof SyntaxError?400:500),{error:error instanceof InputError?error.message:'Could not answer this case question.'});}
       finally{if(ownsLock)pendingExplanations.delete(key);}
+    }
+    if(req.method === 'POST' && path === '/workspace-demo'){
+      try {
+        const operation=assessmentWrites.catch(()=>{}).then(async()=>{
+          const previous=await readSavedAssessments(),known=new Set(previous.map(r=>r.caseId));
+          const added=createWorkspacePortfolio().filter(r=>!known.has(r.caseId));
+          const reviews=await readJsonFile(humanReviewsPath,[]);
+          const settings=await readJsonFile(riskConfigPath,{config:defaultRiskConfig});
+          const migrated=previous.map(record=>{
+            if(record.assessmentSource!=='cross-journey'||!record.caseData?.crossJourneyEvidence||record.modelResult?.modelVersion===crossJourneyModel.version)return record;
+            const fresh=createCrossJourneyAssessment(record.caseData.crossJourneyEvidence),old=record.caseData;
+            const preserved={};for(const key of ['customerName','employerName','subject','entity','nationalId','mobile','employerNumber','supervisorName','country','region','city','transactionAmount','amountAtRisk','preventedAmount','confirmedFraudAmount','paymentStatus','financialOutcome','financialProvenance','outcome','outcomeProvenance','decisionDate','decisionOwner','reviewHistory','humanDecision','workflow','workflowStage','demoPortfolio'])if(old[key]!==undefined)preserved[key]=old[key];
+            Object.assign(fresh.caseData,preserved,{assessmentHistory:[...(old.assessmentHistory||[]),{assessmentId:record.assessmentId,modelVersion:record.modelResult?.modelVersion,assessedAt:record.assessedAt}].slice(-10)});
+            if(old.humanDecision)fresh.caseData.route=old.route;
+            fresh.caseData.status=caseStatus(fresh.caseData);fresh.reviewHistory=record.reviewHistory||[];
+            return fresh;
+          });
+          const records=[...added,...migrated].map(enrichDemoRecord).map(record=>{
+            if(!record.caseData?.businessSimulation)return record;
+            const data=applyBusinessConfig(record.caseData,settings.config||defaultRiskConfig);data.status=caseStatus(data);
+            const fingerprint=JSON.stringify({score:data.score,risk:data.risk,interaction:data.interaction,route:data.recommendedRoute,config:settings.config||defaultRiskConfig});
+            if(record.caseData.scoringFingerprint && record.caseData.scoringFingerprint!==fingerprint){
+              data.assessmentHistory=[...(data.assessmentHistory||[]),{assessmentId:record.assessmentId,score:record.caseData.score,risk:record.caseData.risk}].slice(-10);
+              record={...record,assessmentId:crypto.randomUUID()};data.assessmentId=record.assessmentId;
+            }
+            data.scoringFingerprint=fingerprint;
+            return {...record,caseData:data,risk:data.risk,complete:data.rulesAssessment.complete,applicationAssessment:{route:data.recommendedRoute}};
+          });
+          await writeJsonFile(humanReviewsPath,[...reviews,...added.flatMap(r=>r.reviewHistory||[])]);
+          await writeSavedAssessments(records);
+          return {saved:records.filter((r,i,a)=>r.caseData&&a.findIndex(x=>x.caseId===r.caseId)===i),added:added.length,syntheticOnly:true};
+        });assessmentWrites=operation;return send(200,await operation);
+      }catch{return send(500,{error:'Could not prepare the demo workspace. Existing records are retained.'});}
     }
     if(req.method === 'POST' && path === '/demo-portfolio'){
       try{

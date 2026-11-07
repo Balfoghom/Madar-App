@@ -45,15 +45,15 @@ export function createDemoPortfolio(now=new Date()){
     const id='NEW-ENTERPRISE-SANED-'+index,[region,city]=locations[index+3];
     const record=createApplicationAssessment({id,transactionId:'MADAR-AI-SANED-'+index,synthetic:true,journey:'SANED',scenario:['Routine SANED history','SANED review with simulated prevention','Incomplete SANED history'][index],subject:'SYN-demo-'+suffix,entity:'SYN-AI-EMPLOYER-'+index,customerName:'Synthetic SANED claimant '+(index+1),employerName:'Synthetic SANED employer '+(index+1),country:'Saudi Arabia',region,city,requested:time,ruleScore:index===1?45:10,transactionAmount:24000,amountAtRisk:index===2?null:index===1?24000:0,paymentStatus:'Pending',detectionStage:'Before payment',features:{},modelInput:{case_id:'SYN-demo-'+suffix}});
     record.assessedAt=time;Object.assign(record.caseData,{demoPortfolio:true,assessedAt:time,detectionMethod:'SANED AI + controls',financialProvenance:'Supplied synthetic benefit request amount; not a calculated entitlement.'});
-    if(index===1&&record.modelFlagged)outcome(record,'prevented',24000);
+    if([1,9,10,11].includes(index)&&record.modelFlagged)outcome(record,'prevented',24000);
     records.push(record);
   });
   demoCases.forEach((evidence,index)=>{
     const record=createCrossJourneyAssessment({...structuredClone(evidence),id:'CJ-SYN-enterprise-'+String(index).padStart(3,'0')});
-    const [region,city]=locations[index+6];
+    const [region,city]=locations[(index+6)%locations.length];
     record.assessedAt=time;
-    Object.assign(record.caseData,{demoPortfolio:true,scenario:['Routine connected activity','Connected activity with simulated prevention','Legitimate restructuring pattern','Shared identifier pattern','Conflicting source records','Incomplete linked history'][index],assessedAt:time,requested:time,country:'Saudi Arabia',region,city,transactionAmount:42000+index*6000,amountAtRisk:!record.complete?null:(record.modelFlagged||record.ruleFlagged)?42000+index*6000:0,detectionMethod:'Cross-journey AI + comparator rules',financialProvenance:'Supplied synthetic request total for the linked contributors; not inferred from wage changes.'});
-    if(index===1&&record.modelFlagged)outcome(record,'prevented',record.caseData.transactionAmount);
+    Object.assign(record.caseData,{demoPortfolio:true,scenario:['Routine connected activity','Connected activity with simulated prevention','Legitimate restructuring pattern','Shared identifier pattern','Conflicting source records','Incomplete linked history','Routine digital access','Legitimate travel','Legitimate account update','Rapid login and account changes','Shared IBAN before benefit requests','Repeated profile and payment-account changes'][index],assessedAt:time,requested:time,country:'Saudi Arabia',region,city,transactionAmount:42000+index*6000,amountAtRisk:!record.complete?null:(record.modelFlagged||record.ruleFlagged)?42000+index*6000:0,detectionMethod:'Cross-journey AI + comparator rules',financialProvenance:'Supplied synthetic request total for the linked contributors; not inferred from wage changes.'});
+    if([1,9,10,11].includes(index)&&record.modelFlagged)outcome(record,'prevented',record.caseData.transactionAmount);
     records.push(record);
   });
   return records.map(withDataQuality);

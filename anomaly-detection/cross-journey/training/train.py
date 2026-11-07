@@ -35,6 +35,9 @@ FEATURE_NAMES = [
     "Coordinated chain count",
     "Registration-wage-exclusion-SANED chain",
     "Completed chain span (days)",
+    "Login events", "Verified login locations", "Maximum verified travel speed (km/h)",
+    "IBAN changes", "Profile updates", "Login-profile-IBAN-request sequences",
+    "Hours from latest IBAN change to request (log1p)",
 ]
 
 JOURNEYS = {
@@ -45,8 +48,37 @@ JOURNEYS = {
     "payment": "Benefit Payments",
     "retirement": "Retirement",
     "maternity": "Maternity Benefit",
+    "login": "Digital Access", "iban_change": "Benefit Payments", "profile_update": "Account Maintenance",
 }
 
+
+DIGITAL_FAMILIES = ["routine_digital", "legitimate_travel", "legitimate_account_update", "account_takeover_sequence", "coordinated_iban_network", "rapid_profile_payment"]
+REVIEW_DIGITAL = set(DIGITAL_FAMILIES[3:])
+
+def digital_features(events):
+    logins = [e for e in events if e["type"] == "login"]
+    verified = [e for e in logins if e.get("locationVerified") is True]
+    changes = [e for e in events if e["type"] == "iban_change"]
+    speed, sequences, recencies = 0.0, 0, []
+    for subject in {e["subjectId"] for e in events}:
+        history = [e for e in events if e["subjectId"] == subject]
+        sessions = sorted([e for e in verified if e["subjectId"] == subject], key=lambda e:e["recordedAt"])
+        for a,b in zip(sessions, sessions[1:]):
+            lat1, lat2 = math.radians(a["latitude"]), math.radians(b["latitude"])
+            dlat, dlon = lat2-lat1, math.radians(b["longitude"]-a["longitude"])
+            h = math.sin(dlat/2)**2 + math.cos(lat1)*math.cos(lat2)*math.sin(dlon/2)**2
+            distance = 6371*2*math.asin(min(1,math.sqrt(h)))
+            hours = (b["recordedAt"]-a["recordedAt"])/HOUR
+            if hours > 0: speed=max(speed,min(100000,distance/hours))
+        found=False
+        for claim in [e for e in history if e["type"] == "claim"]:
+            ibans=[e for e in history if e["type"] == "iban_change" and e["recordedAt"] < claim["recordedAt"]]
+            if ibans: recencies.append((claim["recordedAt"]-max(e["recordedAt"] for e in ibans))/HOUR)
+            for iban in ibans:
+                for profile in [e for e in history if e["type"] == "profile_update" and e["recordedAt"] < iban["recordedAt"]]:
+                    if any(e["type"] == "login" and claim["recordedAt"]-DAY <= e["recordedAt"] < profile["recordedAt"] for e in history): found=True
+        sequences += int(found)
+    return [len(logins),len({(e["latitude"],e["longitude"]) for e in verified}),speed,len(changes),sum(e["type"]=="profile_update" for e in events),sequences,math.log1p(min(recencies) if recencies else 720)]
 
 def add_event(case, kind, days_ago, subject, rng, **extra):
     """Append one timestamped synthetic event to a connected case history."""
@@ -78,6 +110,10 @@ def make_case(rng, index, family="routine", split="train"):
         "events": [],
     }
     subjects = [f"CTR-SYN-{split}-{index:05d}-{n:02d}" for n in range(1, 13)]
+
+    if family in DIGITAL_FAMILIES:
+        # Vary event timing between entities without changing event order.
+        case["asOf"] += int(rng.uniform(-12,12)*HOUR)
 
     if family == "missing":
         case["employerId"] = None
@@ -206,9 +242,42 @@ def make_case(rng, index, family="routine", split="train"):
             )
         add_event(case, "retirement", 3, subjects[0], rng, sourceConflict=True)
         add_event(case, "claim", 0, subjects[0], rng)
+    elif family in DIGITAL_FAMILIES:
+        subject = subjects[0]
+        if family == "account_takeover_sequence":
+            add_event(case, "login", 0.15, subject, rng, latitude=24.7136, longitude=46.6753, locationVerified=True)
+            add_event(case, "login", 0.14, subject, rng, latitude=51.5074, longitude=-0.1278, locationVerified=True)
+            add_event(case, "profile_update", 0.12, subject, rng, changedField="mobile")
+            add_event(case, "iban_change", 0.08, subject, rng, identifierId=f"IBAN-SYN-{split}-{index}-new", previousIdentifierId=f"IBAN-SYN-{split}-{index}-old")
+        elif family == "coordinated_iban_network":
+            for n in range(3):
+                add_event(case, "login", 0.6, subjects[n], rng, latitude=24.7136, longitude=46.6753, locationVerified=True)
+                add_event(case, "profile_update", 0.4, subjects[n], rng, changedField="mobile")
+                add_event(case, "iban_change", 0.2, subjects[n], rng, identifierId=f"IBAN-SYN-{split}-{index}-shared", previousIdentifierId=f"IBAN-SYN-{split}-{index}-old-{n}")
+                add_event(case, "claim", 0, subjects[n], rng)
+        elif family == "rapid_profile_payment":
+            add_event(case, "login", 0.7, subject, rng, latitude=24.7136, longitude=46.6753, locationVerified=True)
+            for n, field in enumerate(["mobile", "email", "address"]):
+                add_event(case, "profile_update", 0.6-n*0.1, subject, rng, changedField=field)
+            for n in range(2):
+                add_event(case, "iban_change", 0.3-n*0.1, subject, rng, identifierId=f"IBAN-SYN-{split}-{index}-new-{n}", previousIdentifierId=f"IBAN-SYN-{split}-{index}-old-{n}")
+        else:
+            travel = family == "legitimate_travel"
+            add_event(case, "login", float(rng.uniform(8, 20)), subject, rng, latitude=24.7136, longitude=46.6753, locationVerified=True)
+            add_event(case, "login", 2, subject, rng, latitude=51.5074 if travel else 24.7136, longitude=-0.1278 if travel else 46.6753, locationVerified=True)
+            if family != "legitimate_travel":
+                days = float(rng.uniform(0.05, 7)) if family == "legitimate_account_update" else float(rng.uniform(10, 25))
+                add_event(case, "profile_update", days+0.01, subject, rng, changedField="mobile")
+                add_event(case, "iban_change", days, subject, rng, identifierId=f"IBAN-SYN-{split}-{index}-new", previousIdentifierId=f"IBAN-SYN-{split}-{index}-old")
+        if family != "coordinated_iban_network":
+            add_event(case, "claim", 0, subject, rng)
     else:
         raise ValueError(f"Unknown family: {family}")
 
+    if family in DIGITAL_FAMILIES:
+        scale=float(rng.uniform(0.7,1.1))
+        for event in case["events"]:
+            event["recordedAt"]=int(case["asOf"]-(case["asOf"]-event["recordedAt"])*scale)
     case["events"].sort(key=lambda event: event["recordedAt"])
     return case
 
@@ -289,7 +358,7 @@ def features(case):
         chain_count,
         int(chain),
         chain_span,
-    ]
+    ] + digital_features(events)
 
 
 def comparator_rules(vector):
@@ -351,7 +420,7 @@ def write_demo_csvs(cases):
         "previous_amount",
         "source_conflict",
         "rule_override",
-        "synthetic",
+        "synthetic", "latitude", "longitude", "location_verified", "previous_identifier_id", "changed_field",
     ]
     with (OUT / "cross-journey-demo-events.csv").open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=event_fields, lineterminator="\n")
@@ -374,6 +443,7 @@ def write_demo_csvs(cases):
                         "previous_amount": event.get("previousAmount", ""),
                         "source_conflict": int(bool(event.get("sourceConflict"))),
                         "rule_override": int(bool(event.get("ruleOverride"))),
+                        "latitude":event.get("latitude", ""), "longitude":event.get("longitude", ""), "location_verified":int(bool(event.get("locationVerified"))), "previous_identifier_id":event.get("previousIdentifierId", ""), "changed_field":event.get("changedField", ""),
                         "synthetic": 1,
                     }
                 )
@@ -399,14 +469,14 @@ def write_demo_csvs(cases):
                     "family": case["family"],
                     "expected_review_provisional": int(
                         case["family"]
-                        in {
+                        in REVIEW_DIGITAL | {
                             "coordinated_claim_sequence",
                             "identifier_reuse_network",
                             "retroactive_source_conflict",
                         }
                     ),
                     "business_validation_status": (
-                        "Business pattern confirmed; model threshold remains a prototype assumption"
+                        "Digital typology and threshold require specialist validation" if case["family"] in DIGITAL_FAMILIES else "Original business pattern confirmed; model threshold remains a prototype assumption"
                     ),
                     "primary_journey": "SANED",
                     "employer_id": case.get("employerId") or "",
@@ -428,6 +498,7 @@ def main():
         ("identifier_reuse_network", 600),
         ("retroactive_source_conflict", 600),
     ]
+    train_counts += [(family, 600) for family in DIGITAL_FAMILIES]
     train = generate_population(
         rng,
         "train",
@@ -436,7 +507,7 @@ def main():
     calibration = generate_population(
         rng,
         "calibration",
-        [("routine", 800), ("legitimate_growth", 100), ("legitimate_restructuring", 100)],
+        [("routine", 800), ("legitimate_growth", 100), ("legitimate_restructuring", 100)] + [(family,200) for family in DIGITAL_FAMILIES[:3]],
     )
     test_counts = [
         ("routine", 250),
@@ -446,6 +517,7 @@ def main():
         ("identifier_reuse_network", 75),
         ("retroactive_source_conflict", 75),
     ]
+    test_counts += [(family,100) for family in DIGITAL_FAMILIES]
     test = generate_population(rng, "test", test_counts)
 
     review_families = {
@@ -453,6 +525,7 @@ def main():
         "identifier_reuse_network",
         "retroactive_source_conflict",
     }
+    review_families |= REVIEW_DIGITAL
     train_x = np.asarray([features(case) for case in train], dtype=np.float32)
     train_y = np.asarray([case["family"] in review_families for case in train], dtype=np.int8)
     calibration_x = np.asarray([features(case) for case in calibration], dtype=np.float32)
@@ -468,7 +541,7 @@ def main():
         n_jobs=1,
     ).fit(train_x, train_y)
     calibration_scores = sorted(model.predict_proba(calibration_x)[:, 1].tolist())
-    threshold = float(np.nextafter(np.quantile(calibration_scores, 0.97), np.inf))
+    threshold = float(np.quantile(calibration_scores, 0.97) + 1e-10)
 
     trees = []
     for estimator in model.estimators_:
@@ -487,7 +560,7 @@ def main():
         )
 
     artifact = {
-        "version": "madar-cross-journey-rf-20261019-v2",
+        "version": "madar-cross-journey-rf-20261107-v3",
         "algorithm": "Random Forest cross-journey pattern classifier",
         "sklearnVersion": sklearn.__version__,
         "seed": 20261017,
@@ -561,6 +634,7 @@ def main():
         "retroactive_source_conflict",
         "missing",
     ]
+    demo_families += DIGITAL_FAMILIES
     demos = [make_case(rng, index, family, "demo") for index, family in enumerate(demo_families)]
     (OUT / "demo-cases.json").write_text(json.dumps(demos, separators=(",", ":")))
     write_demo_csvs(demos)

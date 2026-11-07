@@ -1,6 +1,10 @@
 /* A short executive brief, with specialist evidence and questions on demand. */
 (() => {
   const esc=escapeHtml;
+  const scrim=document.createElement('button');scrim.className='case-drawer-scrim';scrim.type='button';scrim.setAttribute('aria-label','Close case');scrim.tabIndex=-1;document.body.append(scrim);
+  function closeDrawer(){casePanelOpen=false;document.querySelector('#case-panel').hidden=true;document.body.classList.remove('case-drawer-open');document.querySelector('[data-case="'+CSS.escape(selectedId||'')+'"]')?.focus({preventScroll:true});}
+  scrim.onclick=closeDrawer;
+
   const conversations=new Map();
   let translateOnLoad=false;
   const copy={
@@ -61,10 +65,10 @@
     wireCitations(host,host);host.querySelector('.case-ask-button').onclick=()=>openConversation(item,draft,language);
   }
   function enhanceCase(){
-    const item=portfolioCases().find(c=>c.id===selectedId),panel=document.querySelector('#case-panel');if(!item)return;
+    const item=portfolioCases().find(c=>c.id===selectedId),panel=document.querySelector('#case-panel');panel.hidden=!casePanelOpen;document.body.classList.toggle('case-drawer-open',casePanelOpen);if(!item||!casePanelOpen)return;
     const language=caseSummaryLanguage==='ar'?'ar':'en',t=copy[language],ar=language==='ar',autoGenerate=translateOnLoad;translateOnLoad=false;
     const view=MadarCasePresentation,score=view.score(item),state=view.state(item),financial=view.financial(item);
-    const hero=panel.querySelector('.case-hero');
+    const hero=panel.querySelector('.case-hero');hero.querySelector('h2').id='case-review-title';panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-labelledby','case-review-title');
     const riskNames={High:'High risk',Medium:'Medium risk',Low:'Low risk',Incomplete:'Evidence incomplete'};
     const riskArabic={High:'مخاطر مرتفعة',Medium:'مخاطر متوسطة',Low:'مخاطر منخفضة',Incomplete:'أدلة غير مكتملة'};
     const ring=hero.querySelector('.score-ring');
@@ -74,8 +78,9 @@
     ring.setAttribute('aria-label',`${score.label}${score.value===null?'':': '+score.value+'/100'}. ${riskNames[item.risk]||item.risk}`);
     const scoreLabel=document.createElement('p');scoreLabel.className='case-score-caption';scoreLabel.textContent=score.value===null?(ar?(state.incomplete?'لا توجد درجة':'تقييم نمط · بلا درجة موحّدة'):score.label):(ar?(score.kind==='simulation'?'درجة المحاكاة':'درجة الضوابط'):score.label);const scoreColumn=document.createElement('div');scoreColumn.className='case-score-column';ring.replaceWith(scoreColumn);scoreColumn.append(ring,scoreLabel);if(state.resolved){const originalSignal=document.createElement('small');originalSignal.className='case-original-signal';originalSignal.textContent=ar?'وقت التقييم':'At assessment';scoreColumn.append(originalSignal);}
     const status=document.createElement('div');status.className='case-header-status';status.innerHTML=`<span>${esc(state.status)}</span><span>${ar?'بيانات تجريبية':'Synthetic demo'}</span>${state.scripted?`<span>${ar?'نتيجة توضيحية':'Scripted outcome'}</span>`:''}`;hero.append(status);
-    const toolbar=document.createElement('div');toolbar.className='case-panel-toolbar';toolbar.innerHTML=`<span>${ar?'مراجعة الحالة':'CASE REVIEW'}</span><button type="button" class="case-expand" aria-pressed="${panel.closest('.workspace').classList.contains('case-focus')}">${panel.closest('.workspace').classList.contains('case-focus')?(ar?'العودة إلى القائمة':'Back to queue'):(ar?'توسيع الحالة':'Expand case')} <span aria-hidden="true">⤢</span></button>`;hero.before(toolbar);
-    toolbar.querySelector('button').onclick=()=>{const expanded=panel.closest('.workspace').classList.toggle('case-focus');toolbar.querySelector('button').setAttribute('aria-pressed',expanded);toolbar.querySelector('button').textContent=expanded?(ar?'العودة إلى القائمة':'Back to queue'):(ar?'توسيع الحالة':'Expand case');panel.scrollTop=0;panel.scrollIntoView({block:'start',behavior:'smooth'});};
+    const toolbar=document.createElement('div');toolbar.className='case-panel-toolbar';toolbar.innerHTML=`<span>${ar?'مراجعة الحالة':'CASE REVIEW'}</span><button type="button" class="case-expand" aria-pressed="${panel.classList.contains('case-drawer-wide')}">${panel.classList.contains('case-drawer-wide')?(ar?'العودة إلى القائمة':'Back to queue'):(ar?'توسيع الحالة':'Expand case')} <span aria-hidden="true">⤢</span></button>`;hero.before(toolbar);
+    const closeCase=document.createElement('button');closeCase.type='button';closeCase.className='case-close-button';closeCase.setAttribute('aria-label','Close case');closeCase.textContent='×';toolbar.append(closeCase);closeCase.onclick=closeDrawer;
+    toolbar.querySelector('button').onclick=()=>{const expanded=panel.classList.toggle('case-drawer-wide');toolbar.querySelector('button').setAttribute('aria-pressed',expanded);toolbar.querySelector('button').textContent=expanded?(ar?'العودة إلى القائمة':'Back to queue'):(ar?'توسيع الحالة':'Expand case');panel.scrollTop=0;};
     if(item.crossJourneyEvidence && window.madarConnectedEvidence){
       const evidence=document.createElement('section');evidence.className='detail-section';evidence.innerHTML='<h3>Connected journey evidence</h3>'+window.madarConnectedEvidence(item.crossJourneyEvidence);
       const timeline=panel.querySelector('.timeline')?.closest('section');if(timeline)timeline.replaceWith(evidence);else panel.append(evidence);
@@ -120,27 +125,31 @@
     button.onclick=async()=>{button.disabled=true;button.textContent=t.loading;message.textContent='';try{const response=await backendJSON('/case-explanation',{caseId:item.id,assessmentId:item.assessmentId,language,generate:true},55000);if(attached())showDraft(response.draft);}catch(error){if(attached()){message.textContent=ar?t.unavailable:error.message;button.disabled=false;button.textContent=t.generate;}}};
   }
   const original=renderCase;renderCase=function(){document.querySelector('#case-review-actions')?.remove();original();enhanceCase()};
+  let workspaceRequest=null;
+  async function refreshWorkspace(){
+    if(workspaceRequest)return workspaceRequest;
+    workspaceRequest=(async()=>{
+      const response=await backendJSON('/workspace-demo',{},60000);
+      cases=response.saved.map(record=>({...record.caseData,assessmentId:record.assessmentId}));
+      if(selectedId&&!cases.some(item=>item.id===selectedId)){selectedId=null;casePanelOpen=false;}
+      renderAll();return response;
+    })().finally(()=>{workspaceRequest=null;});
+    return workspaceRequest;
+  }
+  window.madarRefreshWorkspace=refreshWorkspace;
   let loadingDemo=false;
   async function loadDemo(){
-    if(loadingDemo)return;
-    loadingDemo=true;
+    if(loadingDemo)return;loadingDemo=true;
     const buttons=[...document.querySelectorAll('[data-load-demo]')];
     const status=document.querySelector('.demo-load-status');
-    buttons.forEach(button=>{button.disabled=true;button.textContent='Assessing demo cases…'});
-    status.textContent='Preparing all journeys, rule findings and AI results…';
-    try{
-      const response=await backendJSON('/demo-portfolio',{},60000);
-      for(const record of response.saved){const index=cases.findIndex(item=>item.id===record.caseId);if(index<0)cases.push(record.caseData);else cases[index]=record.caseData;}
-      useAssessedPortfolio();selectedId='CJ-SYN-enterprise-001';activeFilter='All';activeJourney='All';activeRegion='All';searchQuery='';
-      document.querySelector('#case-search').value='';
-      renderAll();switchView('queue');
-      status.textContent='Demo cases are ready in the Intelligence Queue. Existing saved reviews have been retained.';
-      showToast('Enterprise portfolio ready: rules across all journeys, SANED and cross-journey AI.');
-    }catch(error){
-      renderAll();switchView('intake');
-      status.textContent='Demo loading could not finish: '+error.message+' Any completed assessments are saved. Retry to load the remaining cases.';
-    }finally{loadingDemo=false;buttons.forEach(button=>{button.disabled=false;button.textContent='Load & assess demo cases'});}
+    buttons.forEach(button=>{button.disabled=true;button.textContent='Preparing cases…';});
+    if(status)status.textContent='Preparing the shared case workspace…';
+    try{const response=await refreshWorkspace();if(status)status.textContent=response.saved.length+' cases ready. Existing reviews are retained.';showToast('Demo cases are ready.');}
+    catch(error){if(status)status.textContent=error.message;showToast(error.message);}
+    finally{loadingDemo=false;buttons.forEach(button=>{button.disabled=false;button.textContent='Refresh demo cases';});}
   }
   document.querySelectorAll('[data-load-demo]').forEach(button=>button.addEventListener('click',loadDemo));
   switchView('dashboard');
+  refreshWorkspace().catch(error=>showToast('Could not load the workspace: '+error.message));
+  document.addEventListener('keydown',event=>{if(event.key==='Tab'&&casePanelOpen&&!document.querySelector('dialog[open]')){const focusable=[...document.querySelectorAll('#case-panel button:not(:disabled),#case-panel summary,#case-panel [tabindex="0"]')].filter(el=>el.getClientRects().length);if(focusable.length){const first=focusable[0],last=focusable.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}}if(event.key==='Escape' && !document.querySelector('dialog[open]') && casePanelOpen){casePanelOpen=false;document.querySelector('#case-panel').hidden=true;document.body.classList.remove('case-drawer-open');}});
 })();

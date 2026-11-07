@@ -3,11 +3,11 @@
     "caseId": "CJ-SYN-demo-00000",
     "scenario": "routine",
     "synthetic": true,
-    "businessValidation": "Business pattern confirmed; model threshold remains a prototype assumption",
-    "modelVersion": "madar-cross-journey-rf-20261019-v2",
+    "businessValidation": "Original business pattern confirmed; model threshold remains a prototype assumption",
+    "modelVersion": "madar-cross-journey-rf-20261107-v3",
     "complete": true,
     "score": 0,
-    "percentile": 96.6,
+    "percentile": 87.625,
     "modelFlagged": false,
     "ruleFlagged": false,
     "ruleReasons": [],
@@ -27,14 +27,14 @@
         "value": 3,
         "median": 3,
         "low": 2,
-        "high": 3,
+        "high": 4,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Events in 30 days",
-        "value": 7,
-        "median": 6,
+        "value": 4,
+        "median": 5.5,
         "low": 3,
         "high": 12,
         "unusual": false,
@@ -45,23 +45,23 @@
         "value": 2,
         "median": 2,
         "low": 1,
-        "high": 7,
+        "high": 6,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Registrations in 30 days",
-        "value": 2,
-        "median": 1,
+        "value": 0,
+        "median": 0,
         "low": 0,
-        "high": 5,
+        "high": 3,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Wage changes in 30 days",
-        "value": 3,
-        "median": 2,
+        "value": 1,
+        "median": 1,
         "low": 0,
         "high": 3,
         "unusual": false,
@@ -69,8 +69,8 @@
       },
       {
         "name": "Exclusions in 30 days",
-        "value": 1,
-        "median": 1,
+        "value": 2,
+        "median": 0,
         "low": 0,
         "high": 3,
         "unusual": false,
@@ -87,27 +87,27 @@
       },
       {
         "name": "Maximum wage change (%)",
-        "value": 16.31016666666667,
-        "median": 15.923583030700684,
-        "low": -1.4243667125701904,
-        "high": 58.49081802368164,
+        "value": 10.921500000000005,
+        "median": 1.525916576385498,
+        "low": 0,
+        "high": 54.39932632446289,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Maximum retroactive days",
-        "value": 0.32937827546296294,
-        "median": 5.427642345428467,
+        "value": 4.93056099537037,
+        "median": 0,
         "low": 0,
-        "high": 65.07260131835938,
+        "high": 50.50640869140625,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Hours since latest wage change",
-        "value": 217.41025861111106,
-        "median": 340.937871690999,
-        "low": 122.80266287079489,
+        "value": 523.2724508333333,
+        "median": 486.28885494431887,
+        "low": 145.89148523527706,
         "high": 720.0001622612529,
         "unusual": false,
         "outsideReferenceRange": false
@@ -117,7 +117,7 @@
         "value": 0,
         "median": 0,
         "low": 0,
-        "high": 6,
+        "high": 5,
         "unusual": false,
         "outsideReferenceRange": false
       },
@@ -161,8 +161,71 @@
         "name": "Completed chain span (days)",
         "value": 30,
         "median": 30,
-        "low": 20.635461807250977,
+        "low": 21.16374969482422,
         "high": 30,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login events",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Verified login locations",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 2,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum verified travel speed (km/h)",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 19795.697265625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "IBAN changes",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Profile updates",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login-profile-IBAN-request sequences",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours from latest IBAN change to request",
+        "value": 720.0000000000002,
+        "median": 720.0001622612529,
+        "low": 1.991492020304023,
+        "high": 720.0001622612529,
         "unusual": false,
         "outsideReferenceRange": false
       }
@@ -177,8 +240,8 @@
     "caseId": "CJ-SYN-demo-00001",
     "scenario": "coordinated_claim_sequence",
     "synthetic": true,
-    "businessValidation": "Business pattern confirmed; model threshold remains a prototype assumption",
-    "modelVersion": "madar-cross-journey-rf-20261019-v2",
+    "businessValidation": "Original business pattern confirmed; model threshold remains a prototype assumption",
+    "modelVersion": "madar-cross-journey-rf-20261107-v3",
     "complete": true,
     "score": 1,
     "percentile": 100,
@@ -201,14 +264,14 @@
         "value": 3,
         "median": 3,
         "low": 2,
-        "high": 3,
+        "high": 4,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Events in 30 days",
         "value": 12,
-        "median": 6,
+        "median": 5.5,
         "low": 3,
         "high": 12,
         "unusual": false,
@@ -219,23 +282,23 @@
         "value": 3,
         "median": 2,
         "low": 1,
-        "high": 7,
+        "high": 6,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Registrations in 30 days",
         "value": 3,
-        "median": 1,
+        "median": 0,
         "low": 0,
-        "high": 5,
+        "high": 3,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Wage changes in 30 days",
         "value": 3,
-        "median": 2,
+        "median": 1,
         "low": 0,
         "high": 3,
         "unusual": false,
@@ -244,7 +307,7 @@
       {
         "name": "Exclusions in 30 days",
         "value": 3,
-        "median": 1,
+        "median": 0,
         "low": 0,
         "high": 3,
         "unusual": false,
@@ -261,27 +324,27 @@
       },
       {
         "name": "Maximum wage change (%)",
-        "value": 45.483166666666655,
-        "median": 15.923583030700684,
-        "low": -1.4243667125701904,
-        "high": 58.49081802368164,
+        "value": 50.06316666666668,
+        "median": 1.525916576385498,
+        "low": 0,
+        "high": 54.39932632446289,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Maximum retroactive days",
-        "value": 15.719318738425926,
-        "median": 5.427642345428467,
+        "value": 15.167096145833334,
+        "median": 0,
         "low": 0,
-        "high": 65.07260131835938,
+        "high": 50.50640869140625,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Hours since latest wage change",
-        "value": 378.1916111111111,
-        "median": 340.937871690999,
-        "low": 122.80266287079489,
+        "value": 313.4161649999999,
+        "median": 486.28885494431887,
+        "low": 145.89148523527706,
         "high": 720.0001622612529,
         "unusual": false,
         "outsideReferenceRange": false
@@ -291,13 +354,13 @@
         "value": 0,
         "median": 0,
         "low": 0,
-        "high": 6,
+        "high": 5,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Cross-source conflicts",
-        "value": 1,
+        "value": 0,
         "median": 0,
         "low": 0,
         "high": 3,
@@ -333,10 +396,73 @@
       },
       {
         "name": "Completed chain span (days)",
-        "value": 22.68033153935185,
+        "value": 22.068904421296295,
         "median": 30,
-        "low": 20.635461807250977,
+        "low": 21.16374969482422,
         "high": 30,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login events",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Verified login locations",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 2,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum verified travel speed (km/h)",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 19795.697265625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "IBAN changes",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Profile updates",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login-profile-IBAN-request sequences",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours from latest IBAN change to request",
+        "value": 720.0000000000002,
+        "median": 720.0001622612529,
+        "low": 1.991492020304023,
+        "high": 720.0001622612529,
         "unusual": false,
         "outsideReferenceRange": false
       }
@@ -352,12 +478,12 @@
     "caseId": "CJ-SYN-demo-00002",
     "scenario": "legitimate_restructuring",
     "synthetic": true,
-    "businessValidation": "Business pattern confirmed; model threshold remains a prototype assumption",
-    "modelVersion": "madar-cross-journey-rf-20261019-v2",
+    "businessValidation": "Original business pattern confirmed; model threshold remains a prototype assumption",
+    "modelVersion": "madar-cross-journey-rf-20261107-v3",
     "complete": true,
-    "score": 0,
-    "percentile": 96.6,
-    "modelFlagged": false,
+    "score": 0.003944017729324964,
+    "percentile": 99.25,
+    "modelFlagged": true,
     "ruleFlagged": false,
     "ruleReasons": [],
     "ruleFindings": [],
@@ -366,23 +492,23 @@
       "Employer Registration",
       "SANED"
     ],
-    "linkedContributorCount": 3,
-    "route": "Standard review",
-    "band": "Typical",
+    "linkedContributorCount": 5,
+    "route": "Specialist review",
+    "band": "Review",
     "features": [
       {
         "name": "Distinct journeys in 30 days",
         "value": 2,
         "median": 3,
         "low": 2,
-        "high": 3,
+        "high": 4,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Events in 30 days",
-        "value": 4,
-        "median": 6,
+        "value": 6,
+        "median": 5.5,
         "low": 3,
         "high": 12,
         "unusual": false,
@@ -390,26 +516,26 @@
       },
       {
         "name": "Linked contributors in 30 days",
-        "value": 3,
+        "value": 5,
         "median": 2,
         "low": 1,
-        "high": 7,
+        "high": 6,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Registrations in 30 days",
         "value": 0,
-        "median": 1,
+        "median": 0,
         "low": 0,
-        "high": 5,
+        "high": 3,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Wage changes in 30 days",
         "value": 0,
-        "median": 2,
+        "median": 1,
         "low": 0,
         "high": 3,
         "unusual": false,
@@ -417,12 +543,12 @@
       },
       {
         "name": "Exclusions in 30 days",
-        "value": 3,
-        "median": 1,
+        "value": 5,
+        "median": 0,
         "low": 0,
         "high": 3,
-        "unusual": false,
-        "outsideReferenceRange": false
+        "unusual": true,
+        "outsideReferenceRange": true
       },
       {
         "name": "SANED requests in 30 days",
@@ -436,26 +562,26 @@
       {
         "name": "Maximum wage change (%)",
         "value": 0,
-        "median": 15.923583030700684,
-        "low": -1.4243667125701904,
-        "high": 58.49081802368164,
+        "median": 1.525916576385498,
+        "low": 0,
+        "high": 54.39932632446289,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Maximum retroactive days",
-        "value": 6.303023657407407,
-        "median": 5.427642345428467,
+        "value": 5.5874560069444446,
+        "median": 0,
         "low": 0,
-        "high": 65.07260131835938,
+        "high": 50.50640869140625,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Hours since latest wage change",
         "value": 720.0000000000002,
-        "median": 340.937871690999,
-        "low": 122.80266287079489,
+        "median": 486.28885494431887,
+        "low": 145.89148523527706,
         "high": 720.0001622612529,
         "unusual": false,
         "outsideReferenceRange": false
@@ -465,7 +591,7 @@
         "value": 0,
         "median": 0,
         "low": 0,
-        "high": 6,
+        "high": 5,
         "unusual": false,
         "outsideReferenceRange": false
       },
@@ -509,14 +635,77 @@
         "name": "Completed chain span (days)",
         "value": 30,
         "median": 30,
-        "low": 20.635461807250977,
+        "low": 21.16374969482422,
         "high": 30,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login events",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Verified login locations",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 2,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum verified travel speed (km/h)",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 19795.697265625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "IBAN changes",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Profile updates",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login-profile-IBAN-request sequences",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours from latest IBAN change to request",
+        "value": 720.0000000000002,
+        "median": 720.0001622612529,
+        "low": 1.991492020304023,
+        "high": 720.0001622612529,
         "unusual": false,
         "outsideReferenceRange": false
       }
     ],
     "reasons": [
-      "The trained cross-journey model did not cross the selected review threshold."
+      "The trained cross-journey model found similarity to provisional review patterns."
     ],
     "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
     "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions."
@@ -525,10 +714,10 @@
     "caseId": "CJ-SYN-demo-00003",
     "scenario": "identifier_reuse_network",
     "synthetic": true,
-    "businessValidation": "Business pattern confirmed; model threshold remains a prototype assumption",
-    "modelVersion": "madar-cross-journey-rf-20261019-v2",
+    "businessValidation": "Original business pattern confirmed; model threshold remains a prototype assumption",
+    "modelVersion": "madar-cross-journey-rf-20261107-v3",
     "complete": true,
-    "score": 1,
+    "score": 0.9983884621737695,
     "percentile": 100,
     "modelFlagged": true,
     "ruleFlagged": true,
@@ -546,7 +735,7 @@
       "Benefit Payments",
       "SANED"
     ],
-    "linkedContributorCount": 6,
+    "linkedContributorCount": 5,
     "route": "Specialist review",
     "band": "Review",
     "features": [
@@ -555,14 +744,14 @@
         "value": 2,
         "median": 3,
         "low": 2,
-        "high": 3,
+        "high": 4,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Events in 30 days",
-        "value": 7,
-        "median": 6,
+        "value": 6,
+        "median": 5.5,
         "low": 3,
         "high": 12,
         "unusual": false,
@@ -570,26 +759,26 @@
       },
       {
         "name": "Linked contributors in 30 days",
-        "value": 6,
+        "value": 5,
         "median": 2,
         "low": 1,
-        "high": 7,
+        "high": 6,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Registrations in 30 days",
         "value": 0,
-        "median": 1,
+        "median": 0,
         "low": 0,
-        "high": 5,
+        "high": 3,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Wage changes in 30 days",
         "value": 0,
-        "median": 2,
+        "median": 1,
         "low": 0,
         "high": 3,
         "unusual": false,
@@ -598,7 +787,7 @@
       {
         "name": "Exclusions in 30 days",
         "value": 0,
-        "median": 1,
+        "median": 0,
         "low": 0,
         "high": 3,
         "unusual": false,
@@ -616,36 +805,36 @@
       {
         "name": "Maximum wage change (%)",
         "value": 0,
-        "median": 15.923583030700684,
-        "low": -1.4243667125701904,
-        "high": 58.49081802368164,
+        "median": 1.525916576385498,
+        "low": 0,
+        "high": 54.39932632446289,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Maximum retroactive days",
         "value": 0,
-        "median": 5.427642345428467,
+        "median": 0,
         "low": 0,
-        "high": 65.07260131835938,
+        "high": 50.50640869140625,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Hours since latest wage change",
         "value": 720.0000000000002,
-        "median": 340.937871690999,
-        "low": 122.80266287079489,
+        "median": 486.28885494431887,
+        "low": 145.89148523527706,
         "high": 720.0001622612529,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Maximum identifier reuse",
-        "value": 6,
+        "value": 5,
         "median": 0,
         "low": 0,
-        "high": 6,
+        "high": 5,
         "unusual": false,
         "outsideReferenceRange": false
       },
@@ -689,8 +878,71 @@
         "name": "Completed chain span (days)",
         "value": 30,
         "median": 30,
-        "low": 20.635461807250977,
+        "low": 21.16374969482422,
         "high": 30,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login events",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Verified login locations",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 2,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum verified travel speed (km/h)",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 19795.697265625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "IBAN changes",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Profile updates",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login-profile-IBAN-request sequences",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours from latest IBAN change to request",
+        "value": 720.0000000000002,
+        "median": 720.0001622612529,
+        "low": 1.991492020304023,
+        "high": 720.0001622612529,
         "unusual": false,
         "outsideReferenceRange": false
       }
@@ -706,10 +958,10 @@
     "caseId": "CJ-SYN-demo-00004",
     "scenario": "retroactive_source_conflict",
     "synthetic": true,
-    "businessValidation": "Business pattern confirmed; model threshold remains a prototype assumption",
-    "modelVersion": "madar-cross-journey-rf-20261019-v2",
+    "businessValidation": "Original business pattern confirmed; model threshold remains a prototype assumption",
+    "modelVersion": "madar-cross-journey-rf-20261107-v3",
     "complete": true,
-    "score": 1,
+    "score": 0.9999809506115999,
     "percentile": 100,
     "modelFlagged": true,
     "ruleFlagged": true,
@@ -742,14 +994,14 @@
         "value": 3,
         "median": 3,
         "low": 2,
-        "high": 3,
+        "high": 4,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Events in 30 days",
         "value": 4,
-        "median": 6,
+        "median": 5.5,
         "low": 3,
         "high": 12,
         "unusual": false,
@@ -760,23 +1012,23 @@
         "value": 2,
         "median": 2,
         "low": 1,
-        "high": 7,
+        "high": 6,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Registrations in 30 days",
         "value": 0,
-        "median": 1,
+        "median": 0,
         "low": 0,
-        "high": 5,
+        "high": 3,
         "unusual": false,
         "outsideReferenceRange": false
       },
       {
         "name": "Wage changes in 30 days",
         "value": 2,
-        "median": 2,
+        "median": 1,
         "low": 0,
         "high": 3,
         "unusual": false,
@@ -785,7 +1037,7 @@
       {
         "name": "Exclusions in 30 days",
         "value": 0,
-        "median": 1,
+        "median": 0,
         "low": 0,
         "high": 3,
         "unusual": false,
@@ -802,37 +1054,37 @@
       },
       {
         "name": "Maximum wage change (%)",
-        "value": 54.0775,
-        "median": 15.923583030700684,
-        "low": -1.4243667125701904,
-        "high": 58.49081802368164,
-        "unusual": false,
-        "outsideReferenceRange": false
+        "value": 69.61700000000002,
+        "median": 1.525916576385498,
+        "low": 0,
+        "high": 54.39932632446289,
+        "unusual": true,
+        "outsideReferenceRange": true
       },
       {
         "name": "Maximum retroactive days",
-        "value": 78.88695944444444,
-        "median": 5.427642345428467,
+        "value": 63.17368274305556,
+        "median": 0,
         "low": 0,
-        "high": 65.07260131835938,
+        "high": 50.50640869140625,
         "unusual": true,
         "outsideReferenceRange": true
       },
       {
         "name": "Hours since latest wage change",
-        "value": 150.71551666666673,
-        "median": 340.937871690999,
-        "low": 122.80266287079489,
+        "value": 132.5000602777778,
+        "median": 486.28885494431887,
+        "low": 145.89148523527706,
         "high": 720.0001622612529,
-        "unusual": false,
-        "outsideReferenceRange": false
+        "unusual": true,
+        "outsideReferenceRange": true
       },
       {
         "name": "Maximum identifier reuse",
         "value": 0,
         "median": 0,
         "low": 0,
-        "high": 6,
+        "high": 5,
         "unusual": false,
         "outsideReferenceRange": false
       },
@@ -876,8 +1128,71 @@
         "name": "Completed chain span (days)",
         "value": 30,
         "median": 30,
-        "low": 20.635461807250977,
+        "low": 21.16374969482422,
         "high": 30,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login events",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Verified login locations",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 2,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum verified travel speed (km/h)",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 19795.697265625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "IBAN changes",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Profile updates",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login-profile-IBAN-request sequences",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours from latest IBAN change to request",
+        "value": 720.0000000000002,
+        "median": 720.0001622612529,
+        "low": 1.991492020304023,
+        "high": 720.0001622612529,
         "unusual": false,
         "outsideReferenceRange": false
       }
@@ -894,8 +1209,8 @@
     "caseId": "CJ-SYN-demo-00005",
     "scenario": "missing",
     "synthetic": true,
-    "businessValidation": "Business pattern confirmed; model threshold remains a prototype assumption",
-    "modelVersion": "madar-cross-journey-rf-20261019-v2",
+    "businessValidation": "Original business pattern confirmed; model threshold remains a prototype assumption",
+    "modelVersion": "madar-cross-journey-rf-20261107-v3",
     "complete": false,
     "route": "Complete evidence",
     "band": "Incomplete",
@@ -904,5 +1219,1445 @@
       "Required synthetic entity or event evidence is missing. No model score was produced."
     ],
     "features": []
+  },
+  {
+    "caseId": "CJ-SYN-demo-00006",
+    "scenario": "routine_digital",
+    "synthetic": true,
+    "businessValidation": "Digital typology and threshold require specialist validation",
+    "modelVersion": "madar-cross-journey-rf-20261107-v3",
+    "complete": true,
+    "score": 0,
+    "percentile": 87.625,
+    "modelFlagged": false,
+    "ruleFlagged": false,
+    "ruleReasons": [],
+    "ruleFindings": [],
+    "completedContributorChains": 0,
+    "involvedJourneys": [
+      "Account Maintenance",
+      "Benefit Payments",
+      "Digital Access",
+      "SANED"
+    ],
+    "linkedContributorCount": 1,
+    "route": "Standard review",
+    "band": "Typical",
+    "features": [
+      {
+        "name": "Distinct journeys in 30 days",
+        "value": 4,
+        "median": 3,
+        "low": 2,
+        "high": 4,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Events in 30 days",
+        "value": 5,
+        "median": 5.5,
+        "low": 3,
+        "high": 12,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Linked contributors in 30 days",
+        "value": 1,
+        "median": 2,
+        "low": 1,
+        "high": 6,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registrations in 30 days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Wage changes in 30 days",
+        "value": 0,
+        "median": 1,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Exclusions in 30 days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "SANED requests in 30 days",
+        "value": 1,
+        "median": 1,
+        "low": 1,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum wage change (%)",
+        "value": 0,
+        "median": 1.525916576385498,
+        "low": 0,
+        "high": 54.39932632446289,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum retroactive days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 50.50640869140625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours since latest wage change",
+        "value": 720.0000000000002,
+        "median": 486.28885494431887,
+        "low": 145.89148523527706,
+        "high": 720.0001622612529,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum identifier reuse",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 5,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Cross-source conflicts",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Rule overrides",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Coordinated chain count",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registration-wage-exclusion-SANED chain",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Completed chain span (days)",
+        "value": 30,
+        "median": 30,
+        "low": 21.16374969482422,
+        "high": 30,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login events",
+        "value": 2,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Verified login locations",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 2,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum verified travel speed (km/h)",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 19795.697265625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "IBAN changes",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Profile updates",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login-profile-IBAN-request sequences",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours from latest IBAN change to request",
+        "value": 387.78898527777767,
+        "median": 720.0001622612529,
+        "low": 1.991492020304023,
+        "high": 720.0001622612529,
+        "unusual": false,
+        "outsideReferenceRange": false
+      }
+    ],
+    "reasons": [
+      "The trained cross-journey model did not cross the selected review threshold.",
+      "1 payment-account changes appear before the assessment; verify ownership before payment.",
+      "1 profile updates appear in the connected history."
+    ],
+    "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+    "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions."
+  },
+  {
+    "caseId": "CJ-SYN-demo-00007",
+    "scenario": "legitimate_travel",
+    "synthetic": true,
+    "businessValidation": "Digital typology and threshold require specialist validation",
+    "modelVersion": "madar-cross-journey-rf-20261107-v3",
+    "complete": true,
+    "score": 0,
+    "percentile": 87.625,
+    "modelFlagged": false,
+    "ruleFlagged": false,
+    "ruleReasons": [],
+    "ruleFindings": [],
+    "completedContributorChains": 0,
+    "involvedJourneys": [
+      "Digital Access",
+      "SANED"
+    ],
+    "linkedContributorCount": 1,
+    "route": "Standard review",
+    "band": "Typical",
+    "features": [
+      {
+        "name": "Distinct journeys in 30 days",
+        "value": 2,
+        "median": 3,
+        "low": 2,
+        "high": 4,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Events in 30 days",
+        "value": 3,
+        "median": 5.5,
+        "low": 3,
+        "high": 12,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Linked contributors in 30 days",
+        "value": 1,
+        "median": 2,
+        "low": 1,
+        "high": 6,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registrations in 30 days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Wage changes in 30 days",
+        "value": 0,
+        "median": 1,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Exclusions in 30 days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "SANED requests in 30 days",
+        "value": 1,
+        "median": 1,
+        "low": 1,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum wage change (%)",
+        "value": 0,
+        "median": 1.525916576385498,
+        "low": 0,
+        "high": 54.39932632446289,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum retroactive days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 50.50640869140625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours since latest wage change",
+        "value": 720.0000000000002,
+        "median": 486.28885494431887,
+        "low": 145.89148523527706,
+        "high": 720.0001622612529,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum identifier reuse",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 5,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Cross-source conflicts",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Rule overrides",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Coordinated chain count",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registration-wage-exclusion-SANED chain",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Completed chain span (days)",
+        "value": 30,
+        "median": 30,
+        "low": 21.16374969482422,
+        "high": 30,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login events",
+        "value": 2,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Verified login locations",
+        "value": 2,
+        "median": 0,
+        "low": 0,
+        "high": 2,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum verified travel speed (km/h)",
+        "value": 19.50318680962546,
+        "median": 0,
+        "low": 0,
+        "high": 19795.697265625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "IBAN changes",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Profile updates",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login-profile-IBAN-request sequences",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours from latest IBAN change to request",
+        "value": 720.0000000000002,
+        "median": 720.0001622612529,
+        "low": 1.991492020304023,
+        "high": 720.0001622612529,
+        "unusual": false,
+        "outsideReferenceRange": false
+      }
+    ],
+    "reasons": [
+      "The trained cross-journey model did not cross the selected review threshold."
+    ],
+    "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+    "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions."
+  },
+  {
+    "caseId": "CJ-SYN-demo-00008",
+    "scenario": "legitimate_account_update",
+    "synthetic": true,
+    "businessValidation": "Digital typology and threshold require specialist validation",
+    "modelVersion": "madar-cross-journey-rf-20261107-v3",
+    "complete": true,
+    "score": 0,
+    "percentile": 87.625,
+    "modelFlagged": false,
+    "ruleFlagged": false,
+    "ruleReasons": [],
+    "ruleFindings": [],
+    "completedContributorChains": 0,
+    "involvedJourneys": [
+      "Digital Access",
+      "Account Maintenance",
+      "Benefit Payments",
+      "SANED"
+    ],
+    "linkedContributorCount": 1,
+    "route": "Standard review",
+    "band": "Typical",
+    "features": [
+      {
+        "name": "Distinct journeys in 30 days",
+        "value": 4,
+        "median": 3,
+        "low": 2,
+        "high": 4,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Events in 30 days",
+        "value": 5,
+        "median": 5.5,
+        "low": 3,
+        "high": 12,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Linked contributors in 30 days",
+        "value": 1,
+        "median": 2,
+        "low": 1,
+        "high": 6,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registrations in 30 days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Wage changes in 30 days",
+        "value": 0,
+        "median": 1,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Exclusions in 30 days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "SANED requests in 30 days",
+        "value": 1,
+        "median": 1,
+        "low": 1,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum wage change (%)",
+        "value": 0,
+        "median": 1.525916576385498,
+        "low": 0,
+        "high": 54.39932632446289,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum retroactive days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 50.50640869140625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours since latest wage change",
+        "value": 720.0000000000002,
+        "median": 486.28885494431887,
+        "low": 145.89148523527706,
+        "high": 720.0001622612529,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum identifier reuse",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 5,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Cross-source conflicts",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Rule overrides",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Coordinated chain count",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registration-wage-exclusion-SANED chain",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Completed chain span (days)",
+        "value": 30,
+        "median": 30,
+        "low": 21.16374969482422,
+        "high": 30,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login events",
+        "value": 2,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Verified login locations",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 2,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum verified travel speed (km/h)",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 19795.697265625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "IBAN changes",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Profile updates",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login-profile-IBAN-request sequences",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours from latest IBAN change to request",
+        "value": 21.911416666666675,
+        "median": 720.0001622612529,
+        "low": 1.991492020304023,
+        "high": 720.0001622612529,
+        "unusual": false,
+        "outsideReferenceRange": false
+      }
+    ],
+    "reasons": [
+      "The trained cross-journey model did not cross the selected review threshold.",
+      "1 payment-account changes appear before the assessment; verify ownership before payment.",
+      "1 profile updates appear in the connected history."
+    ],
+    "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+    "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions."
+  },
+  {
+    "caseId": "CJ-SYN-demo-00009",
+    "scenario": "account_takeover_sequence",
+    "synthetic": true,
+    "businessValidation": "Digital typology and threshold require specialist validation",
+    "modelVersion": "madar-cross-journey-rf-20261107-v3",
+    "complete": true,
+    "score": 0.9985478558265909,
+    "percentile": 100,
+    "modelFlagged": true,
+    "ruleFlagged": false,
+    "ruleReasons": [],
+    "ruleFindings": [],
+    "completedContributorChains": 0,
+    "involvedJourneys": [
+      "Digital Access",
+      "Account Maintenance",
+      "Benefit Payments",
+      "SANED"
+    ],
+    "linkedContributorCount": 1,
+    "route": "Specialist review",
+    "band": "Review",
+    "features": [
+      {
+        "name": "Distinct journeys in 30 days",
+        "value": 4,
+        "median": 3,
+        "low": 2,
+        "high": 4,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Events in 30 days",
+        "value": 5,
+        "median": 5.5,
+        "low": 3,
+        "high": 12,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Linked contributors in 30 days",
+        "value": 1,
+        "median": 2,
+        "low": 1,
+        "high": 6,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registrations in 30 days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Wage changes in 30 days",
+        "value": 0,
+        "median": 1,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Exclusions in 30 days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "SANED requests in 30 days",
+        "value": 1,
+        "median": 1,
+        "low": 1,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum wage change (%)",
+        "value": 0,
+        "median": 1.525916576385498,
+        "low": 0,
+        "high": 54.39932632446289,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum retroactive days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 50.50640869140625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours since latest wage change",
+        "value": 720.0000000000002,
+        "median": 486.28885494431887,
+        "low": 145.89148523527706,
+        "high": 720.0001622612529,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum identifier reuse",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 5,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Cross-source conflicts",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Rule overrides",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Coordinated chain count",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registration-wage-exclusion-SANED chain",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Completed chain span (days)",
+        "value": 30,
+        "median": 30,
+        "low": 21.16374969482422,
+        "high": 30,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login events",
+        "value": 2,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Verified login locations",
+        "value": 2,
+        "median": 0,
+        "low": 0,
+        "high": 2,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum verified travel speed (km/h)",
+        "value": 29048.926579084247,
+        "median": 0,
+        "low": 0,
+        "high": 19795.697265625,
+        "unusual": true,
+        "outsideReferenceRange": true
+      },
+      {
+        "name": "IBAN changes",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Profile updates",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login-profile-IBAN-request sequences",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours from latest IBAN change to request",
+        "value": 1.3602019444444444,
+        "median": 720.0001622612529,
+        "low": 1.991492020304023,
+        "high": 720.0001622612529,
+        "unusual": true,
+        "outsideReferenceRange": true
+      }
+    ],
+    "reasons": [
+      "The trained cross-journey model found similarity to provisional review patterns.",
+      "Verified login locations imply unusually rapid travel; verify account access and location reliability.",
+      "1 payment-account changes appear before the assessment; verify ownership before payment.",
+      "1 profile updates appear in the connected history.",
+      "1 contributors show a login → profile update → IBAN change → request sequence within 24 hours."
+    ],
+    "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+    "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions."
+  },
+  {
+    "caseId": "CJ-SYN-demo-00010",
+    "scenario": "coordinated_iban_network",
+    "synthetic": true,
+    "businessValidation": "Digital typology and threshold require specialist validation",
+    "modelVersion": "madar-cross-journey-rf-20261107-v3",
+    "complete": true,
+    "score": 0.9999639916389435,
+    "percentile": 100,
+    "modelFlagged": true,
+    "ruleFlagged": false,
+    "ruleReasons": [],
+    "ruleFindings": [],
+    "completedContributorChains": 0,
+    "involvedJourneys": [
+      "Digital Access",
+      "Account Maintenance",
+      "Benefit Payments",
+      "SANED"
+    ],
+    "linkedContributorCount": 3,
+    "route": "Specialist review",
+    "band": "Review",
+    "features": [
+      {
+        "name": "Distinct journeys in 30 days",
+        "value": 4,
+        "median": 3,
+        "low": 2,
+        "high": 4,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Events in 30 days",
+        "value": 12,
+        "median": 5.5,
+        "low": 3,
+        "high": 12,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Linked contributors in 30 days",
+        "value": 3,
+        "median": 2,
+        "low": 1,
+        "high": 6,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registrations in 30 days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Wage changes in 30 days",
+        "value": 0,
+        "median": 1,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Exclusions in 30 days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "SANED requests in 30 days",
+        "value": 3,
+        "median": 1,
+        "low": 1,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum wage change (%)",
+        "value": 0,
+        "median": 1.525916576385498,
+        "low": 0,
+        "high": 54.39932632446289,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum retroactive days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 50.50640869140625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours since latest wage change",
+        "value": 720.0000000000002,
+        "median": 486.28885494431887,
+        "low": 145.89148523527706,
+        "high": 720.0001622612529,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum identifier reuse",
+        "value": 3,
+        "median": 0,
+        "low": 0,
+        "high": 5,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Cross-source conflicts",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Rule overrides",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Coordinated chain count",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registration-wage-exclusion-SANED chain",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Completed chain span (days)",
+        "value": 30,
+        "median": 30,
+        "low": 21.16374969482422,
+        "high": 30,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login events",
+        "value": 3,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Verified login locations",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 2,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum verified travel speed (km/h)",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 19795.697265625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "IBAN changes",
+        "value": 3,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Profile updates",
+        "value": 3,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login-profile-IBAN-request sequences",
+        "value": 3,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours from latest IBAN change to request",
+        "value": 4.317422499999999,
+        "median": 720.0001622612529,
+        "low": 1.991492020304023,
+        "high": 720.0001622612529,
+        "unusual": false,
+        "outsideReferenceRange": false
+      }
+    ],
+    "reasons": [
+      "The trained cross-journey model found similarity to provisional review patterns.",
+      "3 payment-account changes appear before the assessment; verify ownership before payment.",
+      "3 profile updates appear in the connected history.",
+      "3 contributors show a login → profile update → IBAN change → request sequence within 24 hours."
+    ],
+    "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+    "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions."
+  },
+  {
+    "caseId": "CJ-SYN-demo-00011",
+    "scenario": "rapid_profile_payment",
+    "synthetic": true,
+    "businessValidation": "Digital typology and threshold require specialist validation",
+    "modelVersion": "madar-cross-journey-rf-20261107-v3",
+    "complete": true,
+    "score": 0.9999155629111142,
+    "percentile": 100,
+    "modelFlagged": true,
+    "ruleFlagged": false,
+    "ruleReasons": [],
+    "ruleFindings": [],
+    "completedContributorChains": 0,
+    "involvedJourneys": [
+      "Digital Access",
+      "Account Maintenance",
+      "Benefit Payments",
+      "SANED"
+    ],
+    "linkedContributorCount": 1,
+    "route": "Specialist review",
+    "band": "Review",
+    "features": [
+      {
+        "name": "Distinct journeys in 30 days",
+        "value": 4,
+        "median": 3,
+        "low": 2,
+        "high": 4,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Events in 30 days",
+        "value": 7,
+        "median": 5.5,
+        "low": 3,
+        "high": 12,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Linked contributors in 30 days",
+        "value": 1,
+        "median": 2,
+        "low": 1,
+        "high": 6,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registrations in 30 days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Wage changes in 30 days",
+        "value": 0,
+        "median": 1,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Exclusions in 30 days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "SANED requests in 30 days",
+        "value": 1,
+        "median": 1,
+        "low": 1,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum wage change (%)",
+        "value": 0,
+        "median": 1.525916576385498,
+        "low": 0,
+        "high": 54.39932632446289,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum retroactive days",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 50.50640869140625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours since latest wage change",
+        "value": 720.0000000000002,
+        "median": 486.28885494431887,
+        "low": 145.89148523527706,
+        "high": 720.0001622612529,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum identifier reuse",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 5,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Cross-source conflicts",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Rule overrides",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Coordinated chain count",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Registration-wage-exclusion-SANED chain",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 1,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Completed chain span (days)",
+        "value": 30,
+        "median": 30,
+        "low": 21.16374969482422,
+        "high": 30,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login events",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Verified login locations",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 2,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Maximum verified travel speed (km/h)",
+        "value": 0,
+        "median": 0,
+        "low": 0,
+        "high": 19795.697265625,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "IBAN changes",
+        "value": 2,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Profile updates",
+        "value": 3,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Login-profile-IBAN-request sequences",
+        "value": 1,
+        "median": 0,
+        "low": 0,
+        "high": 3,
+        "unusual": false,
+        "outsideReferenceRange": false
+      },
+      {
+        "name": "Hours from latest IBAN change to request",
+        "value": 4.506663611111112,
+        "median": 720.0001622612529,
+        "low": 1.991492020304023,
+        "high": 720.0001622612529,
+        "unusual": false,
+        "outsideReferenceRange": false
+      }
+    ],
+    "reasons": [
+      "The trained cross-journey model found similarity to provisional review patterns.",
+      "2 payment-account changes appear before the assessment; verify ownership before payment.",
+      "3 profile updates appear in the connected history.",
+      "1 contributors show a login → profile update → IBAN change → request sequence within 24 hours."
+    ],
+    "scoreBoundary": "The model score measures similarity to provisional synthetic review patterns. It is not a fraud probability.",
+    "explanationBoundary": "Reference ranges provide context; they are not causal explanations or exact feature contributions."
   }
 ]

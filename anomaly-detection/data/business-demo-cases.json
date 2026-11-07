@@ -1,0 +1,5527 @@
+[
+  {
+    "id": "BRI-001",
+    "transactionId": "TX-2026-1001",
+    "journey": "SANED",
+    "scenario": "Repeated retroactive exclusion changes before a SANED request",
+    "subject": "CTR-4101",
+    "entity": "EMP-341",
+    "requested": "03 Oct · 08:00",
+    "country": "Saudi Arabia",
+    "region": "Riyadh",
+    "city": "Riyadh",
+    "ruleScore": 70,
+    "features": {
+      "velocity": 8,
+      "retroDays": 14,
+      "linkedEntities": 4,
+      "priorRisk": 65,
+      "overrides": 1,
+      "identityReuse": 2,
+      "crossSourceConflict": 1,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "RETRO_EXCLUSION_SEQUENCE",
+    "primaryReason": "Repeated retroactive exclusion changes were followed by a SANED request within a short period.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 18000,
+    "currency": "SAR",
+    "detectionStage": "After payment",
+    "paymentStatus": "On hold",
+    "amountAtRisk": 11160,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Mohammed Alotaibi",
+    "nationalIdMasked": "10******31",
+    "mobileMasked": "050***1427",
+    "employerName": "Al Manar Services Co.",
+    "employerNumber": "700118204",
+    "supervisorName": "Faisal Alqahtani",
+    "supervisorUserId": "USR-210",
+    "supervisorMobileMasked": "050***5703",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 42,
+    "interaction": 16,
+    "score": 73,
+    "risk": "Medium",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Insurance Operations Audit",
+    "status": "Under investigation",
+    "signals": [
+      [
+        "RETRO_EXCLUSION_SEQUENCE",
+        "Repeated retroactive exclusion changes were followed by a SANED request within a short period."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "RETROACTIVE_CHANGE",
+        "A material change was applied 14 days retroactively."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 16 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Repeated retroactive exclusion changes were followed by a SANED request within a short period."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Suspected fraud — further investigation",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-002",
+    "transactionId": "TX-2026-1002",
+    "journey": "SANED",
+    "scenario": "Employer-wide SANED request cluster",
+    "subject": "CTR-4188",
+    "entity": "EMP-778",
+    "requested": "03 Oct · 08:11",
+    "country": "Saudi Arabia",
+    "region": "Eastern Province",
+    "city": "Dammam",
+    "ruleScore": 66,
+    "features": {
+      "velocity": 12,
+      "retroDays": 2,
+      "linkedEntities": 15,
+      "priorRisk": 72,
+      "overrides": 0,
+      "identityReuse": 3,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "EMPLOYER_REQUEST_CLUSTER",
+    "primaryReason": "Multiple exclusions and SANED requests are concentrated around one employer.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 21750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Released",
+    "amountAtRisk": 15443,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "Proceeded",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Noura Alqahtani",
+    "nationalIdMasked": "11******48",
+    "mobileMasked": "050***1620",
+    "employerName": "Riyadh Horizon Trading",
+    "employerNumber": "700118301",
+    "supervisorName": "Reem Alharbi",
+    "supervisorUserId": "USR-211",
+    "supervisorMobileMasked": "050***5830",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 44,
+    "interaction": 10,
+    "score": 66,
+    "risk": "Medium",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Insurance Operations Audit",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "EMPLOYER_REQUEST_CLUSTER",
+        "Multiple exclusions and SANED requests are concentrated around one employer."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 3 related records."
+      ],
+      [
+        "EVENT_CLUSTER",
+        "12 events affect 15 linked entities in the assessment window."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 10 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Multiple exclusions and SANED requests are concentrated around one employer."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Legitimate activity",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-003",
+    "transactionId": "TX-2026-1003",
+    "journey": "SANED",
+    "scenario": "Recent exclusion-date change before request",
+    "subject": "CTR-4215",
+    "entity": "EMP-284",
+    "requested": "03 Oct · 08:22",
+    "country": "Saudi Arabia",
+    "region": "Makkah",
+    "city": "Jeddah",
+    "ruleScore": 50,
+    "features": {
+      "velocity": 4,
+      "retroDays": 5,
+      "linkedEntities": 3,
+      "priorRisk": 30,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "RECENT_EXCLUSION_CHANGE",
+    "primaryReason": "An exclusion-date change occurred shortly before the benefit request.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 25500,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 20400,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Fahad Almutairi",
+    "nationalIdMasked": "20******65",
+    "mobileMasked": "050***1813",
+    "employerName": "Najd Technical Solutions",
+    "employerNumber": "700118398",
+    "supervisorName": "Khalid Aldosari",
+    "supervisorUserId": "USR-212",
+    "supervisorMobileMasked": "050***5957",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 12,
+    "interaction": 0,
+    "score": 33,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "RECENT_EXCLUSION_CHANGE",
+        "An exclusion-date change occurred shortly before the benefit request."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "An exclusion-date change occurred shortly before the benefit request."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-004",
+    "transactionId": "TX-2026-1004",
+    "journey": "SANED",
+    "scenario": "Stable employment history and normal request",
+    "subject": "CTR-4292",
+    "entity": "EMP-114",
+    "requested": "03 Oct · 08:33",
+    "country": "Saudi Arabia",
+    "region": "Madinah",
+    "city": "Madinah",
+    "ruleScore": 10,
+    "features": {
+      "velocity": 1,
+      "retroDays": 0,
+      "linkedEntities": 1,
+      "priorRisk": 5,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "NO_MATERIAL_ANOMALY",
+    "primaryReason": "The request sequence remains within the contributor and employer baseline.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 29250,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 3510,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Sara Alharbi",
+    "nationalIdMasked": "10******82",
+    "mobileMasked": "050***2006",
+    "employerName": "Eastern Gate Contracting",
+    "employerNumber": "700118495",
+    "supervisorName": "Maha Alenezi",
+    "supervisorUserId": "USR-213",
+    "supervisorMobileMasked": "050***6084",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 0,
+    "interaction": 0,
+    "score": 6,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "NO_MATERIAL_ANOMALY",
+        "The request sequence remains within the contributor and employer baseline."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "The request sequence remains within the contributor and employer baseline."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-005",
+    "transactionId": "TX-2026-1005",
+    "journey": "SANED",
+    "scenario": "Rapid request after a conflicting external login sequence",
+    "subject": "CTR-4317",
+    "entity": "EMP-509",
+    "requested": "03 Oct · 09:44",
+    "country": "Bahrain",
+    "region": "Outside KSA",
+    "city": "Manama",
+    "ruleScore": 38,
+    "features": {
+      "velocity": 4,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 28,
+      "overrides": 0,
+      "identityReuse": 2,
+      "crossSourceConflict": 1,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "CROSS_BORDER_SEQUENCE_CONFLICT",
+    "primaryReason": "A rapid login and request sequence conflicts with recent trusted activity; location alone is not treated as risk.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 33000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Released",
+    "amountAtRisk": 3960,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "Proceeded",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Abdullah Alshammari",
+    "nationalIdMasked": "11******99",
+    "mobileMasked": "050***2199",
+    "employerName": "Al Waha Logistics",
+    "employerNumber": "700118592",
+    "supervisorName": "Saad Alzahrani",
+    "supervisorUserId": "USR-214",
+    "supervisorMobileMasked": "050***6211",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 12,
+    "interaction": 4,
+    "score": 30,
+    "risk": "Low",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "CROSS_BORDER_SEQUENCE_CONFLICT",
+        "A rapid login and request sequence conflicts with recent trusted activity; location alone is not treated as risk."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "CROSS_BORDER_CONFLICT",
+        "Cross-border activity conflicts with a verified sequence; the country itself does not increase risk."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 4 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A rapid login and request sequence conflicts with recent trusted activity; location alone is not treated as risk."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Legitimate activity",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-006",
+    "transactionId": "TX-2026-1006",
+    "journey": "Benefit Payments",
+    "scenario": "IBAN ownership mismatch across beneficiary profiles",
+    "subject": "BEN-1048",
+    "entity": "IBAN-4421",
+    "requested": "03 Oct · 09:55",
+    "country": "Saudi Arabia",
+    "region": "Riyadh",
+    "city": "Riyadh",
+    "ruleScore": 88,
+    "features": {
+      "velocity": 3,
+      "retroDays": 0,
+      "linkedEntities": 3,
+      "priorRisk": 20,
+      "overrides": 0,
+      "identityReuse": 4,
+      "crossSourceConflict": 1,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "IBAN_OWNER_MISMATCH",
+    "primaryReason": "The payment IBAN is associated with a different beneficiary profile and is reused across records.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 44750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 31773,
+    "confirmedFraudAmount": 27325,
+    "preventedAmount": 27325,
+    "financialOutcome": "Prevented before payment",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Reem Aldosari",
+    "nationalIdMasked": "20******16",
+    "mobileMasked": "050***2392",
+    "employerName": "Arabian Field Services",
+    "employerNumber": "700118689",
+    "supervisorName": "Noura Alghamdi",
+    "supervisorUserId": "USR-215",
+    "supervisorMobileMasked": "050***6338",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 17,
+    "interaction": 10,
+    "score": 75,
+    "risk": "High",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "IBAN_OWNER_MISMATCH",
+        "The payment IBAN is associated with a different beneficiary profile and is reused across records."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 4 related records."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 10 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "The payment IBAN is associated with a different beneficiary profile and is reused across records."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed fraud — formally established",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-007",
+    "transactionId": "TX-2026-1007",
+    "journey": "Benefit Payments",
+    "scenario": "Shared mobile followed by an IBAN change",
+    "subject": "BEN-1154",
+    "entity": "MOB-7782",
+    "requested": "03 Oct · 09:06",
+    "country": "Saudi Arabia",
+    "region": "Makkah",
+    "city": "Jeddah",
+    "ruleScore": 45,
+    "features": {
+      "velocity": 2,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 18,
+      "overrides": 0,
+      "identityReuse": 3,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "SHARED_IDENTIFIER_SEQUENCE",
+    "primaryReason": "A mobile number shared across profiles was followed by an IBAN change within 24 hours.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 48500,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 38800,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Khalid Alenezi",
+    "nationalIdMasked": "10******33",
+    "mobileMasked": "050***2585",
+    "employerName": "Mada Operations Co.",
+    "employerNumber": "700118786",
+    "supervisorName": "Turki Alsubaie",
+    "supervisorUserId": "USR-216",
+    "supervisorMobileMasked": "050***6465",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 3,
+    "interaction": 0,
+    "score": 26,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "SHARED_IDENTIFIER_SEQUENCE",
+        "A mobile number shared across profiles was followed by an IBAN change within 24 hours."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 3 related records."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A mobile number shared across profiles was followed by an IBAN change within 24 hours."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-008",
+    "transactionId": "TX-2026-1008",
+    "journey": "Benefit Payments",
+    "scenario": "Verified beneficiary payment",
+    "subject": "BEN-1231",
+    "entity": "IBAN-8012",
+    "requested": "03 Oct · 09:17",
+    "country": "Saudi Arabia",
+    "region": "Eastern Province",
+    "city": "Khobar",
+    "ruleScore": 8,
+    "features": {
+      "velocity": 1,
+      "retroDays": 0,
+      "linkedEntities": 1,
+      "priorRisk": 4,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "NO_MATERIAL_ANOMALY",
+    "primaryReason": "IBAN ownership, profile, and recent behavior are consistent.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 52250,
+    "currency": "SAR",
+    "detectionStage": "After payment",
+    "paymentStatus": "Paid",
+    "amountAtRisk": 6270,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Maha Alzahrani",
+    "nationalIdMasked": "11******50",
+    "mobileMasked": "050***2778",
+    "employerName": "Rowad Business Support",
+    "employerNumber": "700118883",
+    "supervisorName": "Hessa Alrasheed",
+    "supervisorUserId": "USR-217",
+    "supervisorMobileMasked": "050***6592",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 0,
+    "interaction": 0,
+    "score": 4,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation and existing controls are broadly aligned",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "NO_MATERIAL_ANOMALY",
+        "IBAN ownership, profile, and recent behavior are consistent."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "IBAN ownership, profile, and recent behavior are consistent."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-009",
+    "transactionId": "TX-2026-1009",
+    "journey": "Benefit Payments",
+    "scenario": "Impossible session sequence before IBAN update",
+    "subject": "BEN-1318",
+    "entity": "IBAN-2051",
+    "requested": "03 Oct · 10:28",
+    "country": "United Arab Emirates",
+    "region": "Outside KSA",
+    "city": "Dubai",
+    "ruleScore": 72,
+    "features": {
+      "velocity": 5,
+      "retroDays": 0,
+      "linkedEntities": 4,
+      "priorRisk": 52,
+      "overrides": 0,
+      "identityReuse": 2,
+      "crossSourceConflict": 1,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "IMPOSSIBLE_SESSION_SEQUENCE",
+    "primaryReason": "Two verified sessions occurred too far apart geographically within an implausibly short time before an IBAN change.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 56000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 34720,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "No financial impact",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Saad Alghamdi",
+    "nationalIdMasked": "20******67",
+    "mobileMasked": "050***2971",
+    "employerName": "Takamul Industrial Services",
+    "employerNumber": "700118980",
+    "supervisorName": "Omar Albalawi",
+    "supervisorUserId": "USR-218",
+    "supervisorMobileMasked": "050***6719",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 20,
+    "interaction": 12,
+    "score": 61,
+    "risk": "Medium",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Payment & IBAN Verification",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "IMPOSSIBLE_SESSION_SEQUENCE",
+        "Two verified sessions occurred too far apart geographically within an implausibly short time before an IBAN change."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "CROSS_BORDER_CONFLICT",
+        "Cross-border activity conflicts with a verified sequence; the country itself does not increase risk."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 12 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Two verified sessions occurred too far apart geographically within an implausibly short time before an IBAN change."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Process or data error",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-010",
+    "transactionId": "TX-2026-1010",
+    "journey": "Benefit Payments",
+    "scenario": "Recent IBAN change before scheduled payment",
+    "subject": "BEN-1392",
+    "entity": "IBAN-9370",
+    "requested": "03 Oct · 10:39",
+    "country": "Saudi Arabia",
+    "region": "Asir",
+    "city": "Abha",
+    "ruleScore": 52,
+    "features": {
+      "velocity": 3,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 24,
+      "overrides": 0,
+      "identityReuse": 2,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "RECENT_IBAN_CHANGE",
+    "primaryReason": "A material payment-account change occurred shortly before disbursement.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 59750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 42423,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Lama Alsubaie",
+    "nationalIdMasked": "10******84",
+    "mobileMasked": "050***3164",
+    "employerName": "Bunyan Facilities Management",
+    "employerNumber": "700119077",
+    "supervisorName": "Abeer Aljuhani",
+    "supervisorUserId": "USR-219",
+    "supervisorMobileMasked": "050***6846",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 0,
+    "interaction": 0,
+    "score": 29,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "RECENT_IBAN_CHANGE",
+        "A material payment-account change occurred shortly before disbursement."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A material payment-account change occurred shortly before disbursement."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-011",
+    "transactionId": "TX-2026-1011",
+    "journey": "Employer Registration",
+    "scenario": "Rapid registration and exclusion cluster",
+    "subject": "EMP-880",
+    "entity": "SUP-308",
+    "requested": "03 Oct · 10:50",
+    "country": "Saudi Arabia",
+    "region": "Riyadh",
+    "city": "Riyadh",
+    "ruleScore": 80,
+    "features": {
+      "velocity": 12,
+      "retroDays": 2,
+      "linkedEntities": 18,
+      "priorRisk": 78,
+      "overrides": 1,
+      "identityReuse": 4,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "RAPID_REGISTRATION_EXCLUSION",
+    "primaryReason": "Repeated registration and exclusion activity affects many linked contributors in a short period.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 44250,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 35400,
+    "confirmedFraudAmount": 30444,
+    "preventedAmount": 30444,
+    "financialOutcome": "Prevented before payment",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Turki Alrasheed",
+    "nationalIdMasked": "11******01",
+    "mobileMasked": "050***3357",
+    "employerName": "Al Manar Services Co.",
+    "employerNumber": "700119174",
+    "supervisorName": "Faisal Alqahtani",
+    "supervisorUserId": "USR-220",
+    "supervisorMobileMasked": "050***6973",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 50,
+    "interaction": 10,
+    "score": 77,
+    "risk": "High",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "RAPID_REGISTRATION_EXCLUSION",
+        "Repeated registration and exclusion activity affects many linked contributors in a short period."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 4 related records."
+      ],
+      [
+        "EVENT_CLUSTER",
+        "12 events affect 18 linked entities in the assessment window."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 10 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Repeated registration and exclusion activity affects many linked contributors in a short period."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed fraud — formally established",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-012",
+    "transactionId": "TX-2026-1012",
+    "journey": "Employer Registration",
+    "scenario": "Elevated employment churn",
+    "subject": "EMP-512",
+    "entity": "SUP-196",
+    "requested": "03 Oct · 10:01",
+    "country": "Saudi Arabia",
+    "region": "Eastern Province",
+    "city": "Dammam",
+    "ruleScore": 50,
+    "features": {
+      "velocity": 6,
+      "retroDays": 0,
+      "linkedEntities": 7,
+      "priorRisk": 35,
+      "overrides": 0,
+      "identityReuse": 2,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "EMPLOYMENT_CHURN",
+    "primaryReason": "Registration and exclusion volume exceeds the employer baseline.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 48000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 42720,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Hessa Albalawi",
+    "nationalIdMasked": "20******18",
+    "mobileMasked": "050***3550",
+    "employerName": "Riyadh Horizon Trading",
+    "employerNumber": "700119271",
+    "supervisorName": "Reem Alharbi",
+    "supervisorUserId": "USR-221",
+    "supervisorMobileMasked": "050***7100",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 17,
+    "interaction": 10,
+    "score": 45,
+    "risk": "Medium",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Insurance Operations Audit",
+    "status": "Awaiting specialist",
+    "signals": [
+      [
+        "EMPLOYMENT_CHURN",
+        "Registration and exclusion volume exceeds the employer baseline."
+      ],
+      [
+        "EVENT_CLUSTER",
+        "6 events affect 7 linked entities in the assessment window."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 10 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Registration and exclusion volume exceeds the employer baseline."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-013",
+    "transactionId": "TX-2026-1013",
+    "journey": "Employer Registration",
+    "scenario": "Normal employer activity",
+    "subject": "EMP-220",
+    "entity": "SUP-041",
+    "requested": "03 Oct · 11:12",
+    "country": "Saudi Arabia",
+    "region": "Qassim",
+    "city": "Buraidah",
+    "ruleScore": 10,
+    "features": {
+      "velocity": 2,
+      "retroDays": 0,
+      "linkedEntities": 3,
+      "priorRisk": 8,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "NO_MATERIAL_ANOMALY",
+    "primaryReason": "Employer events remain within the recent operating baseline.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 51750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Released",
+    "amountAtRisk": 6210,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "Proceeded",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Omar Aljuhani",
+    "nationalIdMasked": "10******35",
+    "mobileMasked": "050***3743",
+    "employerName": "Najd Technical Solutions",
+    "employerNumber": "700119368",
+    "supervisorName": "Khalid Aldosari",
+    "supervisorUserId": "USR-222",
+    "supervisorMobileMasked": "050***7227",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 0,
+    "interaction": 0,
+    "score": 6,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "NO_MATERIAL_ANOMALY",
+        "Employer events remain within the recent operating baseline."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Employer events remain within the recent operating baseline."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Legitimate activity",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-014",
+    "transactionId": "TX-2026-1014",
+    "journey": "Employer Registration",
+    "scenario": "Repeated exclusion changes across linked contributors",
+    "subject": "EMP-642",
+    "entity": "SUP-244",
+    "requested": "03 Oct · 11:23",
+    "country": "Saudi Arabia",
+    "region": "Makkah",
+    "city": "Makkah",
+    "ruleScore": 75,
+    "features": {
+      "velocity": 10,
+      "retroDays": 7,
+      "linkedEntities": 12,
+      "priorRisk": 60,
+      "overrides": 2,
+      "identityReuse": 3,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "COORDINATED_EXCLUSION_CHANGES",
+    "primaryReason": "Multiple linked contributors show repeated exclusion changes and overrides within the same window.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 55500,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 39405,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 21673,
+    "financialOutcome": "Partially prevented",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Abeer Alasmari",
+    "nationalIdMasked": "11******52",
+    "mobileMasked": "050***3936",
+    "employerName": "Eastern Gate Contracting",
+    "employerNumber": "700119465",
+    "supervisorName": "Maha Alenezi",
+    "supervisorUserId": "USR-223",
+    "supervisorMobileMasked": "050***7354",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 48,
+    "interaction": 23,
+    "score": 86,
+    "risk": "High",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "COORDINATED_EXCLUSION_CHANGES",
+        "Multiple linked contributors show repeated exclusion changes and overrides within the same window."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 3 related records."
+      ],
+      [
+        "RETROACTIVE_CHANGE",
+        "A material change was applied 7 days retroactively."
+      ],
+      [
+        "EVENT_CLUSTER",
+        "10 events affect 12 linked entities in the assessment window."
+      ],
+      [
+        "REPEATED_OVERRIDE",
+        "2 control overrides occurred in the assessment window."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Multiple linked contributors show repeated exclusion changes and overrides within the same window."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed violation",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-015",
+    "transactionId": "TX-2026-1015",
+    "journey": "Employer Registration",
+    "scenario": "Supervisor contact reused across establishments",
+    "subject": "EMP-719",
+    "entity": "SUP-775",
+    "requested": "03 Oct · 11:34",
+    "country": "Saudi Arabia",
+    "region": "Madinah",
+    "city": "Madinah",
+    "ruleScore": 42,
+    "features": {
+      "velocity": 4,
+      "retroDays": 0,
+      "linkedEntities": 8,
+      "priorRisk": 30,
+      "overrides": 0,
+      "identityReuse": 5,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "SHARED_SUPERVISOR_IDENTITY",
+    "primaryReason": "The same supervisor contact is reused across several establishments with similar event patterns.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 59250,
+    "currency": "SAR",
+    "detectionStage": "After payment",
+    "paymentStatus": "Paid",
+    "amountAtRisk": 47400,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Yousef Almarri",
+    "nationalIdMasked": "20******69",
+    "mobileMasked": "050***4129",
+    "employerName": "Al Waha Logistics",
+    "employerNumber": "700119562",
+    "supervisorName": "Saad Alzahrani",
+    "supervisorUserId": "USR-224",
+    "supervisorMobileMasked": "050***7481",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 22,
+    "interaction": 0,
+    "score": 33,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "SHARED_SUPERVISOR_IDENTITY",
+        "The same supervisor contact is reused across several establishments with similar event patterns."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 5 related records."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "The same supervisor contact is reused across several establishments with similar event patterns."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-016",
+    "transactionId": "TX-2026-1016",
+    "journey": "Retirement",
+    "scenario": "Re-employment detected through WPS",
+    "subject": "RET-1711",
+    "entity": "EMP-644",
+    "requested": "03 Oct · 11:45",
+    "country": "Saudi Arabia",
+    "region": "Eastern Province",
+    "city": "Dhahran",
+    "ruleScore": 75,
+    "features": {
+      "velocity": 3,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 65,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 1,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "WPS_REEMPLOYMENT_SIGNAL",
+    "primaryReason": "WPS payroll evidence conflicts with the current retirement payment status.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 53000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 47170,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Dania Alotaibi",
+    "nationalIdMasked": "10******86",
+    "mobileMasked": "050***4322",
+    "employerName": "Arabian Field Services",
+    "employerNumber": "700119659",
+    "supervisorName": "Noura Alghamdi",
+    "supervisorUserId": "USR-225",
+    "supervisorMobileMasked": "050***7608",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 17,
+    "interaction": 8,
+    "score": 57,
+    "risk": "Medium",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Eligibility Verification",
+    "status": "Awaiting specialist",
+    "signals": [
+      [
+        "WPS_REEMPLOYMENT_SIGNAL",
+        "WPS payroll evidence conflicts with the current retirement payment status."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 8 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "WPS payroll evidence conflicts with the current retirement payment status."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-017",
+    "transactionId": "TX-2026-1017",
+    "journey": "Retirement",
+    "scenario": "Unconfirmed WPS employment signal",
+    "subject": "RET-1850",
+    "entity": "EMP-302",
+    "requested": "03 Oct · 12:56",
+    "country": "Saudi Arabia",
+    "region": "Riyadh",
+    "city": "Riyadh",
+    "ruleScore": 50,
+    "features": {
+      "velocity": 2,
+      "retroDays": 0,
+      "linkedEntities": 1,
+      "priorRisk": 25,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 1,
+      "amountChangePct": 0,
+      "missingData": 1,
+      "urgentPriority": 0
+    },
+    "primaryCode": "WPS_STATUS_UNCONFIRMED",
+    "primaryReason": "A WPS record requires verification, but the employment start date is missing.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 56750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Released",
+    "amountAtRisk": 35185,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "Proceeded",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Nasser Alqahtani",
+    "nationalIdMasked": "11******03",
+    "mobileMasked": "050***4515",
+    "employerName": "Mada Operations Co.",
+    "employerNumber": "700119756",
+    "supervisorName": "Turki Alsubaie",
+    "supervisorUserId": "USR-226",
+    "supervisorMobileMasked": "050***7735",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 12,
+    "interaction": 0,
+    "score": 33,
+    "risk": "Low",
+    "confidenceScore": 54,
+    "confidence": "Low",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Data Verification Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "WPS_STATUS_UNCONFIRMED",
+        "A WPS record requires verification, but the employment start date is missing."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "REQUIRED_INFORMATION_MISSING",
+        "Required information is missing; confidence is reduced and human review is required."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A WPS record requires verification, but the employment start date is missing."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Legitimate activity",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-018",
+    "transactionId": "TX-2026-1018",
+    "journey": "Retirement",
+    "scenario": "No re-employment evidence",
+    "subject": "RET-1924",
+    "entity": "—",
+    "requested": "03 Oct · 12:07",
+    "country": "Saudi Arabia",
+    "region": "Hail",
+    "city": "Hail",
+    "ruleScore": 7,
+    "features": {
+      "velocity": 1,
+      "retroDays": 0,
+      "linkedEntities": 1,
+      "priorRisk": 5,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "NO_MATERIAL_ANOMALY",
+    "primaryReason": "No conflicting employment or payroll evidence was identified.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 60500,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 7260,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Rana Alharbi",
+    "nationalIdMasked": "20******20",
+    "mobileMasked": "050***4708",
+    "employerName": "Rowad Business Support",
+    "employerNumber": "700119853",
+    "supervisorName": "Hessa Alrasheed",
+    "supervisorUserId": "USR-227",
+    "supervisorMobileMasked": "050***7862",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 0,
+    "interaction": 0,
+    "score": 4,
+    "risk": "Low",
+    "confidenceScore": 89,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation and existing controls are broadly aligned",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "NO_MATERIAL_ANOMALY",
+        "No conflicting employment or payroll evidence was identified."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "No conflicting employment or payroll evidence was identified."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-019",
+    "transactionId": "TX-2026-1019",
+    "journey": "Retirement",
+    "scenario": "External payroll activity conflicts with retirement status",
+    "subject": "RET-2017",
+    "entity": "EMP-811",
+    "requested": "03 Oct · 12:18",
+    "country": "Qatar",
+    "region": "Outside KSA",
+    "city": "Doha",
+    "ruleScore": 68,
+    "features": {
+      "velocity": 4,
+      "retroDays": 0,
+      "linkedEntities": 3,
+      "priorRisk": 55,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 1,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "EXTERNAL_PAYROLL_CONFLICT",
+    "primaryReason": "Approved payroll evidence conflicts with the retirement record; location alone is not treated as risk.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 64250,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "On hold",
+    "amountAtRisk": 51400,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Majed Alshammari",
+    "nationalIdMasked": "10******37",
+    "mobileMasked": "050***4901",
+    "employerName": "Takamul Industrial Services",
+    "employerNumber": "700119950",
+    "supervisorName": "Omar Albalawi",
+    "supervisorUserId": "USR-228",
+    "supervisorMobileMasked": "050***7989",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 15,
+    "interaction": 12,
+    "score": 56,
+    "risk": "Medium",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Eligibility Verification",
+    "status": "Under investigation",
+    "signals": [
+      [
+        "EXTERNAL_PAYROLL_CONFLICT",
+        "Approved payroll evidence conflicts with the retirement record; location alone is not treated as risk."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "CROSS_BORDER_CONFLICT",
+        "Cross-border activity conflicts with a verified sequence; the country itself does not increase risk."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 12 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Approved payroll evidence conflicts with the retirement record; location alone is not treated as risk."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Suspected fraud — further investigation",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-020",
+    "transactionId": "TX-2026-1020",
+    "journey": "Retirement",
+    "scenario": "Salary event after retirement",
+    "subject": "RET-2099",
+    "entity": "EMP-432",
+    "requested": "03 Oct · 12:29",
+    "country": "Saudi Arabia",
+    "region": "Tabuk",
+    "city": "Tabuk",
+    "ruleScore": 46,
+    "features": {
+      "velocity": 2,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 35,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "POST_RETIREMENT_SALARY_EVENT",
+    "primaryReason": "A salary event was reported after the recorded retirement date and requires eligibility verification.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 68000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 60520,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Alanoud Aldosari",
+    "nationalIdMasked": "11******54",
+    "mobileMasked": "050***5094",
+    "employerName": "Bunyan Facilities Management",
+    "employerNumber": "700120047",
+    "supervisorName": "Abeer Aljuhani",
+    "supervisorUserId": "USR-229",
+    "supervisorMobileMasked": "050***8116",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 0,
+    "interaction": 0,
+    "score": 25,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "POST_RETIREMENT_SALARY_EVENT",
+        "A salary event was reported after the recorded retirement date and requires eligibility verification."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A salary event was reported after the recorded retirement date and requires eligibility verification."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-021",
+    "transactionId": "TX-2026-1021",
+    "journey": "Maternity Benefit",
+    "scenario": "Salary spike before maternity benefit request",
+    "subject": "BEN-2056",
+    "entity": "EMP-933",
+    "requested": "03 Oct · 13:40",
+    "country": "Saudi Arabia",
+    "region": "Riyadh",
+    "city": "Riyadh",
+    "ruleScore": 72,
+    "features": {
+      "velocity": 4,
+      "retroDays": 0,
+      "linkedEntities": 3,
+      "priorRisk": 40,
+      "overrides": 0,
+      "identityReuse": 2,
+      "crossSourceConflict": 0,
+      "amountChangePct": 180,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "SALARY_SPIKE_BEFORE_BENEFIT",
+    "primaryReason": "Registered salary increased materially shortly before the request.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 28500,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 17670,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "No financial impact",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Bader Alenezi",
+    "nationalIdMasked": "20******71",
+    "mobileMasked": "050***5287",
+    "employerName": "Al Manar Services Co.",
+    "employerNumber": "700120144",
+    "supervisorName": "Faisal Alqahtani",
+    "supervisorUserId": "USR-230",
+    "supervisorMobileMasked": "050***8243",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 13,
+    "interaction": 8,
+    "score": 53,
+    "risk": "Medium",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Benefit Operations Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "SALARY_SPIKE_BEFORE_BENEFIT",
+        "Registered salary increased materially shortly before the request."
+      ],
+      [
+        "MATERIAL_CHANGE",
+        "The amount or salary changed by 180% within the observed period."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 8 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Registered salary increased materially shortly before the request."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Process or data error",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-022",
+    "transactionId": "TX-2026-1022",
+    "journey": "Maternity Benefit",
+    "scenario": "Shared device and salary change",
+    "subject": "BEN-2188",
+    "entity": "EMP-775",
+    "requested": "03 Oct · 13:51",
+    "country": "Saudi Arabia",
+    "region": "Makkah",
+    "city": "Jeddah",
+    "ruleScore": 48,
+    "features": {
+      "velocity": 2,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 22,
+      "overrides": 0,
+      "identityReuse": 3,
+      "crossSourceConflict": 0,
+      "amountChangePct": 70,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "SHARED_DEVICE_SALARY_SEQUENCE",
+    "primaryReason": "A shared device and a material salary increase occurred before the request.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 32250,
+    "currency": "SAR",
+    "detectionStage": "After payment",
+    "paymentStatus": "Paid",
+    "amountAtRisk": 22898,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Shahad Alzahrani",
+    "nationalIdMasked": "10******88",
+    "mobileMasked": "050***5480",
+    "employerName": "Riyadh Horizon Trading",
+    "employerNumber": "700120241",
+    "supervisorName": "Reem Alharbi",
+    "supervisorUserId": "USR-231",
+    "supervisorMobileMasked": "050***8370",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 15,
+    "interaction": 0,
+    "score": 33,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "SHARED_DEVICE_SALARY_SEQUENCE",
+        "A shared device and a material salary increase occurred before the request."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 3 related records."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A shared device and a material salary increase occurred before the request."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-023",
+    "transactionId": "TX-2026-1023",
+    "journey": "Maternity Benefit",
+    "scenario": "Stable employment relationship",
+    "subject": "BEN-2291",
+    "entity": "EMP-119",
+    "requested": "03 Oct · 13:02",
+    "country": "Saudi Arabia",
+    "region": "Eastern Province",
+    "city": "Dammam",
+    "ruleScore": 11,
+    "features": {
+      "velocity": 1,
+      "retroDays": 0,
+      "linkedEntities": 1,
+      "priorRisk": 5,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 5,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "NO_MATERIAL_ANOMALY",
+    "primaryReason": "Employment duration and salary history remain within the baseline.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 36000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 4320,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Faisal Alghamdi",
+    "nationalIdMasked": "11******05",
+    "mobileMasked": "050***5673",
+    "employerName": "Najd Technical Solutions",
+    "employerNumber": "700120338",
+    "supervisorName": "Khalid Aldosari",
+    "supervisorUserId": "USR-232",
+    "supervisorMobileMasked": "050***8497",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 12,
+    "interaction": 0,
+    "score": 11,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation and existing controls are broadly aligned",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "NO_MATERIAL_ANOMALY",
+        "Employment duration and salary history remain within the baseline."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Employment duration and salary history remain within the baseline."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-024",
+    "transactionId": "TX-2026-1024",
+    "journey": "Maternity Benefit",
+    "scenario": "Short employment relationship and sharp salary increase",
+    "subject": "BEN-2366",
+    "entity": "EMP-887",
+    "requested": "03 Oct · 13:13",
+    "country": "Saudi Arabia",
+    "region": "Jazan",
+    "city": "Jazan",
+    "ruleScore": 70,
+    "features": {
+      "velocity": 7,
+      "retroDays": 0,
+      "linkedEntities": 6,
+      "priorRisk": 58,
+      "overrides": 1,
+      "identityReuse": 2,
+      "crossSourceConflict": 1,
+      "amountChangePct": 220,
+      "missingData": 0,
+      "urgentPriority": 1
+    },
+    "primaryCode": "EMPLOYMENT_RELATIONSHIP_ANOMALY",
+    "primaryReason": "A short employment sequence, sharp salary increase, and conflicting evidence occurred before the request.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 39750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 35378,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 19458,
+    "financialOutcome": "Partially prevented",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Mona Alsubaie",
+    "nationalIdMasked": "20******22",
+    "mobileMasked": "050***5866",
+    "employerName": "Eastern Gate Contracting",
+    "employerNumber": "700120435",
+    "supervisorName": "Maha Alenezi",
+    "supervisorUserId": "USR-233",
+    "supervisorMobileMasked": "050***8624",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 45,
+    "interaction": 16,
+    "score": 75,
+    "risk": "High",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "EMPLOYMENT_RELATIONSHIP_ANOMALY",
+        "A short employment sequence, sharp salary increase, and conflicting evidence occurred before the request."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "MATERIAL_CHANGE",
+        "The amount or salary changed by 220% within the observed period."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 16 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A short employment sequence, sharp salary increase, and conflicting evidence occurred before the request."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed violation",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-025",
+    "transactionId": "TX-2026-1025",
+    "journey": "Maternity Benefit",
+    "scenario": "Late registration and retroactive wage update",
+    "subject": "BEN-2419",
+    "entity": "EMP-553",
+    "requested": "03 Oct · 14:24",
+    "country": "Saudi Arabia",
+    "region": "Asir",
+    "city": "Abha",
+    "ruleScore": 44,
+    "features": {
+      "velocity": 3,
+      "retroDays": 10,
+      "linkedEntities": 2,
+      "priorRisk": 30,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 45,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "LATE_REGISTRATION_SEQUENCE",
+    "primaryReason": "A retroactive employment update and salary change occurred shortly before the request.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 43500,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "On hold",
+    "amountAtRisk": 26970,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Sultan Alrasheed",
+    "nationalIdMasked": "10******39",
+    "mobileMasked": "050***6059",
+    "employerName": "Al Waha Logistics",
+    "employerNumber": "700120532",
+    "supervisorName": "Saad Alzahrani",
+    "supervisorUserId": "USR-234",
+    "supervisorMobileMasked": "050***8751",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 24,
+    "interaction": 8,
+    "score": 43,
+    "risk": "Medium",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Benefit Operations Review",
+    "status": "Under investigation",
+    "signals": [
+      [
+        "LATE_REGISTRATION_SEQUENCE",
+        "A retroactive employment update and salary change occurred shortly before the request."
+      ],
+      [
+        "RETROACTIVE_CHANGE",
+        "A material change was applied 10 days retroactively."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 8 points because multiple indicators occurred together."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A retroactive employment update and salary change occurred shortly before the request."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Suspected fraud — further investigation",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-026",
+    "transactionId": "TX-2026-1026",
+    "journey": "Contribution & Wage",
+    "scenario": "Repeated salary changes across linked employees",
+    "subject": "EMP-330",
+    "entity": "PAY-118",
+    "requested": "03 Oct · 14:35",
+    "country": "Saudi Arabia",
+    "region": "Riyadh",
+    "city": "Riyadh",
+    "ruleScore": 76,
+    "features": {
+      "velocity": 9,
+      "retroDays": 0,
+      "linkedEntities": 10,
+      "priorRisk": 68,
+      "overrides": 2,
+      "identityReuse": 2,
+      "crossSourceConflict": 0,
+      "amountChangePct": 250,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "COORDINATED_WAGE_CHANGES",
+    "primaryReason": "Repeated salary increases and overrides affect several linked employees in the same period.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 91250,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 64788,
+    "confirmedFraudAmount": 55718,
+    "preventedAmount": 55718,
+    "financialOutcome": "Prevented before payment",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Jawaher Albalawi",
+    "nationalIdMasked": "11******56",
+    "mobileMasked": "050***6252",
+    "employerName": "Arabian Field Services",
+    "employerNumber": "700120629",
+    "supervisorName": "Noura Alghamdi",
+    "supervisorUserId": "USR-235",
+    "supervisorMobileMasked": "050***8878",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 45,
+    "interaction": 23,
+    "score": 85,
+    "risk": "High",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "COORDINATED_WAGE_CHANGES",
+        "Repeated salary increases and overrides affect several linked employees in the same period."
+      ],
+      [
+        "MATERIAL_CHANGE",
+        "The amount or salary changed by 250% within the observed period."
+      ],
+      [
+        "EVENT_CLUSTER",
+        "9 events affect 10 linked entities in the assessment window."
+      ],
+      [
+        "REPEATED_OVERRIDE",
+        "2 control overrides occurred in the assessment window."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 23 points because multiple indicators occurred together."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Repeated salary increases and overrides affect several linked employees in the same period."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed fraud — formally established",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-027",
+    "transactionId": "TX-2026-1027",
+    "journey": "Contribution & Wage",
+    "scenario": "Retroactive wage update",
+    "subject": "CTR-5581",
+    "entity": "EMP-406",
+    "requested": "03 Oct · 14:46",
+    "country": "Saudi Arabia",
+    "region": "Qassim",
+    "city": "Buraidah",
+    "ruleScore": 52,
+    "features": {
+      "velocity": 4,
+      "retroDays": 30,
+      "linkedEntities": 3,
+      "priorRisk": 40,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 60,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "RETROACTIVE_WAGE_UPDATE",
+    "primaryReason": "A material wage update was applied retroactively and requires verification.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 95000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 76000,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "No financial impact",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Ahmed Aljuhani",
+    "nationalIdMasked": "20******73",
+    "mobileMasked": "050***6445",
+    "employerName": "Mada Operations Co.",
+    "employerNumber": "700120726",
+    "supervisorName": "Turki Alsubaie",
+    "supervisorUserId": "USR-236",
+    "supervisorMobileMasked": "050***9005",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 25,
+    "interaction": 8,
+    "score": 48,
+    "risk": "Medium",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Insurance Operations Audit",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "RETROACTIVE_WAGE_UPDATE",
+        "A material wage update was applied retroactively and requires verification."
+      ],
+      [
+        "RETROACTIVE_CHANGE",
+        "A material change was applied 30 days retroactively."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 8 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A material wage update was applied retroactively and requires verification."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Process or data error",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-028",
+    "transactionId": "TX-2026-1028",
+    "journey": "Contribution & Wage",
+    "scenario": "Routine payroll submission",
+    "subject": "EMP-164",
+    "entity": "PAY-804",
+    "requested": "03 Oct · 14:57",
+    "country": "Saudi Arabia",
+    "region": "Northern Borders",
+    "city": "Arar",
+    "ruleScore": 9,
+    "features": {
+      "velocity": 2,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 6,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 3,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "NO_MATERIAL_ANOMALY",
+    "primaryReason": "Payroll volume and wage changes remain within the employer baseline.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 98750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 11850,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Nouf Alasmari",
+    "nationalIdMasked": "10******90",
+    "mobileMasked": "050***6638",
+    "employerName": "Rowad Business Support",
+    "employerNumber": "700120823",
+    "supervisorName": "Hessa Alrasheed",
+    "supervisorUserId": "USR-237",
+    "supervisorMobileMasked": "050***9132",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 8,
+    "interaction": 0,
+    "score": 9,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation and existing controls are broadly aligned",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "NO_MATERIAL_ANOMALY",
+        "Payroll volume and wage changes remain within the employer baseline."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Payroll volume and wage changes remain within the employer baseline."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-029",
+    "transactionId": "TX-2026-1029",
+    "journey": "Contribution & Wage",
+    "scenario": "External payroll submission conflicts with employer history",
+    "subject": "EMP-472",
+    "entity": "PAY-990",
+    "requested": "03 Oct · 15:08",
+    "country": "Egypt",
+    "region": "Outside KSA",
+    "city": "Cairo",
+    "ruleScore": 64,
+    "features": {
+      "velocity": 5,
+      "retroDays": 0,
+      "linkedEntities": 4,
+      "priorRisk": 50,
+      "overrides": 0,
+      "identityReuse": 3,
+      "crossSourceConflict": 1,
+      "amountChangePct": 95,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "PAYROLL_SOURCE_CONFLICT",
+    "primaryReason": "The payroll submission conflicts with employer history and identifier relationships; location alone is not treated as risk.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 102500,
+    "currency": "SAR",
+    "detectionStage": "After payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 63550,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 34953,
+    "financialOutcome": "Partially prevented",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Saleh Almarri",
+    "nationalIdMasked": "11******07",
+    "mobileMasked": "050***6831",
+    "employerName": "Takamul Industrial Services",
+    "employerNumber": "700120920",
+    "supervisorName": "Omar Albalawi",
+    "supervisorUserId": "USR-238",
+    "supervisorMobileMasked": "050***9259",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 34,
+    "interaction": 30,
+    "score": 81,
+    "risk": "High",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "PAYROLL_SOURCE_CONFLICT",
+        "The payroll submission conflicts with employer history and identifier relationships; location alone is not treated as risk."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 3 related records."
+      ],
+      [
+        "MATERIAL_CHANGE",
+        "The amount or salary changed by 95% within the observed period."
+      ],
+      [
+        "CROSS_BORDER_CONFLICT",
+        "Cross-border activity conflicts with a verified sequence; the country itself does not increase risk."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "The payroll submission conflicts with employer history and identifier relationships; location alone is not treated as risk."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed violation",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-030",
+    "transactionId": "TX-2026-1030",
+    "journey": "Contribution & Wage",
+    "scenario": "Cross-source wage discrepancy",
+    "subject": "CTR-5904",
+    "entity": "EMP-287",
+    "requested": "03 Oct · 15:19",
+    "country": "Saudi Arabia",
+    "region": "Al Baha",
+    "city": "Al Baha",
+    "ruleScore": 48,
+    "features": {
+      "velocity": 3,
+      "retroDays": 0,
+      "linkedEntities": 3,
+      "priorRisk": 38,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 1,
+      "amountChangePct": 55,
+      "missingData": 1,
+      "urgentPriority": 0
+    },
+    "primaryCode": "WAGE_SOURCE_DISCREPANCY",
+    "primaryReason": "Wage values differ across approved sources and one supporting field is missing.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 106250,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 75438,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Ghada Almutairi",
+    "nationalIdMasked": "20******24",
+    "mobileMasked": "050***7024",
+    "employerName": "Bunyan Facilities Management",
+    "employerNumber": "700121017",
+    "supervisorName": "Abeer Aljuhani",
+    "supervisorUserId": "USR-239",
+    "supervisorMobileMasked": "050***9386",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 24,
+    "interaction": 0,
+    "score": 37,
+    "risk": "Medium",
+    "confidenceScore": 54,
+    "confidence": "Low",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Data Verification Review",
+    "status": "Awaiting specialist",
+    "signals": [
+      [
+        "WAGE_SOURCE_DISCREPANCY",
+        "Wage values differ across approved sources and one supporting field is missing."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "REQUIRED_INFORMATION_MISSING",
+        "Required information is missing; confidence is reduced and human review is required."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Wage values differ across approved sources and one supporting field is missing."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-031",
+    "transactionId": "TX-2026-1031",
+    "journey": "SANED",
+    "scenario": "Repeated retroactive exclusion changes before a SANED request",
+    "subject": "CTR-10101",
+    "entity": "EMP-4341",
+    "requested": "03 Oct · 15:30",
+    "country": "Saudi Arabia",
+    "region": "Riyadh",
+    "city": "Riyadh",
+    "ruleScore": 66,
+    "features": {
+      "velocity": 8,
+      "retroDays": 14,
+      "linkedEntities": 4,
+      "priorRisk": 61,
+      "overrides": 1,
+      "identityReuse": 2,
+      "crossSourceConflict": 1,
+      "amountChangePct": 12,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "RETRO_EXCLUSION_SEQUENCE",
+    "primaryReason": "Repeated retroactive exclusion changes were followed by a SANED request within a short period.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 24750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 19800,
+    "confirmedFraudAmount": 17028,
+    "preventedAmount": 17028,
+    "financialOutcome": "Prevented before payment",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Mohammed Alotaibi",
+    "nationalIdMasked": "10******41",
+    "mobileMasked": "050***7217",
+    "employerName": "Al Manar Services Co.",
+    "employerNumber": "700121114",
+    "supervisorName": "Faisal Alqahtani",
+    "supervisorUserId": "USR-240",
+    "supervisorMobileMasked": "050***9513",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 53,
+    "interaction": 16,
+    "score": 76,
+    "risk": "High",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "RETRO_EXCLUSION_SEQUENCE",
+        "Repeated retroactive exclusion changes were followed by a SANED request within a short period."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "RETROACTIVE_CHANGE",
+        "A material change was applied 14 days retroactively."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 16 points because multiple indicators occurred together."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Repeated retroactive exclusion changes were followed by a SANED request within a short period."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed fraud — formally established",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-032",
+    "transactionId": "TX-2026-1032",
+    "journey": "SANED",
+    "scenario": "Employer-wide SANED request cluster",
+    "subject": "CTR-10188",
+    "entity": "EMP-4778",
+    "requested": "03 Oct · 15:41",
+    "country": "Saudi Arabia",
+    "region": "Eastern Province",
+    "city": "Dammam",
+    "ruleScore": 68,
+    "features": {
+      "velocity": 13,
+      "retroDays": 2,
+      "linkedEntities": 15,
+      "priorRisk": 74,
+      "overrides": 0,
+      "identityReuse": 3,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "EMPLOYER_REQUEST_CLUSTER",
+    "primaryReason": "Multiple exclusions and SANED requests are concentrated around one employer.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 28500,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Released",
+    "amountAtRisk": 25365,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "Proceeded",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Noura Alqahtani",
+    "nationalIdMasked": "11******58",
+    "mobileMasked": "050***7410",
+    "employerName": "Riyadh Horizon Trading",
+    "employerNumber": "700121211",
+    "supervisorName": "Reem Alharbi",
+    "supervisorUserId": "USR-241",
+    "supervisorMobileMasked": "050***9640",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 46,
+    "interaction": 10,
+    "score": 68,
+    "risk": "Medium",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Insurance Operations Audit",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "EMPLOYER_REQUEST_CLUSTER",
+        "Multiple exclusions and SANED requests are concentrated around one employer."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 3 related records."
+      ],
+      [
+        "EVENT_CLUSTER",
+        "13 events affect 15 linked entities in the assessment window."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 10 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Multiple exclusions and SANED requests are concentrated around one employer."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Legitimate activity",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-033",
+    "transactionId": "TX-2026-1033",
+    "journey": "SANED",
+    "scenario": "Recent exclusion-date change before request",
+    "subject": "CTR-10215",
+    "entity": "EMP-4284",
+    "requested": "03 Oct · 16:52",
+    "country": "Saudi Arabia",
+    "region": "Makkah",
+    "city": "Jeddah",
+    "ruleScore": 55,
+    "features": {
+      "velocity": 4,
+      "retroDays": 5,
+      "linkedEntities": 3,
+      "priorRisk": 35,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "RECENT_EXCLUSION_CHANGE",
+    "primaryReason": "An exclusion-date change occurred shortly before the benefit request.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 32250,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 19995,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "No financial impact",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Fahad Almutairi",
+    "nationalIdMasked": "20******75",
+    "mobileMasked": "050***7603",
+    "employerName": "Najd Technical Solutions",
+    "employerNumber": "700121308",
+    "supervisorName": "Khalid Aldosari",
+    "supervisorUserId": "USR-242",
+    "supervisorMobileMasked": "050***9767",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 12,
+    "interaction": 0,
+    "score": 36,
+    "risk": "Medium",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Insurance Operations Audit",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "RECENT_EXCLUSION_CHANGE",
+        "An exclusion-date change occurred shortly before the benefit request."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "An exclusion-date change occurred shortly before the benefit request."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Process or data error",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-034",
+    "transactionId": "TX-2026-1034",
+    "journey": "SANED",
+    "scenario": "Stable employment history and normal request",
+    "subject": "CTR-10292",
+    "entity": "EMP-4114",
+    "requested": "03 Oct · 16:03",
+    "country": "Saudi Arabia",
+    "region": "Madinah",
+    "city": "Madinah",
+    "ruleScore": 6,
+    "features": {
+      "velocity": 2,
+      "retroDays": 0,
+      "linkedEntities": 1,
+      "priorRisk": 1,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "NO_MATERIAL_ANOMALY",
+    "primaryReason": "The request sequence remains within the contributor and employer baseline.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 36000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 4320,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Sara Alharbi",
+    "nationalIdMasked": "10******92",
+    "mobileMasked": "050***7796",
+    "employerName": "Eastern Gate Contracting",
+    "employerNumber": "700121405",
+    "supervisorName": "Maha Alenezi",
+    "supervisorUserId": "USR-243",
+    "supervisorMobileMasked": "050***9894",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 0,
+    "interaction": 0,
+    "score": 3,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation and existing controls are broadly aligned",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "NO_MATERIAL_ANOMALY",
+        "The request sequence remains within the contributor and employer baseline."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "The request sequence remains within the contributor and employer baseline."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-035",
+    "transactionId": "TX-2026-1035",
+    "journey": "SANED",
+    "scenario": "Rapid request after a conflicting external login sequence",
+    "subject": "CTR-10317",
+    "entity": "EMP-4509",
+    "requested": "03 Oct · 16:14",
+    "country": "Bahrain",
+    "region": "Outside KSA",
+    "city": "Manama",
+    "ruleScore": 40,
+    "features": {
+      "velocity": 4,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 30,
+      "overrides": 0,
+      "identityReuse": 2,
+      "crossSourceConflict": 1,
+      "amountChangePct": 12,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "CROSS_BORDER_SEQUENCE_CONFLICT",
+    "primaryReason": "A rapid login and request sequence conflicts with recent trusted activity; location alone is not treated as risk.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 39750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 31800,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Abdullah Alshammari",
+    "nationalIdMasked": "11******09",
+    "mobileMasked": "050***7989",
+    "employerName": "Al Waha Logistics",
+    "employerNumber": "700121502",
+    "supervisorName": "Saad Alzahrani",
+    "supervisorUserId": "USR-244",
+    "supervisorMobileMasked": "050***0021",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 24,
+    "interaction": 4,
+    "score": 37,
+    "risk": "Medium",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Insurance Operations Audit",
+    "status": "Awaiting specialist",
+    "signals": [
+      [
+        "CROSS_BORDER_SEQUENCE_CONFLICT",
+        "A rapid login and request sequence conflicts with recent trusted activity; location alone is not treated as risk."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "CROSS_BORDER_CONFLICT",
+        "Cross-border activity conflicts with a verified sequence; the country itself does not increase risk."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 4 points because multiple indicators occurred together."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A rapid login and request sequence conflicts with recent trusted activity; location alone is not treated as risk."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-036",
+    "transactionId": "TX-2026-1036",
+    "journey": "Benefit Payments",
+    "scenario": "IBAN ownership mismatch across beneficiary profiles",
+    "subject": "BEN-7048",
+    "entity": "IBAN-8421",
+    "requested": "03 Oct · 16:25",
+    "country": "Saudi Arabia",
+    "region": "Riyadh",
+    "city": "Riyadh",
+    "ruleScore": 93,
+    "features": {
+      "velocity": 4,
+      "retroDays": 0,
+      "linkedEntities": 3,
+      "priorRisk": 25,
+      "overrides": 0,
+      "identityReuse": 4,
+      "crossSourceConflict": 1,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "IBAN_OWNER_MISMATCH",
+    "primaryReason": "The payment IBAN is associated with a different beneficiary profile and is reused across records.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 51500,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 45835,
+    "confirmedFraudAmount": 39418,
+    "preventedAmount": 39418,
+    "financialOutcome": "Prevented before payment",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Reem Aldosari",
+    "nationalIdMasked": "20******26",
+    "mobileMasked": "050***8182",
+    "employerName": "Arabian Field Services",
+    "employerNumber": "700121599",
+    "supervisorName": "Noura Alghamdi",
+    "supervisorUserId": "USR-245",
+    "supervisorMobileMasked": "050***0148",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 17,
+    "interaction": 10,
+    "score": 75,
+    "risk": "High",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "IBAN_OWNER_MISMATCH",
+        "The payment IBAN is associated with a different beneficiary profile and is reused across records."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 4 related records."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 10 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "The payment IBAN is associated with a different beneficiary profile and is reused across records."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed fraud — formally established",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-037",
+    "transactionId": "TX-2026-1037",
+    "journey": "Benefit Payments",
+    "scenario": "Shared mobile followed by an IBAN change",
+    "subject": "BEN-7154",
+    "entity": "MOB-11782",
+    "requested": "03 Oct · 17:36",
+    "country": "Saudi Arabia",
+    "region": "Makkah",
+    "city": "Jeddah",
+    "ruleScore": 41,
+    "features": {
+      "velocity": 2,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 14,
+      "overrides": 0,
+      "identityReuse": 3,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "SHARED_IDENTIFIER_SEQUENCE",
+    "primaryReason": "A mobile number shared across profiles was followed by an IBAN change within 24 hours.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 55250,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Released",
+    "amountAtRisk": 34255,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "Proceeded",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Khalid Alenezi",
+    "nationalIdMasked": "10******43",
+    "mobileMasked": "050***8375",
+    "employerName": "Mada Operations Co.",
+    "employerNumber": "700121696",
+    "supervisorName": "Turki Alsubaie",
+    "supervisorUserId": "USR-246",
+    "supervisorMobileMasked": "050***0275",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 3,
+    "interaction": 0,
+    "score": 24,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "SHARED_IDENTIFIER_SEQUENCE",
+        "A mobile number shared across profiles was followed by an IBAN change within 24 hours."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 3 related records."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A mobile number shared across profiles was followed by an IBAN change within 24 hours."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Legitimate activity",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-038",
+    "transactionId": "TX-2026-1038",
+    "journey": "Benefit Payments",
+    "scenario": "Verified beneficiary payment",
+    "subject": "BEN-7231",
+    "entity": "IBAN-12012",
+    "requested": "03 Oct · 17:47",
+    "country": "Saudi Arabia",
+    "region": "Eastern Province",
+    "city": "Khobar",
+    "ruleScore": 10,
+    "features": {
+      "velocity": 2,
+      "retroDays": 0,
+      "linkedEntities": 1,
+      "priorRisk": 6,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "NO_MATERIAL_ANOMALY",
+    "primaryReason": "IBAN ownership, profile, and recent behavior are consistent.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 59000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 7080,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Maha Alzahrani",
+    "nationalIdMasked": "11******60",
+    "mobileMasked": "050***8568",
+    "employerName": "Rowad Business Support",
+    "employerNumber": "700121793",
+    "supervisorName": "Hessa Alrasheed",
+    "supervisorUserId": "USR-247",
+    "supervisorMobileMasked": "050***0402",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 0,
+    "interaction": 0,
+    "score": 6,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "NO_MATERIAL_ANOMALY",
+        "IBAN ownership, profile, and recent behavior are consistent."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "IBAN ownership, profile, and recent behavior are consistent."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-039",
+    "transactionId": "TX-2026-1039",
+    "journey": "Benefit Payments",
+    "scenario": "Impossible session sequence before IBAN update",
+    "subject": "BEN-7318",
+    "entity": "IBAN-6051",
+    "requested": "03 Oct · 17:58",
+    "country": "United Arab Emirates",
+    "region": "Outside KSA",
+    "city": "Dubai",
+    "ruleScore": 77,
+    "features": {
+      "velocity": 5,
+      "retroDays": 0,
+      "linkedEntities": 4,
+      "priorRisk": 57,
+      "overrides": 0,
+      "identityReuse": 2,
+      "crossSourceConflict": 1,
+      "amountChangePct": 12,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "IMPOSSIBLE_SESSION_SEQUENCE",
+    "primaryReason": "Two verified sessions occurred too far apart geographically within an implausibly short time before an IBAN change.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 62750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 50200,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "No financial impact",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Saad Alghamdi",
+    "nationalIdMasked": "20******77",
+    "mobileMasked": "050***8761",
+    "employerName": "Takamul Industrial Services",
+    "employerNumber": "700121890",
+    "supervisorName": "Omar Albalawi",
+    "supervisorUserId": "USR-248",
+    "supervisorMobileMasked": "050***0529",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 33,
+    "interaction": 12,
+    "score": 69,
+    "risk": "Medium",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Payment & IBAN Verification",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "IMPOSSIBLE_SESSION_SEQUENCE",
+        "Two verified sessions occurred too far apart geographically within an implausibly short time before an IBAN change."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "CROSS_BORDER_CONFLICT",
+        "Cross-border activity conflicts with a verified sequence; the country itself does not increase risk."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 12 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Two verified sessions occurred too far apart geographically within an implausibly short time before an IBAN change."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Process or data error",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-040",
+    "transactionId": "TX-2026-1040",
+    "journey": "Benefit Payments",
+    "scenario": "Recent IBAN change before scheduled payment",
+    "subject": "BEN-7392",
+    "entity": "IBAN-13370",
+    "requested": "03 Oct · 17:09",
+    "country": "Saudi Arabia",
+    "region": "Asir",
+    "city": "Abha",
+    "ruleScore": 48,
+    "features": {
+      "velocity": 4,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 20,
+      "overrides": 0,
+      "identityReuse": 2,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "RECENT_IBAN_CHANGE",
+    "primaryReason": "A material payment-account change occurred shortly before disbursement.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 66500,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 59185,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Lama Alsubaie",
+    "nationalIdMasked": "10******94",
+    "mobileMasked": "050***8954",
+    "employerName": "Bunyan Facilities Management",
+    "employerNumber": "700121987",
+    "supervisorName": "Abeer Aljuhani",
+    "supervisorUserId": "USR-249",
+    "supervisorMobileMasked": "050***0656",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 0,
+    "interaction": 0,
+    "score": 26,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "RECENT_IBAN_CHANGE",
+        "A material payment-account change occurred shortly before disbursement."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A material payment-account change occurred shortly before disbursement."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-041",
+    "transactionId": "TX-2026-1041",
+    "journey": "Employer Registration",
+    "scenario": "Rapid registration and exclusion cluster",
+    "subject": "EMP-6880",
+    "entity": "SUP-4308",
+    "requested": "03 Oct · 18:20",
+    "country": "Saudi Arabia",
+    "region": "Riyadh",
+    "city": "Riyadh",
+    "ruleScore": 82,
+    "features": {
+      "velocity": 12,
+      "retroDays": 2,
+      "linkedEntities": 18,
+      "priorRisk": 80,
+      "overrides": 1,
+      "identityReuse": 4,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "RAPID_REGISTRATION_EXCLUSION",
+    "primaryReason": "Repeated registration and exclusion activity affects many linked contributors in a short period.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 51000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 31620,
+    "confirmedFraudAmount": 27193,
+    "preventedAmount": 27193,
+    "financialOutcome": "Prevented before payment",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Turki Alrasheed",
+    "nationalIdMasked": "11******11",
+    "mobileMasked": "050***9147",
+    "employerName": "Al Manar Services Co.",
+    "employerNumber": "700122084",
+    "supervisorName": "Faisal Alqahtani",
+    "supervisorUserId": "USR-250",
+    "supervisorMobileMasked": "050***0783",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 50,
+    "interaction": 10,
+    "score": 78,
+    "risk": "High",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "RAPID_REGISTRATION_EXCLUSION",
+        "Repeated registration and exclusion activity affects many linked contributors in a short period."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 4 related records."
+      ],
+      [
+        "EVENT_CLUSTER",
+        "12 events affect 18 linked entities in the assessment window."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 10 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Repeated registration and exclusion activity affects many linked contributors in a short period."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed fraud — formally established",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-042",
+    "transactionId": "TX-2026-1042",
+    "journey": "Employer Registration",
+    "scenario": "Elevated employment churn",
+    "subject": "EMP-6512",
+    "entity": "SUP-4196",
+    "requested": "03 Oct · 18:31",
+    "country": "Saudi Arabia",
+    "region": "Eastern Province",
+    "city": "Dammam",
+    "ruleScore": 55,
+    "features": {
+      "velocity": 7,
+      "retroDays": 0,
+      "linkedEntities": 7,
+      "priorRisk": 40,
+      "overrides": 0,
+      "identityReuse": 2,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "EMPLOYMENT_CHURN",
+    "primaryReason": "Registration and exclusion volume exceeds the employer baseline.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 54750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 38873,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Hessa Albalawi",
+    "nationalIdMasked": "20******28",
+    "mobileMasked": "050***9340",
+    "employerName": "Riyadh Horizon Trading",
+    "employerNumber": "700122181",
+    "supervisorName": "Reem Alharbi",
+    "supervisorUserId": "USR-251",
+    "supervisorMobileMasked": "050***0910",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 19,
+    "interaction": 10,
+    "score": 49,
+    "risk": "Medium",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Insurance Operations Audit",
+    "status": "Awaiting specialist",
+    "signals": [
+      [
+        "EMPLOYMENT_CHURN",
+        "Registration and exclusion volume exceeds the employer baseline."
+      ],
+      [
+        "EVENT_CLUSTER",
+        "7 events affect 7 linked entities in the assessment window."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 10 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Registration and exclusion volume exceeds the employer baseline."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-043",
+    "transactionId": "TX-2026-1043",
+    "journey": "Employer Registration",
+    "scenario": "Normal employer activity",
+    "subject": "EMP-6220",
+    "entity": "SUP-4041",
+    "requested": "03 Oct · 18:42",
+    "country": "Saudi Arabia",
+    "region": "Qassim",
+    "city": "Buraidah",
+    "ruleScore": 6,
+    "features": {
+      "velocity": 2,
+      "retroDays": 0,
+      "linkedEntities": 3,
+      "priorRisk": 4,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 12,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "NO_MATERIAL_ANOMALY",
+    "primaryReason": "Employer events remain within the recent operating baseline.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 58500,
+    "currency": "SAR",
+    "detectionStage": "After payment",
+    "paymentStatus": "Paid",
+    "amountAtRisk": 7020,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Omar Aljuhani",
+    "nationalIdMasked": "10******45",
+    "mobileMasked": "050***9533",
+    "employerName": "Najd Technical Solutions",
+    "employerNumber": "700122278",
+    "supervisorName": "Khalid Aldosari",
+    "supervisorUserId": "USR-252",
+    "supervisorMobileMasked": "050***1037",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 12,
+    "interaction": 0,
+    "score": 9,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation and existing controls are broadly aligned",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "NO_MATERIAL_ANOMALY",
+        "Employer events remain within the recent operating baseline."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Employer events remain within the recent operating baseline."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-044",
+    "transactionId": "TX-2026-1044",
+    "journey": "Employer Registration",
+    "scenario": "Repeated exclusion changes across linked contributors",
+    "subject": "EMP-6642",
+    "entity": "SUP-4244",
+    "requested": "03 Oct · 18:53",
+    "country": "Saudi Arabia",
+    "region": "Makkah",
+    "city": "Makkah",
+    "ruleScore": 77,
+    "features": {
+      "velocity": 11,
+      "retroDays": 7,
+      "linkedEntities": 12,
+      "priorRisk": 62,
+      "overrides": 2,
+      "identityReuse": 3,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "COORDINATED_EXCLUSION_CHANGES",
+    "primaryReason": "Multiple linked contributors show repeated exclusion changes and overrides within the same window.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 62250,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 55403,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 30472,
+    "financialOutcome": "Partially prevented",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Abeer Alasmari",
+    "nationalIdMasked": "11******62",
+    "mobileMasked": "050***9726",
+    "employerName": "Eastern Gate Contracting",
+    "employerNumber": "700122375",
+    "supervisorName": "Maha Alenezi",
+    "supervisorUserId": "USR-253",
+    "supervisorMobileMasked": "050***1164",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 51,
+    "interaction": 23,
+    "score": 88,
+    "risk": "High",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "COORDINATED_EXCLUSION_CHANGES",
+        "Multiple linked contributors show repeated exclusion changes and overrides within the same window."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 3 related records."
+      ],
+      [
+        "RETROACTIVE_CHANGE",
+        "A material change was applied 7 days retroactively."
+      ],
+      [
+        "EVENT_CLUSTER",
+        "11 events affect 12 linked entities in the assessment window."
+      ],
+      [
+        "REPEATED_OVERRIDE",
+        "2 control overrides occurred in the assessment window."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Multiple linked contributors show repeated exclusion changes and overrides within the same window."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed violation",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-045",
+    "transactionId": "TX-2026-1045",
+    "journey": "Employer Registration",
+    "scenario": "Supervisor contact reused across establishments",
+    "subject": "EMP-6719",
+    "entity": "SUP-4775",
+    "requested": "03 Oct · 19:04",
+    "country": "Saudi Arabia",
+    "region": "Madinah",
+    "city": "Madinah",
+    "ruleScore": 47,
+    "features": {
+      "velocity": 4,
+      "retroDays": 0,
+      "linkedEntities": 8,
+      "priorRisk": 35,
+      "overrides": 0,
+      "identityReuse": 5,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "SHARED_SUPERVISOR_IDENTITY",
+    "primaryReason": "The same supervisor contact is reused across several establishments with similar event patterns.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 66000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 40920,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "No financial impact",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Yousef Almarri",
+    "nationalIdMasked": "20******79",
+    "mobileMasked": "050***9919",
+    "employerName": "Al Waha Logistics",
+    "employerNumber": "700122472",
+    "supervisorName": "Saad Alzahrani",
+    "supervisorUserId": "USR-254",
+    "supervisorMobileMasked": "050***1291",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 22,
+    "interaction": 0,
+    "score": 36,
+    "risk": "Medium",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Insurance Operations Audit",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "SHARED_SUPERVISOR_IDENTITY",
+        "The same supervisor contact is reused across several establishments with similar event patterns."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 5 related records."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "The same supervisor contact is reused across several establishments with similar event patterns."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Process or data error",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-046",
+    "transactionId": "TX-2026-1046",
+    "journey": "Retirement",
+    "scenario": "Re-employment detected through WPS",
+    "subject": "RET-7711",
+    "entity": "EMP-4644",
+    "requested": "03 Oct · 19:15",
+    "country": "Saudi Arabia",
+    "region": "Eastern Province",
+    "city": "Dhahran",
+    "ruleScore": 71,
+    "features": {
+      "velocity": 4,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 61,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 1,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "WPS_REEMPLOYMENT_SIGNAL",
+    "primaryReason": "WPS payroll evidence conflicts with the current retirement payment status.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 59750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 42423,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Dania Alotaibi",
+    "nationalIdMasked": "10******96",
+    "mobileMasked": "050***0112",
+    "employerName": "Arabian Field Services",
+    "employerNumber": "700122569",
+    "supervisorName": "Noura Alghamdi",
+    "supervisorUserId": "USR-255",
+    "supervisorMobileMasked": "050***1418",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 16,
+    "interaction": 8,
+    "score": 54,
+    "risk": "Medium",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Eligibility Verification",
+    "status": "Awaiting specialist",
+    "signals": [
+      [
+        "WPS_REEMPLOYMENT_SIGNAL",
+        "WPS payroll evidence conflicts with the current retirement payment status."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 8 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "WPS payroll evidence conflicts with the current retirement payment status."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-047",
+    "transactionId": "TX-2026-1047",
+    "journey": "Retirement",
+    "scenario": "Unconfirmed WPS employment signal",
+    "subject": "RET-7850",
+    "entity": "EMP-4302",
+    "requested": "03 Oct · 19:26",
+    "country": "Saudi Arabia",
+    "region": "Riyadh",
+    "city": "Riyadh",
+    "ruleScore": 52,
+    "features": {
+      "velocity": 2,
+      "retroDays": 0,
+      "linkedEntities": 1,
+      "priorRisk": 27,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 1,
+      "amountChangePct": 12,
+      "missingData": 1,
+      "urgentPriority": 0
+    },
+    "primaryCode": "WPS_STATUS_UNCONFIRMED",
+    "primaryReason": "A WPS record requires verification, but the employment start date is missing.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 63500,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 50800,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Nasser Alqahtani",
+    "nationalIdMasked": "11******13",
+    "mobileMasked": "050***0305",
+    "employerName": "Mada Operations Co.",
+    "employerNumber": "700122666",
+    "supervisorName": "Turki Alsubaie",
+    "supervisorUserId": "USR-256",
+    "supervisorMobileMasked": "050***1545",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 24,
+    "interaction": 0,
+    "score": 39,
+    "risk": "Medium",
+    "confidenceScore": 54,
+    "confidence": "Low",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Data Verification Review",
+    "status": "Awaiting specialist",
+    "signals": [
+      [
+        "WPS_STATUS_UNCONFIRMED",
+        "A WPS record requires verification, but the employment start date is missing."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "REQUIRED_INFORMATION_MISSING",
+        "Required information is missing; confidence is reduced and human review is required."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A WPS record requires verification, but the employment start date is missing."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-048",
+    "transactionId": "TX-2026-1048",
+    "journey": "Retirement",
+    "scenario": "No re-employment evidence",
+    "subject": "RET-7924",
+    "entity": "—",
+    "requested": "03 Oct · 19:37",
+    "country": "Saudi Arabia",
+    "region": "Hail",
+    "city": "Hail",
+    "ruleScore": 12,
+    "features": {
+      "velocity": 2,
+      "retroDays": 0,
+      "linkedEntities": 1,
+      "priorRisk": 10,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "NO_MATERIAL_ANOMALY",
+    "primaryReason": "No conflicting employment or payroll evidence was identified.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 67250,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 8070,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Rana Alharbi",
+    "nationalIdMasked": "20******30",
+    "mobileMasked": "050***0498",
+    "employerName": "Rowad Business Support",
+    "employerNumber": "700122763",
+    "supervisorName": "Hessa Alrasheed",
+    "supervisorUserId": "USR-257",
+    "supervisorMobileMasked": "050***1672",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 0,
+    "interaction": 0,
+    "score": 7,
+    "risk": "Low",
+    "confidenceScore": 89,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "NO_MATERIAL_ANOMALY",
+        "No conflicting employment or payroll evidence was identified."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "No conflicting employment or payroll evidence was identified."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-049",
+    "transactionId": "TX-2026-1049",
+    "journey": "Retirement",
+    "scenario": "External payroll activity conflicts with retirement status",
+    "subject": "RET-8017",
+    "entity": "EMP-4811",
+    "requested": "03 Oct · 20:48",
+    "country": "Qatar",
+    "region": "Outside KSA",
+    "city": "Doha",
+    "ruleScore": 64,
+    "features": {
+      "velocity": 4,
+      "retroDays": 0,
+      "linkedEntities": 3,
+      "priorRisk": 51,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 1,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "EXTERNAL_PAYROLL_CONFLICT",
+    "primaryReason": "Approved payroll evidence conflicts with the retirement record; location alone is not treated as risk.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 71000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "On hold",
+    "amountAtRisk": 44020,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Majed Alshammari",
+    "nationalIdMasked": "10******47",
+    "mobileMasked": "050***0691",
+    "employerName": "Takamul Industrial Services",
+    "employerNumber": "700122860",
+    "supervisorName": "Omar Albalawi",
+    "supervisorUserId": "USR-258",
+    "supervisorMobileMasked": "050***1799",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 15,
+    "interaction": 12,
+    "score": 54,
+    "risk": "Medium",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Eligibility Verification",
+    "status": "Under investigation",
+    "signals": [
+      [
+        "EXTERNAL_PAYROLL_CONFLICT",
+        "Approved payroll evidence conflicts with the retirement record; location alone is not treated as risk."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "CROSS_BORDER_CONFLICT",
+        "Cross-border activity conflicts with a verified sequence; the country itself does not increase risk."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 12 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Approved payroll evidence conflicts with the retirement record; location alone is not treated as risk."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Suspected fraud — further investigation",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-050",
+    "transactionId": "TX-2026-1050",
+    "journey": "Retirement",
+    "scenario": "Salary event after retirement",
+    "subject": "RET-8099",
+    "entity": "EMP-4432",
+    "requested": "03 Oct · 20:59",
+    "country": "Saudi Arabia",
+    "region": "Tabuk",
+    "city": "Tabuk",
+    "ruleScore": 48,
+    "features": {
+      "velocity": 3,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 37,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 0,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "POST_RETIREMENT_SALARY_EVENT",
+    "primaryReason": "A salary event was reported after the recorded retirement date and requires eligibility verification.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 74750,
+    "currency": "SAR",
+    "detectionStage": "After payment",
+    "paymentStatus": "Paid",
+    "amountAtRisk": 53073,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Alanoud Aldosari",
+    "nationalIdMasked": "11******64",
+    "mobileMasked": "050***0884",
+    "employerName": "Bunyan Facilities Management",
+    "employerNumber": "700122957",
+    "supervisorName": "Abeer Aljuhani",
+    "supervisorUserId": "USR-259",
+    "supervisorMobileMasked": "050***1926",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 0,
+    "interaction": 0,
+    "score": 26,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "POST_RETIREMENT_SALARY_EVENT",
+        "A salary event was reported after the recorded retirement date and requires eligibility verification."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A salary event was reported after the recorded retirement date and requires eligibility verification."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-051",
+    "transactionId": "TX-2026-1051",
+    "journey": "Maternity Benefit",
+    "scenario": "Salary spike before maternity benefit request",
+    "subject": "BEN-8056",
+    "entity": "EMP-4933",
+    "requested": "03 Oct · 20:10",
+    "country": "Saudi Arabia",
+    "region": "Riyadh",
+    "city": "Riyadh",
+    "ruleScore": 77,
+    "features": {
+      "velocity": 4,
+      "retroDays": 0,
+      "linkedEntities": 3,
+      "priorRisk": 45,
+      "overrides": 0,
+      "identityReuse": 2,
+      "crossSourceConflict": 0,
+      "amountChangePct": 192,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "SALARY_SPIKE_BEFORE_BENEFIT",
+    "primaryReason": "Registered salary increased materially shortly before the request.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 35250,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 28200,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "No financial impact",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Bader Alenezi",
+    "nationalIdMasked": "20******81",
+    "mobileMasked": "050***1077",
+    "employerName": "Al Manar Services Co.",
+    "employerNumber": "700123054",
+    "supervisorName": "Faisal Alqahtani",
+    "supervisorUserId": "USR-260",
+    "supervisorMobileMasked": "050***2053",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 14,
+    "interaction": 8,
+    "score": 57,
+    "risk": "Medium",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Benefit Operations Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "SALARY_SPIKE_BEFORE_BENEFIT",
+        "Registered salary increased materially shortly before the request."
+      ],
+      [
+        "MATERIAL_CHANGE",
+        "The amount or salary changed by 192% within the observed period."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 8 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Registered salary increased materially shortly before the request."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Process or data error",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-052",
+    "transactionId": "TX-2026-1052",
+    "journey": "Maternity Benefit",
+    "scenario": "Shared device and salary change",
+    "subject": "BEN-8188",
+    "entity": "EMP-4775",
+    "requested": "03 Oct · 20:21",
+    "country": "Saudi Arabia",
+    "region": "Makkah",
+    "city": "Jeddah",
+    "ruleScore": 44,
+    "features": {
+      "velocity": 3,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 18,
+      "overrides": 0,
+      "identityReuse": 3,
+      "crossSourceConflict": 0,
+      "amountChangePct": 70,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "SHARED_DEVICE_SALARY_SEQUENCE",
+    "primaryReason": "A shared device and a material salary increase occurred before the request.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 39000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 34710,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Shahad Alzahrani",
+    "nationalIdMasked": "10******98",
+    "mobileMasked": "050***1270",
+    "employerName": "Riyadh Horizon Trading",
+    "employerNumber": "700123151",
+    "supervisorName": "Reem Alharbi",
+    "supervisorUserId": "USR-261",
+    "supervisorMobileMasked": "050***2180",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 15,
+    "interaction": 0,
+    "score": 31,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "SHARED_DEVICE_SALARY_SEQUENCE",
+        "A shared device and a material salary increase occurred before the request."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 3 related records."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A shared device and a material salary increase occurred before the request."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-053",
+    "transactionId": "TX-2026-1053",
+    "journey": "Maternity Benefit",
+    "scenario": "Stable employment relationship",
+    "subject": "BEN-8291",
+    "entity": "EMP-4119",
+    "requested": "03 Oct · 21:32",
+    "country": "Saudi Arabia",
+    "region": "Eastern Province",
+    "city": "Dammam",
+    "ruleScore": 13,
+    "features": {
+      "velocity": 1,
+      "retroDays": 0,
+      "linkedEntities": 1,
+      "priorRisk": 7,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 5,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "NO_MATERIAL_ANOMALY",
+    "primaryReason": "Employment duration and salary history remain within the baseline.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 42750,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Released",
+    "amountAtRisk": 5130,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "Proceeded",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Faisal Alghamdi",
+    "nationalIdMasked": "11******15",
+    "mobileMasked": "050***1463",
+    "employerName": "Najd Technical Solutions",
+    "employerNumber": "700123248",
+    "supervisorName": "Khalid Aldosari",
+    "supervisorUserId": "USR-262",
+    "supervisorMobileMasked": "050***2307",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 12,
+    "interaction": 0,
+    "score": 13,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation and existing controls are broadly aligned",
+    "route": "Straight-through processing",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "NO_MATERIAL_ANOMALY",
+        "Employment duration and salary history remain within the baseline."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Employment duration and salary history remain within the baseline."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Legitimate activity",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-054",
+    "transactionId": "TX-2026-1054",
+    "journey": "Maternity Benefit",
+    "scenario": "Short employment relationship and sharp salary increase",
+    "subject": "BEN-8366",
+    "entity": "EMP-4887",
+    "requested": "03 Oct · 21:43",
+    "country": "Saudi Arabia",
+    "region": "Jazan",
+    "city": "Jazan",
+    "ruleScore": 75,
+    "features": {
+      "velocity": 8,
+      "retroDays": 0,
+      "linkedEntities": 6,
+      "priorRisk": 63,
+      "overrides": 1,
+      "identityReuse": 2,
+      "crossSourceConflict": 1,
+      "amountChangePct": 220,
+      "missingData": 0,
+      "urgentPriority": 1
+    },
+    "primaryCode": "EMPLOYMENT_RELATIONSHIP_ANOMALY",
+    "primaryReason": "A short employment sequence, sharp salary increase, and conflicting evidence occurred before the request.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 46500,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 33015,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 18158,
+    "financialOutcome": "Partially prevented",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Mona Alsubaie",
+    "nationalIdMasked": "20******32",
+    "mobileMasked": "050***1656",
+    "employerName": "Eastern Gate Contracting",
+    "employerNumber": "700123345",
+    "supervisorName": "Maha Alenezi",
+    "supervisorUserId": "USR-263",
+    "supervisorMobileMasked": "050***2434",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 48,
+    "interaction": 16,
+    "score": 79,
+    "risk": "High",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "EMPLOYMENT_RELATIONSHIP_ANOMALY",
+        "A short employment sequence, sharp salary increase, and conflicting evidence occurred before the request."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "MATERIAL_CHANGE",
+        "The amount or salary changed by 220% within the observed period."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 16 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A short employment sequence, sharp salary increase, and conflicting evidence occurred before the request."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed violation",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-055",
+    "transactionId": "TX-2026-1055",
+    "journey": "Maternity Benefit",
+    "scenario": "Late registration and retroactive wage update",
+    "subject": "BEN-8419",
+    "entity": "EMP-4553",
+    "requested": "03 Oct · 21:54",
+    "country": "Saudi Arabia",
+    "region": "Asir",
+    "city": "Abha",
+    "ruleScore": 40,
+    "features": {
+      "velocity": 3,
+      "retroDays": 10,
+      "linkedEntities": 2,
+      "priorRisk": 26,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 57,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "LATE_REGISTRATION_SEQUENCE",
+    "primaryReason": "A retroactive employment update and salary change occurred shortly before the request.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 50250,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "On hold",
+    "amountAtRisk": 40200,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Sultan Alrasheed",
+    "nationalIdMasked": "10******49",
+    "mobileMasked": "050***1849",
+    "employerName": "Al Waha Logistics",
+    "employerNumber": "700123442",
+    "supervisorName": "Saad Alzahrani",
+    "supervisorUserId": "USR-264",
+    "supervisorMobileMasked": "050***2561",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 24,
+    "interaction": 8,
+    "score": 41,
+    "risk": "Medium",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Benefit Operations Review",
+    "status": "Under investigation",
+    "signals": [
+      [
+        "LATE_REGISTRATION_SEQUENCE",
+        "A retroactive employment update and salary change occurred shortly before the request."
+      ],
+      [
+        "RETROACTIVE_CHANGE",
+        "A material change was applied 10 days retroactively."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 8 points because multiple indicators occurred together."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A retroactive employment update and salary change occurred shortly before the request."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Suspected fraud — further investigation",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-056",
+    "transactionId": "TX-2026-1056",
+    "journey": "Contribution & Wage",
+    "scenario": "Repeated salary changes across linked employees",
+    "subject": "EMP-6330",
+    "entity": "PAY-4118",
+    "requested": "03 Oct · 21:05",
+    "country": "Saudi Arabia",
+    "region": "Riyadh",
+    "city": "Riyadh",
+    "ruleScore": 78,
+    "features": {
+      "velocity": 10,
+      "retroDays": 0,
+      "linkedEntities": 10,
+      "priorRisk": 70,
+      "overrides": 2,
+      "identityReuse": 2,
+      "crossSourceConflict": 0,
+      "amountChangePct": 250,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "COORDINATED_WAGE_CHANGES",
+    "primaryReason": "Repeated salary increases and overrides affect several linked employees in the same period.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 98000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 87220,
+    "confirmedFraudAmount": 75009,
+    "preventedAmount": 75009,
+    "financialOutcome": "Prevented before payment",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Jawaher Albalawi",
+    "nationalIdMasked": "11******66",
+    "mobileMasked": "050***2042",
+    "employerName": "Arabian Field Services",
+    "employerNumber": "700123539",
+    "supervisorName": "Noura Alghamdi",
+    "supervisorUserId": "USR-265",
+    "supervisorMobileMasked": "050***2688",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 47,
+    "interaction": 23,
+    "score": 87,
+    "risk": "High",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "COORDINATED_WAGE_CHANGES",
+        "Repeated salary increases and overrides affect several linked employees in the same period."
+      ],
+      [
+        "MATERIAL_CHANGE",
+        "The amount or salary changed by 250% within the observed period."
+      ],
+      [
+        "EVENT_CLUSTER",
+        "10 events affect 10 linked entities in the assessment window."
+      ],
+      [
+        "REPEATED_OVERRIDE",
+        "2 control overrides occurred in the assessment window."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 23 points because multiple indicators occurred together."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Repeated salary increases and overrides affect several linked employees in the same period."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed fraud — formally established",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-057",
+    "transactionId": "TX-2026-1057",
+    "journey": "Contribution & Wage",
+    "scenario": "Retroactive wage update",
+    "subject": "CTR-11581",
+    "entity": "EMP-4406",
+    "requested": "03 Oct · 22:16",
+    "country": "Saudi Arabia",
+    "region": "Qassim",
+    "city": "Buraidah",
+    "ruleScore": 57,
+    "features": {
+      "velocity": 4,
+      "retroDays": 30,
+      "linkedEntities": 3,
+      "priorRisk": 45,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 60,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "RETROACTIVE_WAGE_UPDATE",
+    "primaryReason": "A material wage update was applied retroactively and requires verification.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 101750,
+    "currency": "SAR",
+    "detectionStage": "After payment",
+    "paymentStatus": "Paid",
+    "amountAtRisk": 63085,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": "No financial impact",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Insurance Operations Specialist",
+    "customerName": "Ahmed Aljuhani",
+    "nationalIdMasked": "20******83",
+    "mobileMasked": "050***2235",
+    "employerName": "Mada Operations Co.",
+    "employerNumber": "700123636",
+    "supervisorName": "Turki Alsubaie",
+    "supervisorUserId": "USR-266",
+    "supervisorMobileMasked": "050***2815",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 26,
+    "interaction": 8,
+    "score": 51,
+    "risk": "Medium",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Insurance Operations Audit",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "RETROACTIVE_WAGE_UPDATE",
+        "A material wage update was applied retroactively and requires verification."
+      ],
+      [
+        "RETROACTIVE_CHANGE",
+        "A material change was applied 30 days retroactively."
+      ],
+      [
+        "COMBINED_PATTERN",
+        "The approved interaction logic added 8 points because multiple indicators occurred together."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "A material wage update was applied retroactively and requires verification."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Process or data error",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-058",
+    "transactionId": "TX-2026-1058",
+    "journey": "Contribution & Wage",
+    "scenario": "Routine payroll submission",
+    "subject": "EMP-6164",
+    "entity": "PAY-4804",
+    "requested": "03 Oct · 22:27",
+    "country": "Saudi Arabia",
+    "region": "Northern Borders",
+    "city": "Arar",
+    "ruleScore": 5,
+    "features": {
+      "velocity": 3,
+      "retroDays": 0,
+      "linkedEntities": 2,
+      "priorRisk": 2,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 0,
+      "amountChangePct": 3,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "NO_MATERIAL_ANOMALY",
+    "primaryReason": "Payroll volume and wage changes remain within the employer baseline.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 105500,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 12660,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Nouf Alasmari",
+    "nationalIdMasked": "10******00",
+    "mobileMasked": "050***2428",
+    "employerName": "Rowad Business Support",
+    "employerNumber": "700123733",
+    "supervisorName": "Hessa Alrasheed",
+    "supervisorUserId": "USR-267",
+    "supervisorMobileMasked": "050***2942",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 8,
+    "interaction": 0,
+    "score": 6,
+    "risk": "Low",
+    "confidenceScore": 94,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation and existing controls are broadly aligned",
+    "route": "Straight-through processing",
+    "status": "Ready to proceed",
+    "signals": [
+      [
+        "NO_MATERIAL_ANOMALY",
+        "Payroll volume and wage changes remain within the employer baseline."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Payroll volume and wage changes remain within the employer baseline."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-059",
+    "transactionId": "TX-2026-1059",
+    "journey": "Contribution & Wage",
+    "scenario": "External payroll submission conflicts with employer history",
+    "subject": "EMP-6472",
+    "entity": "PAY-4990",
+    "requested": "03 Oct · 22:38",
+    "country": "Egypt",
+    "region": "Outside KSA",
+    "city": "Cairo",
+    "ruleScore": 66,
+    "features": {
+      "velocity": 5,
+      "retroDays": 0,
+      "linkedEntities": 4,
+      "priorRisk": 52,
+      "overrides": 0,
+      "identityReuse": 3,
+      "crossSourceConflict": 1,
+      "amountChangePct": 107,
+      "missingData": 0,
+      "urgentPriority": 0
+    },
+    "primaryCode": "PAYROLL_SOURCE_CONFLICT",
+    "primaryReason": "The payroll submission conflicts with employer history and identifier relationships; location alone is not treated as risk.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 109250,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Prevented",
+    "amountAtRisk": 87400,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 48070,
+    "financialOutcome": "Partially prevented",
+    "decisionDate": "08 Oct 2026",
+    "decisionOwner": "Fraud Prevention & Inspection Specialist",
+    "customerName": "Saleh Almarri",
+    "nationalIdMasked": "11******17",
+    "mobileMasked": "050***2621",
+    "employerName": "Takamul Industrial Services",
+    "employerNumber": "700123830",
+    "supervisorName": "Omar Albalawi",
+    "supervisorUserId": "USR-268",
+    "supervisorMobileMasked": "050***3069",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 35,
+    "interaction": 30,
+    "score": 82,
+    "risk": "High",
+    "confidenceScore": 86,
+    "confidence": "High",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Fraud Prevention & Inspection Review",
+    "status": "Outcome recorded",
+    "signals": [
+      [
+        "PAYROLL_SOURCE_CONFLICT",
+        "The payroll submission conflicts with employer history and identifier relationships; location alone is not treated as risk."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "IDENTIFIER_REUSE",
+        "An identifier is reused across 3 related records."
+      ],
+      [
+        "MATERIAL_CHANGE",
+        "The amount or salary changed by 107% within the observed period."
+      ],
+      [
+        "CROSS_BORDER_CONFLICT",
+        "Cross-border activity conflicts with a verified sequence; the country itself does not increase risk."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "The payroll submission conflicts with employer history and identifier relationships; location alone is not treated as risk."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": "Confirmed violation",
+    "audit": [
+      "Assessment calculated using prototype model v1.4",
+      "Synthetic specialist outcome recorded for prototype reporting"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  },
+  {
+    "id": "BRI-060",
+    "transactionId": "TX-2026-1060",
+    "journey": "Contribution & Wage",
+    "scenario": "Cross-source wage discrepancy",
+    "subject": "CTR-11904",
+    "entity": "EMP-4287",
+    "requested": "03 Oct · 22:49",
+    "country": "Saudi Arabia",
+    "region": "Al Baha",
+    "city": "Al Baha",
+    "ruleScore": 53,
+    "features": {
+      "velocity": 4,
+      "retroDays": 0,
+      "linkedEntities": 3,
+      "priorRisk": 43,
+      "overrides": 0,
+      "identityReuse": 1,
+      "crossSourceConflict": 1,
+      "amountChangePct": 55,
+      "missingData": 1,
+      "urgentPriority": 0
+    },
+    "primaryCode": "WAGE_SOURCE_DISCREPANCY",
+    "primaryReason": "Wage values differ across approved sources and one supporting field is missing.",
+    "source": "Business-rule scenario",
+    "transactionAmount": 113000,
+    "currency": "SAR",
+    "detectionStage": "Before payment",
+    "paymentStatus": "Pending",
+    "amountAtRisk": 100570,
+    "confirmedFraudAmount": 0,
+    "preventedAmount": 0,
+    "financialOutcome": null,
+    "decisionDate": null,
+    "decisionOwner": null,
+    "customerName": "Ghada Almutairi",
+    "nationalIdMasked": "20******34",
+    "mobileMasked": "050***2814",
+    "employerName": "Bunyan Facilities Management",
+    "employerNumber": "700123927",
+    "supervisorName": "Abeer Aljuhani",
+    "supervisorUserId": "USR-269",
+    "supervisorMobileMasked": "050***3196",
+    "assessmentMode": "legacy-simulation",
+    "anomalyScore": 25,
+    "interaction": 0,
+    "score": 40,
+    "risk": "Medium",
+    "confidenceScore": 54,
+    "confidence": "Low",
+    "comparison": "Behavioral scoring simulation is below the existing control score",
+    "route": "Data Verification Review",
+    "status": "Awaiting specialist",
+    "signals": [
+      [
+        "WAGE_SOURCE_DISCREPANCY",
+        "Wage values differ across approved sources and one supporting field is missing."
+      ],
+      [
+        "SOURCE_CONFLICT",
+        "Approved sources provide conflicting information that requires verification."
+      ],
+      [
+        "REQUIRED_INFORMATION_MISSING",
+        "Required information is missing; confidence is reduced and human review is required."
+      ],
+      [
+        "LOWER_BEHAVIORAL_DEVIATION",
+        "Behavioral evidence is less unusual than the existing control score; both remain visible to the specialist."
+      ]
+    ],
+    "events": [
+      [
+        "Historical window",
+        "Behavioral profile and validated prior outcomes loaded"
+      ],
+      [
+        "Recent event sequence",
+        "Wage values differ across approved sources and one supporting field is missing."
+      ],
+      [
+        "Assessment time",
+        "Existing controls and behavioral anomaly signals evaluated before action"
+      ]
+    ],
+    "outcome": null,
+    "audit": [
+      "Assessment calculated using prototype model v1.4"
+    ],
+    "synthetic": true,
+    "businessSimulation": true
+  }
+]

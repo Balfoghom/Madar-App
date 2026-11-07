@@ -28,6 +28,9 @@ export function dataQuality(data) {
         check(key+'amount',number(event.amount)&&event.amount>0,true);
         if(linked)check(key+'previousAmount',number(event.previousAmount)&&event.previousAmount>0,true);
       }
+      if(linked&&event?.type==='login'){check(key+'latitude',number(event.latitude)&&Math.abs(event.latitude)<=90,true);check(key+'longitude',number(event.longitude)&&Math.abs(event.longitude)<=180,true);check(key+'locationVerification',typeof event.locationVerified==='boolean',true);}
+      if(linked&&event?.type==='iban_change'){check(key+'newAccount',supplied(event.identifierId),true);check(key+'previousAccount',supplied(event.previousIdentifierId),true);}
+      if(linked&&event?.type==='profile_update')check(key+'changedField',supplied(event.changedField),true);
       if(event?.type==='amendment')check(key+'effectiveAt',number(event.effectiveAt),true);
       if(typeof event?.sourceConflict==='boolean')check(key+'sourceConsistency',!event.sourceConflict);
     });

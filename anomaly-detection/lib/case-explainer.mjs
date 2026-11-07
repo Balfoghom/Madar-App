@@ -6,7 +6,7 @@ export function llmStatus(env=process.env) {
   const configured=env.MADAR_LLM_PROVIDER==='openai' && !!env.OPENAI_API_KEY && !!env.MADAR_LLM_MODEL;
   return {configured,provider:configured?'OpenAI':'Not configured',model:configured?env.MADAR_LLM_MODEL:null,syntheticOnly:true,mode:'On-demand advisory explanation'};
 }
-const EVENT_LABELS = {registration:'Employment registered',wage:'Wage updated',exclusion:'Employment ended in the register',claim:'SANED request submitted',payment:'Benefit payment event',retirement:'Retirement event',maternity:'Maternity benefit event'};
+const EVENT_LABELS = {registration:'Employment registered',wage:'Wage updated',exclusion:'Employment ended in the register',claim:'SANED request submitted',payment:'Benefit payment event',retirement:'Retirement event',maternity:'Maternity benefit event',login:'Account login',iban_change:'Payment account changed',profile_update:'Profile updated'};
 const JOURNEY_LABELS = new Set(['SANED','Benefit Payments','Employer Registration','Retirement','Maternity Benefit','Contribution & Wage']);
 const round = value => Math.round(value * 100) / 100;
 
@@ -18,7 +18,7 @@ function connectedActivityFacts(data) {
   const facts = [{id:'connected-context',value:{windowDays:30,linkedContributorCount:contributors.length,eventCount:events.length,commonEmployerSupplied:!!evidence.employerId,contributorsShown:Math.min(contributors.length,6),note:'Contributor labels are anonymous references within this case. An ordered event history is an observation, not proof of intent or benefit eligibility.'}}];
   contributors.slice(0,6).forEach((subject,index)=>{
     const history=events.filter(event=>event.subjectId===subject);
-    facts.push({id:'activity-'+index,value:{contributor:'Contributor '+(index+1),omittedEvents:Math.max(0,history.length-12),events:history.slice(0,12).map(event=>({activity:EVENT_LABELS[event.type],daysBeforeAssessment:round((evidence.asOf-event.recordedAt)/86400000),...(event.type==='wage' && Number.isFinite(event.amount) && Number.isFinite(event.previousAmount)?{previousWageSar:round(event.previousAmount),updatedWageSar:round(event.amount)}:{}),...(Number.isFinite(event.effectiveAt)?{retroactiveDays:round(Math.max(0,event.recordedAt-event.effectiveAt)/86400000)}:{}),sourceConflictReported:event.sourceConflict===true,controlOverrideReported:event.ruleOverride===true}))}});
+    facts.push({id:'activity-'+index,value:{contributor:'Contributor '+(index+1),omittedEvents:Math.max(0,history.length-12),events:history.slice(0,12).map(event=>({activity:EVENT_LABELS[event.type],daysBeforeAssessment:round((evidence.asOf-event.recordedAt)/86400000),...(event.type==='wage' && Number.isFinite(event.amount) && Number.isFinite(event.previousAmount)?{previousWageSar:round(event.previousAmount),updatedWageSar:round(event.amount)}:{}),...(Number.isFinite(event.effectiveAt)?{retroactiveDays:round(Math.max(0,event.recordedAt-event.effectiveAt)/86400000)}:{}),...(event.type==='login'?{locationVerificationAvailable:event.locationVerified===true}:{}),...(event.type==='profile_update'?{changedField:event.changedField}:{}),sourceConflictReported:event.sourceConflict===true,controlOverrideReported:event.ruleOverride===true}))}});
   });
   return facts;
 }

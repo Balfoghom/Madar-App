@@ -107,7 +107,7 @@ test("Data Intake event CSV carries the assessment time needed for the 30-day wi
   for (const row of rows.slice(1)) {
     const columns = row.split(",");
     assert.match(columns[caseIndex], /^CJ-SYN-demo-/);
-    assert.equal(columns[assessmentIndex], "1792195200000");
+    assert.equal(Number(columns[assessmentIndex]),cases.find(c=>c.id===columns[caseIndex]).asOf);
   }
 });
 
@@ -127,4 +127,25 @@ test('invalid wages and missing or mismatched journeys abstain',()=>{
 test('reported journeys use the same evidence window as the model',()=>{
  const c=structuredClone(cases[0]);c.events.push({...c.events[0],type:'payment',journey:'Benefit Payments',recordedAt:c.asOf-31*86400000});
  assert.ok(!assess(c).involvedJourneys.includes('Benefit Payments'));
+});
+
+test('digital histories use fitted ML while ordinary travel and account changes remain typical',()=>{
+ for(const family of ['account_takeover_sequence','coordinated_iban_network','rapid_profile_payment']){
+  const evidence=cases.find(c=>c.family===family),result=assess(evidence);
+  assert.equal(result.complete,true);assert.equal(result.modelFlagged,true);assert.equal(result.ruleFlagged,false);
+  assert.equal(extractFeatures(evidence).length,23);
+ }
+ for(const family of ['routine_digital','legitimate_travel','legitimate_account_update'])assert.equal(assess(cases.find(c=>c.family===family)).modelFlagged,false);
+});
+test('digital sequences are contributor-specific and malformed location/account facts abstain',()=>{
+ const base=cases.find(c=>c.family==='account_takeover_sequence');
+ const separated=structuredClone(base);separated.events.find(e=>e.type==='profile_update').subjectId='CTR-SYN-other';
+ assert.equal(extractFeatures(separated)[21],0);
+ const unverified=structuredClone(base);unverified.events.filter(e=>e.type==='login').forEach(e=>e.locationVerified=false);
+ assert.equal(extractFeatures(unverified)[18],0);
+ const future=structuredClone(base);future.events.push({...future.events.find(e=>e.type==='iban_change'),eventId:'future',recordedAt:base.asOf+1});
+ assert.deepEqual(extractFeatures(future),extractFeatures(base));
+ for(const change of [e=>{e.events.find(e=>e.type==='login').latitude=120;},e=>{e.events.find(e=>e.type==='iban_change').previousIdentifierId='real-account';},e=>{delete e.events.find(e=>e.type==='profile_update').changedField;}]){
+  const invalid=structuredClone(base);change(invalid);assert.equal(assess(invalid).complete,false);
+ }
 });

@@ -18,7 +18,7 @@ test('resolved outcomes, unknown financial values and actual linked evidence are
  const linked=createDemoPortfolio().find(r=>r.caseId==='CJ-SYN-enterprise-001').caseData;
  const before=JSON.stringify(linked),facts=view.keyEvidence(linked);
  assert.match(facts[0].text,/12 supplied events involve 3 contributors/);
- assert.ok(facts.some(f=>f.title==='Source conflict'));
+ assert.equal(facts.some(f=>f.title==='Source conflict'),linked.crossJourneyEvidence.events.some(e=>e.sourceConflict));
  assert.equal(view.state(linked).resolved,true);assert.equal(view.state(linked).action,'Update outcome');assert.equal(view.state(linked).scripted,true);
  assert.equal(view.state({...linked,outcome:'Suspected fraud — further investigation'}).resolved,false);
  assert.equal(view.financial({...linked,outcomeProvenance:null,amountAtRisk:null,transactionAmount:null}).amount,null);

@@ -4,6 +4,7 @@ import demoCases from '../cross-journey/data/demo-cases.json' with { type: 'json
 import { InputError } from './assessment-adapter.mjs';
 export { demoCases, model as crossJourneyModel };
 const titles = {
+  routine_digital:'Routine digital activity', legitimate_travel:'Legitimate travel and account access', legitimate_account_update:'Legitimate payment-account update', account_takeover_sequence:'Rapid location and account changes before a request', coordinated_iban_network:'Linked contributors change to one payment account', rapid_profile_payment:'Repeated profile and IBAN changes before payment',
   routine: 'Routine linked activity', coordinated_claim_sequence: 'Connected activity before a SANED request',
   legitimate_restructuring: 'Legitimate restructuring', identifier_reuse_network: 'Shared identifiers across contributors',
   retroactive_source_conflict: 'Retroactive changes and conflicting evidence', missing: 'Missing employer evidence',
@@ -50,7 +51,7 @@ export function parseEventCSV(text) {
     if (c.events.some(e => e.eventId === r.event_id)) throw new InputError(`Duplicate event ${r.event_id} in ${c.id}.`);
     const recordedAt = number(r.recorded_at,'recorded_at');
     if (!Number.isFinite(new Date(recordedAt).getTime())) throw new InputError('recorded_at must be a valid timestamp in milliseconds.');
-    c.events.push({eventId:r.event_id,recordedAt,effectiveAt:number(r.effective_at || '', 'effective_at', true),journey:r.journey,type:r.event_type,subjectId:r.subject_id,employerId:r.employer_id,identifierId:r.identifier_id || undefined,amount:number(r.amount || '', 'amount', true),previousAmount:number(r.previous_amount || '', 'previous_amount', true),sourceConflict:boolean(r.source_conflict || '', 'source_conflict'),ruleOverride:boolean(r.rule_override || '', 'rule_override')});
+    c.events.push({latitude:number(r.latitude || '', 'latitude', true),longitude:number(r.longitude || '', 'longitude', true),locationVerified:r.event_type==='login'?boolean(r.location_verified || '', 'location_verified'):undefined,previousIdentifierId:r.previous_identifier_id || undefined,changedField:r.changed_field || undefined,eventId:r.event_id,recordedAt,effectiveAt:number(r.effective_at || '', 'effective_at', true),journey:r.journey,type:r.event_type,subjectId:r.subject_id,employerId:r.employer_id,identifierId:r.identifier_id || undefined,amount:number(r.amount || '', 'amount', true),previousAmount:number(r.previous_amount || '', 'previous_amount', true),sourceConflict:boolean(r.source_conflict || '', 'source_conflict'),ruleOverride:boolean(r.rule_override || '', 'rule_override')});
   }
   if (grouped.size > 200) throw new InputError('Import at most 200 grouped cases.');
   return [...grouped.values()];
@@ -66,6 +67,7 @@ export function createCrossJourneyAssessment(evidence) {
   const subjects = [...new Set(events.map(e => e.subjectId))];
   const reasonCodes = [{code: !result.complete ? 'EVIDENCE_INCOMPLETE' : result.modelFlagged ? 'CROSS_JOURNEY_PATTERN' : 'MODEL_NOT_FLAGGED', description:result.reasons[0]}];
   if (result.completedContributorChains >= 2) reasonCodes.push({code:'CJ_COMPLETED_CONTRIBUTOR_SEQUENCE',description:result.reasons[1]});
+  for(const [index,description] of result.reasons.entries())if(index>0&&!reasonCodes.some(r=>r.description===description))reasonCodes.push({code:'CROSS_JOURNEY_EVIDENCE_'+index,description});
   reasonCodes.push(...(result.ruleFindings || []));
   const caseData = {
     id:evidence.id,transactionId:evidence.id,synthetic:true,journey:'SANED',scenario,
@@ -84,7 +86,7 @@ export function createCrossJourneyAssessment(evidence) {
     audit:[`Cross-journey model ${result.modelVersion} assessed at ${assessedAt}.`],
     paymentStatus:'Pending · simulation',detectionStage:'Before payment',transactionAmount:null,amountAtRisk:null,confirmedFraudAmount:0,preventedAmount:0,currency:'SAR',outcome:null,financialOutcome:null,
   };
-  const keys=['eventId','recordedAt','effectiveAt','journey','type','subjectId','employerId','identifierId','amount','previousAmount','sourceConflict','ruleOverride'];
+  const keys=['eventId','recordedAt','effectiveAt','journey','type','subjectId','employerId','identifierId','amount','previousAmount','sourceConflict','ruleOverride','latitude','longitude','locationVerified','previousIdentifierId','changedField'];
   const canonical={id:evidence.id,employerId:evidence.employerId || '',asOf:evidence.asOf,events:[...evidence.events].sort((a,b)=>a.eventId.localeCompare(b.eventId)).map(e=>Object.fromEntries(keys.map(key=>[key,e[key] === "" ? null : e[key] ?? null])))};
   return {assessmentId,assessedAt,caseId:evidence.id,transactionId:evidence.id,synthetic:true,assessmentSource:'cross-journey',journey:'SANED',scenario,...result,risk,modelResult:caseData.modelAssessment,caseData,evidenceFingerprint:createHash('sha256').update(JSON.stringify(canonical)).digest('hex')};
 }
