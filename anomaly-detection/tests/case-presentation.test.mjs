@@ -8,7 +8,7 @@ test('case presentation retains distinct control, connected and simulation scori
  const rule=portfolio.find(r=>r.assessmentSource==='rules-demo'&&r.complete).caseData;
  assert.equal(view.score(rule).value,rule.ruleScore);assert.equal(view.score(rule).label,'Control score');
  const saned=portfolio.find(r=>r.caseId==='NEW-ENTERPRISE-SANED-1').caseData;
- assert.equal(view.score(saned).value,saned.ruleScore);assert.equal(view.score(saned).kind,'control');
+ assert.equal(view.score(saned).value,saned.score);assert.equal(view.score(saned).kind,'hybrid');assert.equal(view.score(saned).label,'Hybrid review score');
  const linked=portfolio.find(r=>r.caseId==='CJ-SYN-enterprise-001').caseData;
  assert.equal(view.score(linked).value,null);assert.equal(view.score(linked).kind,'pattern');
  const incomplete=portfolio.find(r=>!r.complete).caseData;assert.equal(view.score(incomplete).value,null);

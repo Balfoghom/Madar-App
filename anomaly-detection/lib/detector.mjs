@@ -1,23 +1,10 @@
 import model from '../data/model.json' with { type: 'json' };
 export { model };
-export function features(c) {
-  if(!c || c.synthetic!==true || typeof c.id!=='string' || !c.id.startsWith('SYN-') || !Number.isFinite(c.asOf) || !Number.isInteger(c.workforce) || c.workforce<=0 || !Array.isArray(c.events)) return null;
-  const types=['wage','amendment','employer_exclusion','supervisor_change','claim'];
-  if(c.events.some(e=>!e || !types.includes(e.type) || !Number.isFinite(e.recordedAt) || typeof e.subject!=='string' || !e.subject.startsWith('SYN-')))return null;
-  const es=c.events.filter(e=>Number.isFinite(e.recordedAt)&&e.recordedAt<=c.asOf);
-  const am=es.filter(e=>e.type==='amendment'&&e.subject===c.id&&e.recordedAt>=c.asOf-30*86400000);
-  const wages=es.filter(e=>e.type==='wage'&&e.subject===c.id).sort((a,b)=>a.recordedAt-b.recordedAt);
-  if(!es.some(e=>e.type==='claim'&&e.subject===c.id))return null;
-  if(wages.length<2 || wages.some(e=>!Number.isFinite(e.amount)||e.amount<=0) || am.some(e=>!Number.isFinite(e.effectiveAt))) return null;
-  const x=[am.length,Math.max(0,...am.map(e=>(e.recordedAt-e.effectiveAt)/86400000)),Math.log1p(am.length?(c.asOf-Math.max(...am.map(e=>e.recordedAt)))/3600000:720),(wages.at(-1).amount/wages.at(-2).amount-1)*100,100*es.filter(e=>e.type==='employer_exclusion'&&e.recordedAt>=c.asOf-7*86400000).length/c.workforce,100*es.filter(e=>e.type==='supervisor_change'&&e.recordedAt>=c.asOf-86400000).length/c.workforce];
-  return x.every(Number.isFinite)?x:null;
-}
-export function pathCorrection(n){return n<=1?0:n===2?1:2*(Math.log(n-1)+0.5772156649015329)-2*(n-1)/n;}
-export function scoreVector(x){
-  const v=x.map(Math.fround);
-  const depths=model.trees.map(t=>{let i=0,d=0;while(t.left[i]!==-1){i=v[t.feature[i]]<=t.threshold[i]?t.left[i]:t.right[i];d++;}return d+pathCorrection(t.samples[i]);});
-  return 2**(-depths.reduce((a,b)=>a+b,0)/model.trees.length/pathCorrection(model.maxSamples));
-}
+import {features} from './saned-features.mjs';
+import {forestScore} from './isolation-forest.mjs';
+export {features};
+export {pathCorrection} from './isolation-forest.mjs';
+export function scoreVector(x){return forestScore(model,x);}
 export function assess(c){
   const x=features(c);
   if(!x) return {modelVersion:model.version,complete:false,route:'Complete evidence',band:'Incomplete',percentile:null,reasons:['Required workforce or event evidence is missing. No model score was produced.'],features:[]};

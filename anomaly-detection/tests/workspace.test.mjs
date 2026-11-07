@@ -89,3 +89,18 @@ test('demo intake adds six new maternity cases to preloaded data and safely dedu
  const reload=await post('/workspace-demo');assert.equal(reload.saved.length,83);assert.equal(reload.added,0);assert.equal(reload.saved.find(r=>r.caseId===pending.caseId).assessmentId,pending.assessmentId);
  await post('/demo-reset');assert.equal((await post('/workspace-demo')).saved.length,77);assert.equal((await post('/demo-intake')).added,6);
 });
+
+test('SANED model and hybrid-policy upgrade preserves existing decisions, outcomes and ownership',async()=>{
+ const before=await post('/workspace-demo');const original=before.saved.find(r=>r.caseId==='NEW-ENTERPRISE-SANED-0');
+ let decided=await post('/decision',{caseId:original.caseId,assessmentId:original.assessmentId,actorName:'QA hybrid specialist',note:'Retain documented specialist route.',action:'override',route:'Cybersecurity Review'});
+ decided=await post('/outcome',{caseId:original.caseId,assessmentId:original.assessmentId,actorName:'QA hybrid specialist',note:'Documented legitimate synthetic activity.',outcome:'Legitimate activity',financialOutcome:'Proceeded',amountAtRisk:0,confirmedFraudAmount:0,preventedAmount:0});
+ const path=join(dir,'backend-assessments.json'),records=JSON.parse(await readFile(path,'utf8')),record=records.find(r=>r.caseId===original.caseId);
+ record.modelResult.modelVersion='historical-saned-model';record.caseData.assessmentMode='model-separated';record.caseData.workflow={stage:'Triage',assignedTo:'Retained owner',revision:2};await writeFile(path,JSON.stringify(records));
+ const upgraded=(await post('/workspace-demo')).saved.find(r=>r.caseId===record.caseId);
+ assert.notEqual(upgraded.assessmentId,record.assessmentId);assert.equal(upgraded.modelResult.modelVersion,'saned-custom-js-if-96x80-v1');assert.equal(upgraded.caseData.assessmentMode,'saned-hybrid');
+ assert.deepEqual(upgraded.caseData.workflow,record.caseData.workflow);assert.deepEqual(upgraded.reviewHistory,decided.reviewHistory);assert.equal(upgraded.caseData.route,'Cybersecurity Review');
+ for(const key of ['outcome','preventedAmount','confirmedFraudAmount','financialOutcome'])assert.equal(upgraded.caseData[key],record.caseData[key]);
+ assert.ok(upgraded.caseData.assessmentHistory.some(h=>h.assessmentId===record.assessmentId));
+ const repeated=(await post('/workspace-demo')).saved.find(r=>r.caseId===record.caseId);assert.equal(repeated.assessmentId,upgraded.assessmentId);
+ const registry=await(await fetch(base+'/journey-models')).json(),saned=registry.models.find(m=>m.journey==='SANED');assert.equal(saned.trainingCases,96);assert.equal(saned.treeCount,80);assert.equal(registry.models.length,7);
+});

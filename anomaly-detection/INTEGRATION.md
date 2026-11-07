@@ -92,4 +92,11 @@ Human reviews are appended to `data/human-reviews.json` with assessmentId, caseI
 
 Demo Reset clears runtime cases, decisions and proposals and restores sandbox settings; it does not delete or retrain model artifacts. Sandbox weights remain for legacy statistical simulation; trained model cases are protected from frontend recalculation. No training is invoked by startup, upload, review, proposals, or reset. Changes to other journey models remain the responsibility of the model owner.
 
-To run the current adapter after source changes, stop the previous `npm start` process and start it again in `anomaly-detection`. `/health` must report `contractVersion: "integration-v0.2-separated"`. An older process does not pick up module changes automatically.
+To run the current adapter after source changes, stop the previous `npm start` process and start it again in `anomaly-detection`. `/health` must report `contractVersion: "integration-v0.3-saned-hybrid"`. An older process does not pick up module changes automatically.
+
+
+## SANED custom JavaScript hybrid architecture
+
+SANED now uses `saned-custom-js-if-96x80-v1`: 96 fully synthetic behavioral training histories and 80 isolation trees, trained with `npm run train:saned` from the repository root. Raw inference fields (`score`, `percentile`, `modelFlagged`, `features`) remain immutable in the response and `modelResult`. Application `caseData.score` is the separate hybrid review-priority score, `caseData.ruleScore` is the supplied existing control score, and `caseData.scoringComponents` records 55% control, 45% raw anomaly × 100, approved adjustments and the critical-control floor. The anomaly percentile is never blended into this score. Non-SANED and connected-model contracts retain their existing policy.
+
+`approved-behavioral-patterns.json` is the trusted release catalog. It currently contains no approved entries. The engine accepts only bounded adjustment points with explicit approval metadata and matching supported evidence conditions. Uploaded context, proposed indicators and reference-scenario activation cannot supply or deploy adjustments. Confidence reports field-quality checks, not statistical certainty. Saved SANED model assessments are upgraded on workspace load while retaining routes decided by specialists, outcomes, ownership and review history.

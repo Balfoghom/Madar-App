@@ -1,10 +1,11 @@
 # Madar — assessment methodology
 
-The interface contains three different assessment modes. Their numbers must not be combined or presented as one probability of fraud.
+The interface contains distinct assessment modes. Their numbers must not be combined or presented as one probability of fraud.
 
 | Mode | Meaning | How it affects the case |
 |---|---|---|
-| Six journey-specific fitted models | Isolation Forest anomaly score and rank against synthetic reference data | Model/comparator flags can require review; the supplied operational control score remains separate |
+| SANED custom JavaScript model |96 fully synthetic training histories, 80 isolation trees; raw multivariate anomaly score and separate calibration rank | Hybrid policy combines 55% existing controls, 45% raw anomaly ×100 and approved catalog adjustments |
+| Other five journey-specific fitted models | Isolation Forest anomaly score and rank against synthetic reference data | Model findings can require review; supplied operational control score remains separate |
 | Connected-journey fitted model | Random Forest similarity to provisional synthetic review patterns | A model or comparator-rule flag recommends specialist review; missing evidence causes abstention |
 | Illustrative legacy portfolio | Median/MAD statistical demonstration with configurable weighted control and pattern adjustments | Persisted business-rule scenarios in the shared workspace; configured weights never change fitted-model inference or policy |
 
@@ -12,13 +13,13 @@ The interface contains three different assessment modes. Their numbers must not 
 
 The case header retains a score indicator but labels its origin. Business-rule simulation cases show the existing weighted **Business-rule score**; the default mix is 55% existing control plus 45% simulated behavioral score plus pattern adjustments, rounded, capped at 100, with the existing critical-control floor. Apply to business rules saves the configuration and versions changed business-rule assessments in the shared queue. Reset defaults restores their original configured scores while retaining review history. Fitted-model outputs remain unchanged.
 
-Assessed journey/rules cases show **Control score**. AI or comparator findings can raise review priority while that number stays unchanged (for example, control score 20 with Medium review priority). Connected demo cases carry explicitly supplied fictional operational-control scores in addition to the separate Cross-Journey Model finding. The control score is not derived from model similarity or blended with it. Incomplete assessments show no numeric score. Resolved cases retain the original assessment indicator alongside a separate outcome status.
+SANED model cases show **Hybrid review score** and retain the original control and AI components. Other assessed journey/rules cases show **Control score**. AI or comparator findings can raise review priority while that number stays unchanged (for example, control score 20 with Medium review priority). Connected demo cases carry explicitly supplied fictional operational-control scores in addition to the separate Cross-Journey Model finding. The control score is not derived from model similarity or blended with it. Incomplete assessments show no numeric score. Resolved cases retain the original assessment indicator alongside a separate outcome status.
 
 The visual redesign does not change detector inference, thresholds, scoring, routing policy or stored specialist decisions.
 
 ## Fitted journey routing
 
-The prototype operational-control bands are Low 0–34, Medium 35–74 and High 75–100. Missing required model evidence yields Incomplete. A model flag, comparator flag or supplied cross-source conflict raises a Low case to at least Medium. These are provisional routing assumptions, not validated enterprise risk bands. Model percentiles are not added to the operational score.
+The prototype operational-control bands are Low 0–34, Medium 35–74 and High 75–100. Missing required model evidence yields Incomplete. A model flag, comparator flag or supplied cross-source conflict raises a Low case to at least Medium. These are provisional routing assumptions, not validated enterprise risk bands. SANED uses the raw anomaly score ×100 in its hybrid formula, never the calibration percentile. Other journey policies retain separate operational scores.
 
 ## Connected-journey routing
 
@@ -26,10 +27,17 @@ Events are assessed within a 30-day window. A completed sequence requires the sa
 
 A complete unflagged case routes to Standard review. Model or comparator flags route to Specialist review. The original inference fixtures do not supply operational-control or financial context. The shared presentation workspace adds fictional names, operational-control scores and amounts, with provenance, without altering source event histories or ML inference. Pattern similarity and reference percentiles are technical model outputs, not fraud probability or calibrated case risk percentages.
 
-Model `madar-cross-journey-rf-20261107-v3` uses 23 derived features and 180 trees. Its held-out synthetic evaluation records 600 true positives, 25 false positives, zero false negatives and 675 true negatives (98.1% accuracy). Generator-based evaluation does not establish performance on real enterprise cases.
+Model `madar-cross-journey-rf-20261107-v4` uses 25 derived features and 180 trees. Its held-out synthetic evaluation records 900 true positives, 7 false positives, zero false negatives and 893 true negatives. Maternity requests can be assessed without SANED claims, using contributor-level registration → wage → maternity sequences and digital account evidence. Generator-based evaluation does not establish performance on real enterprise cases.
 
 ## Explanation and governance
 
 Reason codes identify evidence categories consistently. Repeated-indicator suggestions exclude generic model flags and ambiguous positional legacy reasons; unrelated reasons cannot become one repeated indicator. Reference-range deviations provide context, not causal feature attribution.
 
 LLM explanations use saved evidence and do not change scores, routes, findings or outcomes. Human review, formal violation issuance, payment intervention and verified financial impact are distinct steps. The prototype records human outcomes and validates amount consistency; it does not execute those enterprise actions.
+
+
+## SANED hybrid policy
+
+The custom forest is trained offline in JavaScript on 96 fully synthetic SANED histories with 80 trees. `saned-hybrid-55-45-v1` combines `0.55 × control + 0.45 × raw anomaly ×100 + approved adjustment points`, rounds and caps the result at 0–100, and preserves a 75-point floor when the existing control is≥ 80. Model and comparator flags may still require review below the Medium score threshold. Original model inference remains in `modelResult`; the hybrid application score is `caseData.score`. These are review-priority values, not fraud probabilities.
+
+Adjustment entries must be in the trusted release catalog with Approved status, named approval/date, bounded points and matching conditions over supplied model evidence. The current catalog is empty: zero adjustment applies. Governance proposals and uploaded fields never create approvals. Confidence uses the existing field-quality checks and does not imply model certainty. Reasons, supporting evidence, score components and the proposed route are saved with the assessment. Existing specialist decisions, outcomes and ownership remain intact during model/policy migration.

@@ -19,7 +19,7 @@ The intended value is less time assembling evidence and writing case summaries, 
 ## Implemented prototype
 
 - English Madar / مدار workspace opens on Fraud Operations.
-- Seven bundled synthetic models supply cases: six journey-specific Isolation Forest models and one connected-journey Random Forest.
+- Seven bundled synthetic models supply cases. SANED uses a custom JavaScript Isolation Forest trained on 96 fully synthetic behavioral histories with 80 isolation trees. A hybrid decision engine combines the existing control score, AI anomaly score and approved behavioral-pattern adjustments. The explainability layer supplies reason codes, field-quality confidence, supporting evidence and the recommended review route. Five other journey Isolation Forests and the connected Random Forest remain available with their existing policies.
 - CSV/manual synthetic intake, calculated model evidence and a shared case queue.
 - Named ownership and staged work: New → Triage → Investigation → Decision pending → Closed. Adjacent transitions and a resolved outcome before closure are enforced server-side.
 - Named human routing decisions, outcomes, financial consistency checks, assessment-version checks and persisted local review history.
@@ -29,7 +29,7 @@ The intended value is less time assembling evidence and writing case summaries, 
 
 ## Evidence and boundaries
 
-All supplied examples are synthetic. Anomaly scores, pattern similarity and calibration percentiles are not fraud probabilities. The current connected model’s synthetic holdout has 300 true positives, 18 false positives, no false negatives and 382 true negatives; this is not evidence of enterprise performance.
+All supplied examples are synthetic. Anomaly scores, pattern similarity and calibration percentiles are not fraud probabilities. The current connected model’s synthetic holdout has 900 true positives, 7 false positives, no false negatives and 893 true negatives; this is not evidence of enterprise performance.
 
 The prototype records outcomes; it does not formally issue violations, block payments or verify recovered money. A zero recorded amount is not proof that there was no exposure. Missing transaction values remain “Not supplied.” The app has no measured specialist-effort saving or detection uplift.
 

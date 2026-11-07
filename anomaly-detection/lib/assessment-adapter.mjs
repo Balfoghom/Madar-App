@@ -1,4 +1,5 @@
-import {withRouting} from './routing-policy.mjs';
+import {withDataQuality} from './data-quality.mjs';
+import {hybridPolicy} from './hybrid-policy.mjs';
 // Application adapter only. Imports fitted artifacts; never trains or changes models.
 import { assess as assessSaned, model as sanedModel } from './detector.mjs';
 import { assessJourney, modeledJourneys } from './journey-detector.mjs';
@@ -65,29 +66,34 @@ export function createApplicationAssessment(context, options = {}) {
   }
   const assessmentId = crypto.randomUUID();
   const assessedAt = new Date().toISOString();
-  const policy = separatedPolicy(context, modelResult, options.config);
+  const hybrid=context.journey==='SANED';
+  const policy = hybrid ? hybridPolicy(context, modelResult) : separatedPolicy(context, modelResult, options.config);
   const reasonCodes = explain(modelResult, context);
+  if(hybrid&&policy.scoringComponents){
+    reasonCodes.push({code:'HYBRID_SCORE_COMPONENTS',description:`Hybrid review score ${policy.score}/100 combines existing control ${context.ruleScore}/100, AI anomaly ${policy.scoringComponents.anomalyScore.toFixed(1)}/100 and approved pattern adjustment ${policy.scoringComponents.patternAdjustment}.`});
+    reasonCodes.push(...policy.scoringComponents.approvedPatterns.map(p=>({code:p.code,description:`${p.description} (${p.points>0?'+':''}${p.points} approved adjustment points).`})));
+  }
   const modelSnapshot = { ...modelResult, assessmentId, assessedAt };
   const clean = { ...context };
   // Review decisions are written through /outcome or /decision, never imported as model evidence.
-  for (const key of ['outcome', 'financialOutcome', 'decisionDate', 'decisionOwner', 'confirmedFraudAmount', 'preventedAmount', 'aiModel', 'modelAssessment', 'reviewHistory', 'humanDecision', 'workflow', 'audit', 'score', 'risk']) delete clean[key];
+  for (const key of ['outcome', 'financialOutcome', 'decisionDate', 'decisionOwner', 'confirmedFraudAmount', 'preventedAmount', 'aiModel', 'modelAssessment', 'reviewHistory', 'humanDecision', 'workflow', 'audit', 'score', 'risk', 'approvedPatterns', 'patternAdjustment']) delete clean[key];
   const caseData = {
-    ...clean, ...policy, assessmentId, assessedAt, synthetic: true, assessmentMode: 'model-separated', assessmentSource: options.source || 'journey-prototype',
+    ...clean, ...policy, assessmentId, assessedAt, synthetic: true, assessmentMode: hybrid?'saned-hybrid':'model-separated', assessmentSource: options.source || 'journey-prototype',
     recommendedRoute:policy.route,
     features: { velocity: 0, retroDays: 0, linkedEntities: 0, priorRisk: 0, overrides: 0, identityReuse: 0, amountChangePct: 0, crossSourceConflict: 0, missingData: 0, urgentPriority: 0, ...context.features },
-    anomalyScore: modelResult.complete ? modelResult.percentile : null,
-    interaction: 0, confidence: 'Not calibrated', confidenceScore: null,
-    comparison: 'Existing controls and model evidence are separate; no calibrated combined score is defined.',
+    anomalyScore: modelResult.complete ? (hybrid?policy.scoringComponents.anomalyScore:modelResult.percentile) : null,
+    interaction: policy.scoringComponents?.patternAdjustment||0, confidence: 'Not calibrated', confidenceScore: null,
+    comparison: hybrid?'Hybrid review priority combines existing controls, the custom Isolation Forest anomaly score and approved pattern adjustments.':'Existing controls and model evidence are separate; no calibrated combined score is defined.',
     primaryCode: reasonCodes[0].code, primaryReason: reasonCodes[0].description,
     reasonCodes, signals: reasonCodes.map(entry => [entry.code, entry.description]),
     modelAssessment: modelSnapshot,
     modelInput: evidence ? { sanedCase: structuredClone(evidence) } : context.modelInput || null,
     aiModel: { version: modelResult.modelVersion, rawScore: modelResult.complete ? modelResult.score : null, percentile: modelResult.percentile ?? null, flagged: modelResult.modelFlagged ?? null, complete: modelResult.complete, ruleFlagged: modelResult.ruleFlagged ?? null, features: modelResult.features, algorithm: modelResult.algorithm },
     events: [['Assessment', assessedAt], ['Evidence source', suppliedId ? 'Bundled synthetic SANED history: ' + suppliedId : context.journey === 'SANED' ? 'Explicit synthetic SANED event history' : 'Provided synthetic journey features']],
-    audit: [`Model ${modelResult.modelVersion} assessed at ${assessedAt}; existing control score kept separate.`],
+    audit: [`Model ${modelResult.modelVersion} assessed at ${assessedAt}; decision policy ${policy.policy}.`],
     outcome: null, financialOutcome: null, confirmedFraudAmount: 0, preventedAmount: 0,
   };
-  return withRouting({
+  return withDataQuality({
     assessmentId, assessedAt, caseId: context.id, transactionId: context.transactionId,
     journey: context.journey, scenario: context.scenario, synthetic: true,
     assessmentSource: options.source || 'journey-prototype', validation: 'Synthetic evidence only; not business validated.',

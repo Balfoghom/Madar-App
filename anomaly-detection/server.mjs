@@ -462,8 +462,11 @@ export function createInferenceServer({explain = generateExplanation, answer = g
           const reviews=await readJsonFile(humanReviewsPath,[]);
           const settings=await readJsonFile(riskConfigPath,{config:defaultRiskConfig});
           const migrated=previous.map(record=>{
-            if(record.assessmentSource!=='cross-journey'||!record.caseData?.crossJourneyEvidence||record.modelResult?.modelVersion===crossJourneyModel.version)return record;
-            const fresh=createCrossJourneyAssessment(record.caseData.crossJourneyEvidence),old=record.caseData;
+            const old=record.caseData;
+            const connected=record.assessmentSource==='cross-journey'&&old?.crossJourneyEvidence;
+            const saned=old?.journey==='SANED'&&old?.modelInput&&old.modelAssessment&&!old.businessSimulation;
+            if((!connected&&!saned)||(record.modelResult?.modelVersion===(connected?crossJourneyModel.version:model.version)&&(!saned||old.assessmentMode==='saned-hybrid')))return record;
+            const fresh=connected?createCrossJourneyAssessment(old.crossJourneyEvidence):createApplicationAssessment(old,{source:record.assessmentSource});
             const preserved={};for(const key of ['customerName','employerName','subject','entity','nationalId','mobile','employerNumber','supervisorName','country','region','city','transactionAmount','amountAtRisk','preventedAmount','confirmedFraudAmount','paymentStatus','financialOutcome','financialProvenance','outcome','outcomeProvenance','decisionDate','decisionOwner','reviewHistory','humanDecision','workflow','workflowStage','demoPortfolio','demoIntakeBatch','intakeReceivedAt','scenario'])if(old[key]!==undefined)preserved[key]=old[key];
             Object.assign(fresh.caseData,preserved,{assessmentHistory:[...(old.assessmentHistory||[]),{assessmentId:record.assessmentId,modelVersion:record.modelResult?.modelVersion,assessedAt:record.assessedAt}].slice(-10)});
             if(old.humanDecision)fresh.caseData.route=old.route;
@@ -515,7 +518,7 @@ export function createInferenceServer({explain = generateExplanation, answer = g
     if (req.method === "GET" && path === "/health")
       return send(200, {
         status: "ready",
-        contractVersion: "integration-v0.2-separated",
+        contractVersion: "integration-v0.3-saned-hybrid",
         modelVersion: model.version,
         crossJourneyModelVersion: crossJourneyModel.version,
         syntheticOnly: true,

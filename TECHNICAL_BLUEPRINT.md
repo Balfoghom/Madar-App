@@ -2,7 +2,7 @@
 
 ## Runtime
 
-Node.js 22.13+ runs `start.mjs`, serving an allowlisted static interface from `dist/` and routing `/api/*` to `anomaly-detection/server.mjs`. No npm dependencies are required for inference. Model training is an offline task with separate pinned Python dependencies.
+Node.js 22.13+ runs `start.mjs`, serving an allowlisted static interface from `dist/` and routing `/api/*` to `anomaly-detection/server.mjs`. No npm dependencies are required for inference. SANED model training is an offline custom JavaScript task (96 synthetic histories, 80 trees); the connected Random Forest retains its pinned Python training environment.
 
 The launcher reads an optional root `.env` before importing the API. Host environment variables take precedence. `.env` files are ignored by Git and Docker. Secrets must remain on the server.
 
@@ -14,7 +14,10 @@ The launcher reads an optional root `.env` before importing the API. Host enviro
 | `dist/app.js` | Intake, queue, decisions, outcomes, reports, governance views and separately scoped legacy simulation |
 | `dist/madar.js` | Connected-event example, evidence timeline, inference and specialist review |
 | `anomaly-detection/server.mjs` | Validation, inference APIs, serialized local mutations, workflow, explanations and model registry |
-| `lib/assessment-adapter.mjs` | Six journey models and separate operational-control routing policy |
+| `lib/assessment-adapter.mjs` | SANED hybrid decision mapping and separate policies for the other five journey models |
+| `lib/isolation-forest.mjs`, `ml/train-saned.mjs` | Custom JavaScript Isolation Forest, trained on 96 fully synthetic SANED histories with 80 isolation trees |
+| `lib/hybrid-policy.mjs` | 55% control + 45% raw AI anomaly × 100 + approved catalog adjustments, bounded review score and critical-control protection |
+| `lib/data-quality.mjs`, `lib/case-explainer.mjs` | Reason/evidence context, field-quality confidence and optional cited case explanation |
 | `lib/cross-journey-adapter.mjs` | Event CSV contract and connected-model case mapping |
 | `cross-journey/inference/detector.mjs` | Derived features and fitted Random Forest inference |
 | `lib/case-explainer.mjs` | Minimal evidence packet, OpenAI Responses request, strict output validation |
