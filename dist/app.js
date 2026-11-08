@@ -2197,13 +2197,23 @@ function projectSaudi(point) {
   return [Math.round(x * 10) / 10, Math.round(y * 10) / 10];
 }
 
-const MAP_VOLUME_BANDS=[
-  {max:4,label:'1–4 cases',color:'#cfe4f4',text:'#163653'},
-  {max:8,label:'5–8 cases',color:'#83b7df',text:'#102e48'},
-  {max:12,label:'9–12 cases',color:'#2b6ea6',text:'#ffffff'},
-  {max:Infinity,label:'13+ cases',color:'#163f70',text:'#ffffff'}
+const MAP_RISK_CATEGORIES=[
+  {key:'high',label:'High',color:'#d74b52'},
+  {key:'medium',label:'Medium',color:'#dc9017'},
+  {key:'low',label:'Low',color:'#00bf00'},
+  {key:'incomplete',label:'Incomplete',color:'#5d6880'}
 ];
-function mapVolumeBand(count){return MAP_VOLUME_BANDS.find(band=>count<=band.max);}
+function mapRiskSegments(value,cx,cy,radius){
+  let angle=-Math.PI/2;
+  return MAP_RISK_CATEGORIES.map(category=>{
+    const count=value[category.key]||0;if(!count||!value.count)return '';
+    const fraction=count/value.count,end=angle+fraction*2*Math.PI;
+    const x=cx+radius*Math.cos(angle),y=cy+radius*Math.sin(angle),ex=cx+radius*Math.cos(end),ey=cy+radius*Math.sin(end);
+    const path=fraction>=1?`M ${cx} ${cy-radius} A ${radius} ${radius} 0 1 1 ${cx} ${cy+radius} A ${radius} ${radius} 0 1 1 ${cx} ${cy-radius}`:`M ${x} ${y} A ${radius} ${radius} 0 ${fraction>.5?1:0} 1 ${ex} ${ey}`;
+    angle=end;
+    return `<path class="marker-risk-segment" d="${path}" fill="none" stroke="${category.color}" stroke-width="6" data-risk="${category.label}" data-count="${count}"><title>${category.label}: ${count} of ${value.count} cases</title></path>`;
+  }).join('');
+}
 
 function renderMap() {
   const stats = regionStats();
@@ -2220,13 +2230,13 @@ function renderMap() {
       const value = stats[name];
       const coords = projectSaudi(REGION_GEO[name]);
       const radius = 11 + Math.min(12, Math.sqrt(value.count) * 3);
-      const volume=mapVolumeBand(value.count);
+
       return [
         '<g class="map-marker" data-region-link="' +
           escapeHtml(name) +
           '" tabindex="0" role="button" aria-label="' +
           escapeHtml(
-            name + ": " + value.count + " cases; " + volume.label + "; " + value.high + " high, " + value.medium + " medium, " + value.low + " low, " + value.incomplete + " incomplete",
+            name + ": " + value.count + " cases; " + value.high + " high, " + value.medium + " medium, " + value.low + " low, " + value.incomplete + " incomplete",
           ) +
           '">',
         '<circle class="marker-halo" cx="' +
@@ -2236,7 +2246,7 @@ function renderMap() {
           '" r="' +
           (radius + 7) +
           '" fill="' +
-          volume.color +
+          '#64748b' +
           '"></circle>',
         '<circle cx="' +
           coords[0] +
@@ -2245,15 +2255,16 @@ function renderMap() {
           '" r="' +
           radius +
           '" fill="' +
-          volume.color +
+          '#ffffff' +
           '"><title>' +
-          escapeHtml(name + " · " + value.count + " cases · " + volume.label) +
+          escapeHtml(name + " · " + value.count + " cases · " + value.high + " high · " + value.medium + " medium · " + value.low + " low · " + value.incomplete + " incomplete") +
           "</title></circle>",
+        mapRiskSegments(value,coords[0],coords[1],radius-3),
         '<text x="' +
           coords[0] +
           '" y="' +
           (coords[1] + 4) +
-          '" text-anchor="middle" style="fill:' + volume.text + '">' +
+          '" text-anchor="middle" style="fill:#00122d">' +
           value.count +
           "</text>",
         "</g>",
@@ -2272,7 +2283,7 @@ function renderMap() {
     '<text class="map-attribution" x="582" y="453" text-anchor="end">Boundary: Natural Earth (public domain)</text>',
     "</svg>",
   ].join("");
-  document.querySelector('#map-volume-legend').innerHTML='<span>Case volume</span>'+MAP_VOLUME_BANDS.map(band=>'<span><i aria-hidden="true" style="background:'+band.color+'"></i>'+band.label+'</span>').join('');
+  document.querySelector('#map-risk-legend').innerHTML='<span>Case risk mix</span>'+MAP_RISK_CATEGORIES.map(category=>'<span><i aria-hidden="true" style="background:'+category.color+'"></i>'+category.label+'</span>').join('');
   const ordered = Object.keys(stats)
     .sort(function (a, b) {
       return stats[b].count - stats[a].count;
@@ -2286,7 +2297,7 @@ function renderMap() {
         return (
           '<button data-region-link="' +
           escapeHtml(name) +
-          '"><span style="background:' + mapVolumeBand(value.count).color + ';color:' + mapVolumeBand(value.count).text + '">' +
+          '"><span style="background:#eef2f7;color:#00122d">' +
           value.count +
           "</span><div><strong>" +
           escapeHtml(name) +
