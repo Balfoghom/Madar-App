@@ -2498,7 +2498,7 @@ function renderQueue() {
               " " +
               (item.score == null ? " —" : " · " + item.score) +
               '</span><span class="subtext">' +
-              (item.assessmentMode === "hybrid" ? "Hybrid · control " + item.ruleScore + " · AI " + (item.anomalyScore == null ? "unavailable" : Number(item.anomalyScore).toFixed(1)) : item.modelAssessment ? "Existing control " + item.ruleScore + " · Reference percentile " + (item.modelAssessment.complete ? Number(item.modelAssessment.percentile).toFixed(1) + "%" : "unavailable") : item.rulesAssessment ? "Business control · no AI model" : "Scoring simulation · behavioral score " + item.anomalyScore) +
+              (item.assessmentMode === "hybrid" ? "Hybrid · control " + item.ruleScore + " · AI " + (item.anomalyScore == null ? "unavailable" : Number(item.anomalyScore).toFixed(1)) : item.modelAssessment ? "Existing control " + item.ruleScore + " · Reference percentile " + (item.modelAssessment.complete ? Number(item.modelAssessment.percentile).toFixed(1) + "%" : "unavailable") : item.rulesAssessment ? "Business Control" : "Scoring simulation · behavioral score " + item.anomalyScore) +
               "</span></td>",
             '<td><span class="confidence-chip ' +
               item.confidence +

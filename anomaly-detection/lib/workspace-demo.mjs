@@ -12,7 +12,6 @@ const employers=['Al Manar Services Co.','Riyadh Horizon Trading','Najd Technica
 const hash=value=>parseInt(createHash('sha256').update(String(value)).digest('hex').slice(0,7),16);
 const maleNames=['Mohammed','Abdullah','Faisal','Khalid','Saad','Sultan','Ahmed','Saleh','Omar','Turki','Nasser','Ibrahim','Yousef','Abdulaziz','Majed','Bader','Fahad','Hamad','Rakan','Waleed','Abdulrahman','Mansour','Ziyad','Nawaf'];
 const femaleNames=['Noura','Abeer','Reem','Hessa','Maha','Jawaher','Nouf','Ghada','Sara','Lama','Shahad','Mona','Rana','Alanoud','Hind','Amal','Haifa','Razan','Dalal','Hanan','Mariam','Fatimah','Afnan','Wadha'];
-const fathers=['Abdullah','Mohammed','Ibrahim','Abdulaziz','Hamad','Nasser','Khalid','Fahad'];
 const families=['Alotaibi','Alharbi','Alqahtani','Alasmari','Aldosari','Alzahrani','Alghamdi','Alenezi','Almutairi','Alsubaie','Alrasheed','Albalawi','Aljuhani','Almarri'];
 const demoIds=[...Array.from({length:30},(_,i)=>'BRI-'+String(i+1).padStart(3,'0')),...Array.from({length:30},(_,i)=>'SYN-ENTERPRISE-RULE-'+String(i+1).padStart(3,'0')),...Array.from({length:3},(_,i)=>'NEW-ENTERPRISE-SANED-'+i),...Array.from({length:12},(_,i)=>'CJ-SYN-enterprise-'+String(i).padStart(3,'0')),'NEW-SANED-DQ-LOGIN-DATE','NEW-SANED-DQ-LOGIN-TIME'];
 export function caseStatus(data){
@@ -47,8 +46,10 @@ export function enrichDemoRecord(record){
  const data={...record.caseData};const n=hash(data.subject||record.caseId),e=hash(data.entity||record.caseId);
  const replace=v=>!v||/^(Synthetic |SYN-|EMP-SYN|CTR-SYN|\d+ linked contributor|Not supplied|Missing employer)/i.test(v);
  const index=demoIds.indexOf(record.caseId);
- if(index>=0){const pool=data.journey==='Maternity Benefit'?femaleNames:(index%3===1?femaleNames:maleNames);data.customerName=pool[index%pool.length]+' '+fathers[Math.floor(index/pool.length)%fathers.length]+' '+families[index%families.length];data.demoIdentityVersion='distinct-saudi-names-v2';}
+ if(index>=0){const pool=data.journey==='Maternity Benefit'?femaleNames:(index%3===1?femaleNames:maleNames);data.customerName=pool[index%pool.length]+' '+families[index%families.length];data.demoIdentityVersion='distinct-saudi-names-v2';}
  else if(replace(data.customerName))data.customerName=names[n%names.length];
+ const nameParts=data.customerName.trim().split(/\s+/);
+ if(nameParts.length>2)data.customerName=nameParts[0]+' '+nameParts.at(-1);
  if(/^BRI-0(3[1-9]|[45][0-9]|60)$/.test(record.caseId))data.demoDuplicateOf='BRI-'+String(Number(record.caseId.slice(4))-30).padStart(3,'0');
  if(replace(data.employerName))data.employerName=employers[e%employers.length];
  if(replace(data.nationalIdMasked))data.nationalIdMasked= '10******'+String(n%100).padStart(2,'0');if(replace(data.mobileMasked))data.mobileMasked= '050***'+String(n%10000).padStart(4,'0');
@@ -118,7 +119,7 @@ export function activeWorkspaceRecords(records){return records.filter((r,i,a)=>r
 // IDs make retries safe; every new history goes through the fitted model.
 export const DEMO_INTAKE_BATCH='maternity-v1';
 export function createDemoIntake(now=new Date()){
- const names=['Latifah Saad Alharbi','Dania Omar Alqahtani','Bayan Fahad Alotaibi','Wijdan Khalid Alzahrani','Raghad Nasser Alghamdi','Basma Hamad Almutairi'];
+ const names=['Latifah Alharbi','Dania Alqahtani','Bayan Alotaibi','Wijdan Alzahrani','Raghad Alghamdi','Basma Almutairi'];
  const scenarios=['Registration and wage changes before linked maternity requests','Shared payment account before maternity requests','Conflicting wage records before a maternity request','Routine maternity request with linked employment history','Maternity request after a legitimate account update','Maternity request missing a contributor link'];
  return maternityIntake.map((evidence,index)=>{
   const record=createCrossJourneyAssessment(structuredClone(evidence),{ruleScore:[25,25,55,10,15,25][index]});
