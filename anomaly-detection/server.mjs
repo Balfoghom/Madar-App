@@ -512,7 +512,7 @@ export function createInferenceServer({explain = generateExplanation, answer = g
     if (req.method === "GET" && path === "/health")
       return send(200, {
         status: "ready",
-        contractVersion: "integration-v0.4-shared-hybrid",
+        contractVersion: "integration-v0.5-appendix-scoring",
         modelVersion: model.version,
         crossJourneyModelVersion: crossJourneyModel.version,
         syntheticOnly: true,

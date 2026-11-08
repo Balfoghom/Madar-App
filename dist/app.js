@@ -4865,4 +4865,4 @@ loadIndicatorSuggestions();
 
 loadScenarioProposals().catch(() => { /* The review form reports backend errors when used. */ });
 
-backendJSON("/health").then((health) => { document.querySelector("#engine-status").textContent = health.contractVersion === "integration-v0.2-separated" ? "Model services ready" : "Restart backend · older integration running"; }).catch(() => { document.querySelector("#engine-status").textContent = "AI service unavailable · illustrative demo only"; });
+backendJSON("/health").then((health) => { document.querySelector("#engine-status").textContent = health.contractVersion === "integration-v0.5-appendix-scoring" ? "Madar models ready" : "Restart backend · older integration running"; }).catch(() => { document.querySelector("#engine-status").textContent = "AI service unavailable · illustrative demo only"; });
