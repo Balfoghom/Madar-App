@@ -50,6 +50,8 @@ export function parseEventCSV(text) {
     if (!grouped.has(r.case_id)) grouped.set(r.case_id,{id:r.case_id,synthetic:true,employerId:r.employer_id,asOf,events:[]});
     const c = grouped.get(r.case_id);
     if(header.includes('existing_control_score')){const control=number(r.existing_control_score,'existing_control_score',true);if(control!==undefined&&(control<0||control>100))throw new InputError('existing_control_score must be between 0 and 100.');if(c.events.length&&c.existingControlScore!==control)throw new InputError('A case has inconsistent existing control scores.');c.existingControlScore=control;}
+    const behavioralKeys=['velocity','retroDays','linkedEntities','priorRisk','overrides','identityReuse','amountChangePct','crossSourceConflict'];
+    for(const key of behavioralKeys){const column='behavioral_'+key.replace(/[A-Z]/g,c=>'_'+c.toLowerCase());if(header.includes(column)&&r[column]!==''){const value=number(r[column],column);if(value<0)throw new InputError(column+' must be nonnegative.');if(c.behavioralInputs&&Object.hasOwn(c.behavioralInputs,key)&&c.behavioralInputs[key]!==value)throw new InputError('A case has inconsistent behavioral inputs.');c.behavioralInputs={...c.behavioralInputs,[key]:value};}}
     if (c.asOf !== asOf || c.employerId !== r.employer_id) throw new InputError(`Case ${c.id} has inconsistent assessment time or employer IDs.`);
     if (c.events.some(e => e.eventId === r.event_id)) throw new InputError(`Duplicate event ${r.event_id} in ${c.id}.`);
     const recordedAt = number(r.recorded_at,'recorded_at');
@@ -66,7 +68,8 @@ export function createCrossJourneyAssessment(evidence, context={}) {
   const scenario = titles[known?.family] || 'Connected synthetic event history';
   const review = result.modelFlagged || result.ruleFlagged;
   const controlScore=context.ruleScore??evidence.existingControlScore??null;
-  const policy=hybridPolicy({journey:evidence.events.filter(e=>['claim','maternity','payment','retirement'].includes(e.type)&&e.recordedAt<=evidence.asOf).sort((a,b)=>a.recordedAt-b.recordedAt).at(-1)?.journey,assessmentSource:'cross-journey',ruleScore:controlScore,features:{crossSourceConflict:evidence.events.some(e=>e.recordedAt<=evidence.asOf&&e.recordedAt>=evidence.asOf-30*86400000&&e.sourceConflict)}},result);
+  const behavioralInputs=structuredClone(context.behavioralInputs??evidence.behavioralInputs??{});
+  const policy=hybridPolicy({behavioralInputs,journey:evidence.events.filter(e=>['claim','maternity','payment','retirement'].includes(e.type)&&e.recordedAt<=evidence.asOf).sort((a,b)=>a.recordedAt-b.recordedAt).at(-1)?.journey,assessmentSource:'cross-journey',ruleScore:controlScore,features:{crossSourceConflict:evidence.events.some(e=>e.recordedAt<=evidence.asOf&&e.recordedAt>=evidence.asOf-30*86400000&&e.sourceConflict)}},result);
   const risk=policy.risk;
   const events = evidence.events.filter(e => e.recordedAt <= evidence.asOf && e.recordedAt >= evidence.asOf - 30 * 86400000).sort((a,b) => a.recordedAt - b.recordedAt);
   const subjects = [...new Set(events.map(e => e.subjectId))];
@@ -82,8 +85,8 @@ export function createCrossJourneyAssessment(evidence, context={}) {
     assessmentId,assessedAt,assessmentSource:'cross-journey',assessmentMode:'hybrid',
     subject:subjects.join(', '),entity:evidence.employerId || 'Missing employer',customerName:subjects.length + ' linked contributor' + (subjects.length === 1 ? '' : 's'),employerName:evidence.employerId || 'Missing employer',
     requested:assessedAt,country:'Saudi Arabia',region:'Not supplied',city:'Not supplied',source:'Synthetic linked event history',
-    ...policy,ruleScore:controlScore,risk,route:policy.route,status:policy.status,recommendedRoute:policy.route,
-    comparison:policy.decisionComplete?'Hybrid review priority combines the supplied control score, the existing model AI score and approved adjustments. The original model finding remains unchanged.':policy.decisionIssue,
+    ...policy,behavioralInputs,requiredEvidenceMissing:!result.complete,ruleScore:controlScore,risk,route:policy.route,status:policy.status,recommendedRoute:policy.route,
+    comparison:policy.decisionComplete?'Hybrid review priority combines the supplied control score, the Appendix feature-based behavioral score and pattern adjustments. The original model finding remains unchanged.':policy.decisionIssue,
     confidence:'Not calibrated',confidenceScore:null,anomalyScore:policy.scoringComponents?.anomalyScore??null,interaction:policy.scoringComponents?.patternAdjustment||0,
     features:{velocity:events.length,linkedEntities:subjects.length,retroDays:0,priorRisk:0,overrides:0,identityReuse:0,amountChangePct:0,crossSourceConflict:events.some(e=>e.sourceConflict),missingData:!policy.decisionComplete,urgentPriority:0},
     primaryCode:reasonCodes[0].code,primaryReason:result.reasons.join(' '),reasonCodes,signals:reasonCodes.map(r=>[r.code,r.description]),
@@ -96,5 +99,5 @@ export function createCrossJourneyAssessment(evidence, context={}) {
   };
   const keys=['eventId','recordedAt','effectiveAt','journey','type','subjectId','employerId','identifierId','amount','previousAmount','sourceConflict','ruleOverride','latitude','longitude','locationVerified','previousIdentifierId','changedField'];
   const canonical={id:evidence.id,employerId:evidence.employerId || '',asOf:evidence.asOf,events:[...evidence.events].sort((a,b)=>a.eventId.localeCompare(b.eventId)).map(e=>Object.fromEntries(keys.map(key=>[key,e[key] === "" ? null : e[key] ?? null])))};
-  return withDataQuality({assessmentId,assessedAt,caseId:evidence.id,transactionId:evidence.id,synthetic:true,assessmentSource:'cross-journey',journey:primaryJourney,scenario,...result,risk,decisionComplete:policy.decisionComplete,applicationAssessment:policy,businessAssessment:policy,decisionFingerprint:createHash('sha256').update(JSON.stringify({policy:policy.policy,controlScore,score:policy.score,patterns:policy.scoringComponents?.approvedPatterns})).digest('hex'),modelResult:caseData.modelAssessment,caseData,evidenceFingerprint:createHash('sha256').update(JSON.stringify(canonical)).digest('hex')});
+  return withDataQuality({assessmentId,assessedAt,caseId:evidence.id,transactionId:evidence.id,synthetic:true,assessmentSource:'cross-journey',journey:primaryJourney,scenario,...result,risk,decisionComplete:policy.decisionComplete,applicationAssessment:policy,businessAssessment:policy,decisionFingerprint:createHash('sha256').update(JSON.stringify({policy:policy.policy,controlScore,behavioralInputs,score:policy.score,patterns:policy.scoringComponents?.approvedPatterns})).digest('hex'),modelResult:caseData.modelAssessment,caseData,evidenceFingerprint:createHash('sha256').update(JSON.stringify(canonical)).digest('hex')});
 }

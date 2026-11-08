@@ -75,12 +75,12 @@ export function createApplicationAssessment(context, options = {}) {
   // Review decisions are written through /outcome or /decision, never imported as model evidence.
   for (const key of ['outcome', 'financialOutcome', 'decisionDate', 'decisionOwner', 'confirmedFraudAmount', 'preventedAmount', 'aiModel', 'modelAssessment', 'reviewHistory', 'humanDecision', 'workflow', 'audit', 'score', 'risk', 'approvedPatterns', 'patternAdjustment']) delete clean[key];
   const caseData = {
-    ...clean, ...policy, assessmentId, assessedAt, synthetic: true, assessmentMode: 'hybrid', assessmentSource: options.source || 'journey-prototype',
+    ...clean, ...policy, behavioralInputs:structuredClone(context.behavioralInputs??context.features??{}), requiredEvidenceMissing:!modelResult.complete||!!context.features?.missingData, assessmentId, assessedAt, synthetic: true, assessmentMode: 'hybrid', assessmentSource: options.source || 'journey-prototype',
     recommendedRoute:policy.route,
     features: { velocity: 0, retroDays: 0, linkedEntities: 0, priorRisk: 0, overrides: 0, identityReuse: 0, amountChangePct: 0, crossSourceConflict: 0, missingData: 0, urgentPriority: 0, ...context.features },
     anomalyScore: policy.scoringComponents?.anomalyScore??null,
     interaction: policy.scoringComponents?.patternAdjustment||0, confidence: 'Not calibrated', confidenceScore: null,
-    comparison: policy.decisionComplete?'Hybrid review priority combines existing controls, the existing model AI score and approved pattern adjustments.':policy.decisionIssue,
+    comparison: policy.decisionComplete?'Hybrid review priority combines existing controls, the Appendix feature-based behavioral score and pattern adjustments.':policy.decisionIssue,
     primaryCode: reasonCodes[0].code, primaryReason: reasonCodes[0].description,
     reasonCodes, signals: reasonCodes.map(entry => [entry.code, entry.description]),
     modelAssessment: modelSnapshot,

@@ -34,7 +34,7 @@ export function explanationEvidence(record) {
   facts.push(...connectedActivityFacts(data));
   if(data.dataQuality)facts.push({id:'data-quality',value:data.dataQuality});
   if(data.rulesEvidence)facts.push({id:'rule-evidence',value:{ruleCode:data.rulesEvidence.ruleCode,measure:data.rulesEvidence.measure,threshold:data.rulesEvidence.threshold,observed:data.rulesEvidence.observed}});
-  if(data.assessmentMode==='hybrid')facts.push({id:'hybrid-decision',value:{decisionComplete:data.decisionComplete,decisionIssue:data.decisionIssue,score:data.score,meaning:data.scoreMeaning,components:data.scoringComponents?{...data.scoringComponents,approvedPatterns:data.scoringComponents.approvedPatterns.map(p=>({code:p.code,description:p.description,points:p.points}))}:null,confidence:data.dataQuality?{label:data.dataQuality.label,score:data.dataQuality.score,meaning:'Supplied evidence quality; not probability of fraud or model certainty.'}:null}});
+  if(data.assessmentMode==='hybrid'||data.policy==='appendix-scoring-v1')facts.push({id:'hybrid-decision',value:{decisionComplete:data.decisionComplete,decisionIssue:data.decisionIssue,score:data.score,meaning:data.scoreMeaning,components:data.scoringComponents?{...data.scoringComponents,approvedPatterns:(data.scoringComponents.approvedPatterns||[]).map(p=>({code:p.code,description:p.description,points:p.points}))}:null,confidence:data.dataQuality?{label:data.dataQuality.label,score:data.dataQuality.score,meaning:'Supplied evidence quality; not probability of fraud or model certainty.'}:null}});
   const fingerprint=createHash('sha256').update(JSON.stringify(facts)).digest('hex');
   return {facts,fingerprint};
 }

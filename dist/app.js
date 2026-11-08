@@ -1303,6 +1303,7 @@ document.querySelector("#route-decision-form").addEventListener("submit", async 
 
 
 function generateCaseSummary(item) {
+  if(item.policy==='appendix-scoring-v1')return item.decisionComplete===false ? (item.decisionIssue||'Complete the required evidence before calculating the assessment.') : 'Assessment score: '+item.score+'/100. Existing controls contribute '+item.scoringComponents.controlContribution.toFixed(2)+' points; feature-based behavior contributes '+item.scoringComponents.anomalyContribution.toFixed(2)+' points; pattern adjustments contribute '+item.scoringComponents.patternAdjustment+' points. Recommended route: '+item.route+'. Model findings remain separate supporting evidence.';
   const recorded=item.outcome ? 'Recorded outcome: '+item.outcome+'. '+(item.outcomeProvenance==='Scripted demo outcome'?'This is a scripted demo outcome. ':'') : '';
   if(item.rulesAssessment)return recorded + item.primaryReason + ' Recommended route: '+item.route+'. This case uses an illustrative business control, not a trained AI model.';
   if (item.assessmentSource === "cross-journey" && item.assessmentMode!=="hybrid") return recorded + item.modelAssessment.reasons.join(" ") + " Recommended route: " + item.route + ". Assessment uses connected synthetic event evidence; the supplied operational-control context remains separate from the Cross-Journey Model.";
@@ -1310,7 +1311,7 @@ function generateCaseSummary(item) {
     const m = item.modelAssessment;
     if(item.assessmentMode==='hybrid'&&item.decisionComplete===false)return recorded+(item.decisionIssue||'Complete the decision evidence.')+' The original model evidence is retained. Recommended route: '+item.route+'.';
     if (!m.complete) return recorded + "Model evidence is incomplete. Complete the requested evidence before relying on a model recommendation. Existing control score: " + item.ruleScore + "/100. Specialist review is required.";
-    if(item.assessmentMode==='hybrid')return recorded+'Hybrid review score: '+item.score+'/100. Existing control '+item.ruleScore+'/100 contributes 55%; existing model AI '+Number(item.scoringComponents.anomalyScore).toFixed(1)+'/100 contributes 45%; approved pattern adjustment '+item.scoringComponents.patternAdjustment+'. '+(m.modelFlagged?'The model suggests review. ':'The model did not cross its review threshold. ')+'Recommended route: '+item.route+'. This prioritizes human review and is not a fraud probability.';
+    if(item.assessmentMode==='hybrid')return recorded+'Hybrid review score: '+item.score+'/100. Existing control '+item.ruleScore+'/100 contributes 55%; feature-based behavior '+Number(item.scoringComponents.anomalyScore).toFixed(1)+'/100 contributes 45%; pattern adjustment '+item.scoringComponents.patternAdjustment+'. '+(m.modelFlagged?'The model suggests review. ':'The model did not cross its review threshold. ')+'Recommended route: '+item.route+'. This prioritizes human review and is not a fraud probability.';
     return recorded + "Existing control score: " + item.ruleScore + "/100. The model returned an unusualness percentile of " + Number(m.percentile).toFixed(1) + "% against synthetic reference data. " + (m.modelFlagged ? "The model suggests review. " : "The model did not flag the combination at its threshold. ") + "These outputs are separate, not a calibrated fraud probability. Proposed route: " + item.route + ". The specialist retains the final decision.";
   }
 
@@ -1351,6 +1352,7 @@ function generateCaseSummary(item) {
 }
 
 function generateArabicCaseSummary(item) {
+  if(item.policy==='appendix-scoring-v1')return item.decisionComplete===false ? 'يلزم استكمال المدخلات السلوكية وأدلة الحالة قبل احتساب درجة التقييم.' : 'درجة التقييم: '+item.score+'/100. تُحتسب من 55٪ من درجة الضوابط القائمة و45٪ من الدرجة السلوكية مع تعديلات الأنماط. نتائج النماذج أدلة مساندة منفصلة، والقرار النهائي للمختص.';
   if(item.rulesAssessment)return 'تقييم قائم على ضوابط عمل توضيحية ببيانات اصطناعية. '+item.primaryReason;
   if (item.modelAssessment) {
     const m = item.modelAssessment;
@@ -1429,58 +1431,9 @@ function generateArabicCaseSummary(item) {
 
 function assess(raw, config, anomalyOverride) {
   const activeConfig = config || modelConfig;
-  let anomaly = 0;
-  featureConfig.forEach(function (config) {
-    const z = robustDeviation(raw.features[config.key], config.key);
-    const weight =
-      activeConfig.featureWeights[config.key] == null
-        ? config.weight
-        : activeConfig.featureWeights[config.key];
-    anomaly += weight * Math.min(z / 3, 1);
-  });
-  if (raw.features.crossSourceConflict)
-    anomaly += activeConfig.featureWeights.crossSourceConflict;
-  anomaly = Math.max(0, Math.min(100, Math.round(anomaly)));
-  if (Number.isFinite(anomalyOverride)) {
-    anomaly = Math.max(0, Math.min(100, Math.round(anomalyOverride)));
-  }
-
-  let interaction = 0;
-  const f = raw.features;
-  if (f.identityReuse >= 3 && f.crossSourceConflict) interaction += 10;
-  if (f.velocity >= 6 && f.linkedEntities >= 7) interaction += 10;
-  if (f.amountChangePct >= 80 && f.velocity >= 2) interaction += 8;
-  if (f.crossSourceConflict && f.priorRisk >= 50) interaction += 8;
-  if (f.retroDays >= 7 && f.velocity >= 2) interaction += 8;
-  if (f.overrides >= 2) interaction += 5;
-  if (!isSaudi(raw.country) && f.crossSourceConflict) interaction += 4;
-  interaction = Math.round(
-    (interaction * activeConfig.interactionMultiplier) / 100,
-  );
-
-  const totalWeight = Math.max(
-    1,
-    activeConfig.controlWeight + activeConfig.anomalyWeight,
-  );
-  const formulaScore = Math.round(
-    (raw.ruleScore * activeConfig.controlWeight) / totalWeight +
-      (anomaly * activeConfig.anomalyWeight) / totalWeight +
-      interaction,
-  );
-  const criticalControlFloor =
-    raw.ruleScore >= activeConfig.criticalControlFloor
-      ? activeConfig.highMin
-      : 0;
-  const score = Math.max(
-    0,
-    Math.min(100, Math.max(formulaScore, criticalControlFloor)),
-  );
-  const risk =
-    score >= activeConfig.highMin
-      ? "High"
-      : score > activeConfig.lowMax
-        ? "Medium"
-        : "Low";
+  const f=raw.features;
+  const appendix=MadarAppendixScoring.calculate({...raw,requiredEvidenceMissing:!!raw.features?.missingData},activeConfig);
+  const anomaly=appendix.scoringComponents?.anomalyScore??null,interaction=appendix.scoringComponents?.patternAdjustment??0,score=appendix.score,risk=appendix.risk;
   let confidenceScore = 94;
   if (f.missingData) confidenceScore -= 32;
   if (f.crossSourceConflict) confidenceScore -= 8;
@@ -1506,6 +1459,7 @@ function assess(raw, config, anomalyOverride) {
       ? "Ready to proceed"
       : "Awaiting specialist";
   return Object.assign({}, raw, {
+    ...appendix,
     assessmentMode: "legacy-simulation",
     anomalyScore: anomaly,
     interaction: interaction,
@@ -2369,8 +2323,8 @@ function renderOutsideList() {
 function renderHybridDecision(item){
   const decision=MadarCasePresentation.decisionBreakdown(item);if(!decision)return '';
   const number=value=>Number.isFinite(value)?String(Number(value.toFixed(2))):'—';
-  const components=decision.components.map(component=>`<div><dt>${escapeHtml(component.label)}${component.weight!==undefined?' · '+number(component.weight)+'%':''}</dt><dd>${number(component.points)} points</dd><small>${component.weight!==undefined?number(component.value)+'/100 × '+number(component.weight)+'%':component.matched?component.matched+' approved pattern'+(component.matched===1?'':'s')+' matched':'No approved adjustment matched'}</small></div>`).join('');
-  return `<div class="hybrid-explanation"><h4>How the review score is formed</h4>${decision.complete?`<dl class="hybrid-breakdown">${components}</dl><p>Final review score: <strong>${decision.score}/100</strong> · rounded and bounded to 0–100.</p>`:''}${decision.notes.map(note=>`<p>${escapeHtml(note)}</p>`).join('')}${decision.confidence?`<p>Evidence confidence: <strong>${escapeHtml(decision.confidence.label)}</strong> · ${decision.confidence.passed}/${decision.confidence.total} field checks passed. This describes supplied-data quality.</p>`:''}</div>`;
+  const components=decision.components.map(component=>`<div><dt>${escapeHtml(component.label)}${component.weight!==undefined?' · '+number(component.weight)+'%':''}</dt><dd>${number(component.points)} points</dd><small>${component.weight!==undefined?number(component.value)+'/100 × '+number(component.weight)+'%':component.matched?component.matched+' pattern'+(component.matched===1?'':'s')+' matched':'No pattern adjustment matched'}</small></div>`).join('');
+  return `<div class="hybrid-explanation"><h4>How the review score is formed</h4>${decision.complete?`<dl class="hybrid-breakdown">${components}</dl><p>Final review score: <strong>${decision.score}/100</strong> · rounded and bounded to 0–100.</p>`:''}${decision.complete&&decision.featureContributions.length?`<table class="model-contract-table"><thead><tr><th>Behavioral feature</th><th>Observed</th><th>Maximum</th><th>Points</th></tr></thead><tbody>${decision.featureContributions.map(f=>`<tr><td>${escapeHtml(f.label||f.key)}</td><td>${number(f.value)}</td><td>${number(f.maximum)}</td><td>${number(f.points)}</td></tr>`).join('')}</tbody></table>`:''}${decision.notes.map(note=>`<p>${escapeHtml(note)}</p>`).join('')}${decision.confidence?`<p>Evidence confidence: <strong>${escapeHtml(decision.confidence.label)}</strong> · ${decision.confidence.passed}/${decision.confidence.total} field checks passed. This describes supplied-data quality.</p>`:''}</div>`;
 }
 
 function renderLatestActivity() {
@@ -2498,7 +2452,7 @@ function renderQueue() {
               " " +
               (item.score == null ? " —" : " · " + item.score) +
               '</span><span class="subtext">' +
-              (item.assessmentMode === "hybrid" ? "Hybrid · control " + item.ruleScore + " · AI " + (item.anomalyScore == null ? "unavailable" : Number(item.anomalyScore).toFixed(1)) : item.modelAssessment ? "Existing control " + item.ruleScore + " · Reference percentile " + (item.modelAssessment.complete ? Number(item.modelAssessment.percentile).toFixed(1) + "%" : "unavailable") : item.rulesAssessment ? "Business Control" : "Scoring simulation · behavioral score " + item.anomalyScore) +
+              (item.rulesAssessment ? "Business Control" : item.policy === "appendix-scoring-v1" ? "Appendix · control " + item.ruleScore + " · behavior " + (item.anomalyScore == null ? "unavailable" : Number(item.anomalyScore).toFixed(1)) : item.modelAssessment ? "Existing control " + item.ruleScore + " · Reference percentile " + (item.modelAssessment.complete ? Number(item.modelAssessment.percentile).toFixed(1) + "%" : "unavailable") : item.rulesAssessment ? "Business Control" : "Scoring simulation · behavioral score " + item.anomalyScore) +
               "</span></td>",
             '<td><span class="confidence-chip ' +
               item.confidence +
@@ -2583,7 +2537,7 @@ function renderCase() {
       '"><div><strong>' +
       (item.score == null ? "—" : item.score) +
       "</strong><small>" +
-      (item.assessmentMode === "hybrid" ? "Hybrid review score" : item.rulesAssessment ? "Control score" : item.assessmentSource === "cross-journey" ? "Pattern review" : item.modelAssessment ? "Existing control" : "Scoring simulation") +
+      (item.policy === "appendix-scoring-v1" ? "Assessment score" : item.assessmentMode === "hybrid" ? "Hybrid review score" : item.rulesAssessment ? "Control score" : item.assessmentSource === "cross-journey" ? "Pattern review" : item.modelAssessment ? "Existing control" : "Scoring simulation") +
       "</small></div></div></div>",
     item.features.urgentPriority
       ? '<span class="urgent-banner">Urgent operational priority — urgency does not change risk</span>'
@@ -2639,11 +2593,11 @@ function renderCase() {
     '<div class="mini-score"><span>Existing control</span><strong>' +
       (item.ruleScore == null ? "Not supplied" : item.ruleScore) +
       "</strong></div>",
-    '<div class="mini-score"><span>' + (item.assessmentMode === 'hybrid' ? 'AI score (/100)' : item.assessmentSource === 'cross-journey' ? 'Pattern assessment' : item.modelAssessment ? 'Reference percentile' : item.rulesAssessment ? 'AI model' : 'Simulated behavioral score') + '</span><strong>' +
-      (item.assessmentMode === 'hybrid' ? (item.anomalyScore == null ? '—' : Number(item.anomalyScore).toFixed(1)) : item.assessmentSource === 'cross-journey' ? (!item.modelAssessment.complete ? 'Incomplete' : item.modelAssessment.modelFlagged ? 'Review' : 'Not flagged') : item.rulesAssessment ? 'Not used' : item.anomalyScore == null ? '—' : Number(item.anomalyScore).toFixed(1)) +
+    '<div class="mini-score"><span>' + (item.policy === 'appendix-scoring-v1' || item.assessmentMode === 'hybrid' ? 'Behavioral score (/100)' : item.assessmentSource === 'cross-journey' ? 'Pattern assessment' : item.modelAssessment ? 'Reference percentile' : item.rulesAssessment ? 'AI model' : 'Simulated behavioral score') + '</span><strong>' +
+      (item.policy === 'appendix-scoring-v1' || item.assessmentMode === 'hybrid' ? (item.anomalyScore == null ? '—' : Number(item.anomalyScore).toFixed(1)) : item.assessmentSource === 'cross-journey' ? (!item.modelAssessment.complete ? 'Incomplete' : item.modelAssessment.modelFlagged ? 'Review' : 'Not flagged') : item.rulesAssessment ? 'Not used' : item.anomalyScore == null ? '—' : Number(item.anomalyScore).toFixed(1)) +
       "</strong></div>",
     '<div class="mini-score"><span>Pattern adjustment</span><strong>' +
-      (item.assessmentMode === 'hybrid' ? (item.interaction||0)+' points' : item.modelAssessment || item.rulesAssessment ? 'Not applied' : '+' + item.interaction) +
+      (item.policy === 'appendix-scoring-v1' || item.assessmentMode === 'hybrid' ? (item.interaction||0)+' points' : item.modelAssessment || item.rulesAssessment ? 'Not applied' : '+' + item.interaction) +
       "</strong></div>",
     '<div class="mini-score"><span>Data quality</span><strong>' +
       (item.dataQuality ? item.dataQuality.label : item.confidenceScore + '% illustrative') +
@@ -2979,15 +2933,8 @@ function renderModelState() {
       '</span><span><i class="high-dot"></i>High ' +
       modelConfig.highMin +
       "–100</span>";
-  if (appendixFormula)
-    appendixFormula.innerHTML =
-      "<b>" +
-      modelConfig.controlWeight +
-      "%</b> Existing Control Score <span>+</span><b>" +
-      modelConfig.anomalyWeight +
-      "%</b> Simulated Behavioral Score <span>+</span> " +
-      modelConfig.interactionMultiplier +
-      "% of simulated Pattern Adjustment. This formula applies to the business-rule cases in the shared queue; fitted ML outputs remain separate.";
+  if (appendixFormula) appendixFormula.innerHTML = '<b>55%</b> Existing Control Score <span>+</span><b>45%</b> Behavioral Score <span>+</span> Pattern Adjustment. Rounded to the nearest whole number and capped at 100. The Assessment queue uses these fixed Appendix settings; Scoring Simulation settings apply only to sandbox previews.';
+
 }
 
 const scenarioReviewStages = ["Specialist Review", "Testing", "GM Approval", "Approved", "Active"];

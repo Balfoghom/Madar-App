@@ -1,4 +1,6 @@
+import {behavioral} from './fixtures/behavioral.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';
+import {createCrossJourneyAssessment,demoCases} from '../lib/cross-journey-adapter.mjs';
 import {routingPolicy,withRouting} from '../lib/routing-policy.mjs';
 import {createWorkspacePortfolio} from '../lib/workspace-demo.mjs';
 test('six canonical routes have accountable owners and concrete next steps',()=>{
@@ -8,7 +10,7 @@ test('six canonical routes have accountable owners and concrete next steps',()=>
 });
 test('digital model findings propose cybersecurity review without rewriting fitted evidence or human overrides',()=>{
  const records=createWorkspacePortfolio();for(const id of ['009','010','011']){
- const r=records.find(r=>r.caseId==='CJ-SYN-enterprise-'+id);assert.equal(r.caseData.recommendedRoute,'Cybersecurity Review');assert.equal(r.caseData.recommendedOwner,'Cybersecurity');
+ const r=createCrossJourneyAssessment(demoCases[Number(id)],{ruleScore:55,behavioralInputs:behavioral});assert.equal(r.caseData.recommendedRoute,'Cybersecurity Review');assert.equal(r.caseData.recommendedOwner,'Cybersecurity');
  const model=structuredClone(r.modelResult),override=structuredClone(r);override.caseData.humanDecision={action:'override',route:'Business Owner Review'};override.caseData.route='Business Owner Review';
  const result=withRouting(override);assert.equal(result.caseData.route,'Business Owner Review');assert.equal(result.caseData.recommendedRoute,'Cybersecurity Review');assert.deepEqual(result.modelResult,model);
  }

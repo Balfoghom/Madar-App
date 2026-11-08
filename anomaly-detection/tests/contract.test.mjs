@@ -1,3 +1,4 @@
+import {behavioral} from './fixtures/behavioral.mjs';
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {mkdtemp,rm,readFile} from 'node:fs/promises';
@@ -12,7 +13,7 @@ test('integration contract: CSV inference, hybrid scores, abstention and immutab
  const cases=JSON.parse(await readFile(new URL('../data/cases.json',import.meta.url),'utf8'));
  const server=createInferenceServer();server.listen(0,'127.0.0.1');await once(server,'listening');const base='http://127.0.0.1:'+server.address().port;
  async function post(path,body,status=200){const r=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await r.json();assert.equal(r.status,status,JSON.stringify(j));return j;}
- const context=(n,score=20)=>({id:'UPL-contract-'+n,synthetic:true,transactionId:'TEST-'+n,journey:'SANED',scenario:'Synthetic contract check',ruleScore:score,transactionAmount:12000,features:{},modelInput:{case_id:cases[n].id}});
+ const context=(n,score=20)=>({id:'UPL-contract-'+n,synthetic:true,transactionId:'TEST-'+n,journey:'SANED',scenario:'Synthetic contract check',ruleScore:score,transactionAmount:12000,features:{...behavioral},modelInput:{case_id:cases[n].id}});
  try {
   const uploaded=await post('/upload',{csv:'synthetic,journey\ntrue,SANED',mode:'append',rows:[context(0),context(2),context(5)]});
   assert.equal(uploaded.saved.length,3);

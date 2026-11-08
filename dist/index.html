@@ -732,7 +732,7 @@
             </div>
             <p class="session-note journey-model-registry-note">Training and holdout figures use generated synthetic cases only. These measurements are not proof of real-world performance, and the model does not determine fraud.</p>
           </section>
-          <section class="panel formula-card saned-architecture" aria-label="Shared decision and explainability architecture"><p class="eyebrow">SHARED DECISION & EXPLAINABILITY</p><h3>Existing models → hybrid decision → explained review route</h3><p>The existing journey and Cross-Journey Models retain their training, features and inference. A shared layer turns model evidence and existing controls into an explained review recommendation.</p><p>The hybrid engine combines 55% existing control score, 45% AI anomaly score and approved behavioral-pattern adjustments. Reason codes, field-quality confidence and supporting evidence explain the recommended route. The specialist retains the final decision.</p><p class="session-note">No adjustment catalog entries are currently approved. Proposed indicators and reference scenarios do not change scoring. All model-based cases use the shared decision policy; original model outputs remain available as supporting evidence.</p></section>
+          <section class="panel formula-card saned-architecture" aria-label="Shared decision and explainability architecture"><p class="eyebrow">SHARED DECISION & EXPLAINABILITY</p><h3>Existing models → hybrid decision → explained review route</h3><p>The existing journey and Cross-Journey Models retain their training, features and inference. A shared layer turns model evidence and existing controls into an explained review recommendation.</p><p>The hybrid engine combines 55% existing control score, 45% feature-based behavioral score and Appendix pattern adjustments. Reason codes, field-quality confidence and supporting evidence explain the recommended route. The specialist retains the final decision.</p><p class="session-note">The Appendix defines the active feature contributions and pattern conditions. Proposed indicators do not change scoring. Original model outputs remain available as supporting evidence. Required scoring inputs must be supplied; missing values are never treated as zero.</p></section>
           <div class="method-grid">
             <article class="panel formula-card">
               <p class="eyebrow">PROTOTYPE ASSUMPTION</p>
@@ -748,7 +748,7 @@
                 ><span><i class="high-dot"></i>High 75–100</span>
               </div>
               <p>
-                This formula drives business-rule demonstration scores in the shared queue. Journey and Cross-Journey Model outputs remain separate and are not changed by these weights.
+                The Appendix formula governs all Assessment queue scores. Journey and Cross-Journey Model findings remain separate supporting evidence. Scoring Simulation provides independent sandbox previews.
               </p>
             </article>
             <article class="panel governance-card">
@@ -820,9 +820,9 @@
           <div class="page-heading">
             <div>
               <p class="eyebrow">APPENDIX · SCORING METHODOLOGY</p>
-              <h2>Business-rule simulation and model evidence</h2>
+              <h2>Assessment scoring methodology</h2>
               <p>
-                The weighted formula below applies only to business-rule simulation cases. Journey-specific anomaly models and the Cross-Journey Model retain their own findings; their outputs are not blended into this score.
+                This is the scoring specification for every record in the Assessment queue. Behavioral inputs are scored using the feature contributions below. Journey and Cross-Journey Model findings remain separate supporting evidence and do not enter this calculation. Missing required inputs produce an Incomplete assessment.
               </p>
             </div>
             <span class="status-chip neutral">Explainable by design</span>
@@ -842,10 +842,10 @@
             <article class="panel appendix-step">
               <span class="appendix-number">2</span>
               <div>
-                <p class="eyebrow">BEHAVIORAL SIMULATION</p>
-                <h3>Simulated behavioral contribution</h3>
+                <p class="eyebrow">BEHAVIORAL ASSESSMENT</p>
+                <h3>Feature-based behavioral contribution</h3>
                 <p>
-                  Illustrative features contribute configured points within the simulator. These weighted points are not the trained models’ anomaly outputs.
+                  Each feature contributes up to its listed maximum. For numeric features, points = maximum × min(positive deviation ÷ 3, 1), where deviation = (observed value − reference median) ÷ (1.4826 × median absolute deviation). A reported source conflict contributes its full 12 points. The sum is rounded and capped at 100. These are feature points, separate from trained-model outputs.
                 </p>
               </div>
             </article>
@@ -855,9 +855,7 @@
                 <p class="eyebrow">SEQUENCE CONTEXT</p>
                 <h3>Pattern Adjustment</h3>
                 <p>
-                  Additional controlled points apply only when approved
-                  combinations occur together—for example, a retroactive change
-                  within a rapid event sequence.
+                  Configured pattern adjustments apply when their conditions are met: identifier reuse ≥3 with source conflict (+10); velocity ≥6 with linked entities ≥7 (+10); material change ≥80% with velocity ≥2 (+8); source conflict with prior validated outcome indicator ≥50 (+8); retroactive days ≥7 with velocity ≥2 (+8); overrides ≥2 (+5); external location with source conflict (+4). Location alone adds no points. Multiple matched adjustments are added together.
                 </p>
               </div>
             </article>
@@ -865,7 +863,7 @@
 
           <article class="panel appendix-formula-card">
             <div>
-              <p class="eyebrow">CURRENT SANDBOX CONFIGURATION</p>
+              <p class="eyebrow">ASSESSMENT QUEUE SPECIFICATION</p>
               <h3>Combined assessment</h3>
               <p id="appendix-formula" class="appendix-equation">
                 <b>55%</b> Existing Control Score <span>+</span> <b>45%</b> AI
@@ -937,7 +935,7 @@
             <article class="panel appendix-table-card">
               <div class="card-heading">
                 <div>
-                  <p class="eyebrow">AI ANOMALY FEATURES</p>
+                  <p class="eyebrow">BEHAVIORAL FEATURES</p>
                   <h3>Maximum prototype contribution</h3>
                   <p>
                     A feature earns only part of its maximum when its deviation
@@ -983,7 +981,7 @@
               <p class="eyebrow">SIMULATION AND MODEL FINDINGS</p>
               <h3>Rules and behavior remain separately visible</h3>
               <p>
-                Simulation contributions can raise or lower the business-rule demonstration score. A trained model supplies a separate finding; routing policy considers it alongside controls and evidence quality without rewriting the model result.
+                The displayed score follows the Appendix calculation. Model findings remain available as supporting evidence. Specialist routing and recorded decisions remain separately visible; a score is not a fraud probability.
               </p>
             </article>
             <article class="panel appendix-note-card governance-accent">
@@ -991,11 +989,10 @@
               <h3>Configuration is governed</h3>
               <ul class="boundary-list">
                 <li>
-                  Low: 0–34 · Medium: 35–74 · High: 75–100 under default sandbox settings. Current test thresholds are shown in Scoring Simulation.
+                  Low: 0–34 · Medium: 35–74 · High: 75–100. These fixed thresholds govern the Assessment queue. Sandbox settings affect Scoring Simulation previews only.
                 </li>
                 <li>
-                  An approved critical control can establish a minimum review
-                  floor.
+                  A control score of 80 or higher establishes a minimum assessment score of 75. All scores are rounded and capped between 0 and 100.
                 </li>
                 <li>
                   Data quality is separate from the risk band and model performance. Missing critical evidence requires verification.
@@ -1545,6 +1542,7 @@
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
     <script src="routing-policy.js?v=2"></script>
     <script src="case-presentation.js?v=2"></script>
+    <script src="appendix-scoring.js?v=1"></script>
     <script src="app.js?v=2.1.0"></script>
 <script src="madar.js?v=2.0.0"></script>
 

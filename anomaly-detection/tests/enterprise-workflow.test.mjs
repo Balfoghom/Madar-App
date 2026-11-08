@@ -1,3 +1,4 @@
+import {behavioral} from './fixtures/behavioral.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';import {mkdtemp,rm} from 'node:fs/promises';import {join} from 'node:path';import {tmpdir} from 'node:os';import {once} from 'node:events';
 import {createCrossJourneyAssessment,demoCases} from '../lib/cross-journey-adapter.mjs';
 const dir=await mkdtemp(join(tmpdir(),'madar-enterprise-'));process.env.ASSESSMENT_DATA_DIR=dir;
@@ -6,11 +7,11 @@ test.before(async()=>{server=createInferenceServer();server.listen(0,'127.0.0.1'
 test.after(async()=>{await new Promise(r=>server.close(r));await rm(dir,{recursive:true,force:true})});
 async function post(path,body,status=200){const response=await fetch(base+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await response.json();assert.equal(response.status,status,JSON.stringify(data));return data}
 const reviewer=record=>({caseId:record.caseId,assessmentId:record.assessmentId,actorName:'Test specialist',note:'Synthetic evidence reviewed.'});
-const input={id:'NEW-policy',synthetic:true,transactionId:'TX-SYN-policy',journey:'SANED',scenario:'Synthetic policy test',ruleScore:60,transactionAmount:100,features:{},modelInput:{case_id:'SYN-demo-00000'}};
+const input={id:'NEW-policy',synthetic:true,transactionId:'TX-SYN-policy',journey:'SANED',scenario:'Synthetic policy test',ruleScore:60,transactionAmount:100,features:{...behavioral},modelInput:{case_id:'SYN-demo-00000'}};
 test('sandbox drafts cannot change new assessment risk or routing',async()=>{
  const before=await post('/assess',{assessment:input});const {config}=await(await fetch(base+'/risk-config')).json();config.lowMax=70;
  const draft=await post('/risk-config',{config});assert.equal(draft.status,'Draft');
- const after=await post('/assess',{assessment:input});assert.equal(after.risk,before.risk);assert.equal(after.caseData.route,before.caseData.route);assert.equal(after.risk,'Medium');
+ const after=await post('/assess',{assessment:input});assert.equal(after.risk,before.risk);assert.equal(after.caseData.route,before.caseData.route);assert.equal(after.risk,'Low');
 });
 test('approval after override restores the original recommendation and requires named current review',async()=>{
  const record=(await post('/cross-journey/assess',{case_id:demoCases[1].id})).saved[0];const review=reviewer(record);

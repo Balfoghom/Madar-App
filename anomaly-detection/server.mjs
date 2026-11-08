@@ -1,6 +1,6 @@
 import {HYBRID_POLICY_VERSION} from './lib/hybrid-policy.mjs';
 import {routingPolicy} from './lib/routing-policy.mjs';
-import {createWorkspacePortfolio,createDemoIntake,DEMO_INTAKE_BATCH,enrichDemoRecord,applyBusinessConfig,caseStatus,activeWorkspaceRecords,retainRecordedRoute} from './lib/workspace-demo.mjs';
+import {createWorkspacePortfolio,createDemoIntake,DEMO_INTAKE_BATCH,enrichDemoRecord,applyBusinessConfig,caseStatus,activeWorkspaceRecords,retainRecordedRoute,withAppendixAssessment} from './lib/workspace-demo.mjs';
 import {createDemoPortfolio} from './lib/demo-portfolio.mjs';
 import {withDataQuality} from './lib/data-quality.mjs';
 import {llmStatus, explanationEvidence, generateExplanation, generateCaseAnswer, validateLanguage, validateConversation, PROMPT_VERSION} from './lib/case-explainer.mjs';
@@ -63,7 +63,7 @@ async function readQueueCases() {
 
 async function readSavedAssessments() {
   try {
-    return JSON.parse(await readFile(assessmentsPath, "utf8"));
+    return JSON.parse(await readFile(assessmentsPath, "utf8")).map(withAppendixAssessment);
   } catch (error) {
     if (error.code === "ENOENT") return [];
     throw error;
@@ -72,7 +72,7 @@ async function readSavedAssessments() {
 
 function writeSavedAssessments(saved) {
   const temporaryPath = assessmentsPath + ".tmp";
-  return writeFile(temporaryPath, JSON.stringify(saved.slice(0, 200).map(retainRecordedRoute).map(withDataQuality), null, 2) + "\n")
+  return writeFile(temporaryPath, JSON.stringify(saved.slice(0, 200).map(retainRecordedRoute).map(withAppendixAssessment), null, 2) + "\n")
     .then(() => rename(temporaryPath, assessmentsPath));
 }
 
@@ -468,7 +468,7 @@ export function createInferenceServer({explain = generateExplanation, answer = g
             const connected=record.assessmentSource==='cross-journey'&&old?.crossJourneyEvidence;
             const modeled=old?.modelAssessment&&!old.businessSimulation&&record.assessmentSource!=='rules-demo';
             const expectedVersion=connected?crossJourneyModel.version:old?.journey==='SANED'?model.version:journeyModelMetadata.find(m=>m.journey===old?.journey)?.version;
-            if((!connected&&!modeled)||(record.modelResult?.modelVersion===expectedVersion&&old.policy===HYBRID_POLICY_VERSION))return record;
+            if((!connected&&!modeled)||(record.modelResult?.modelVersion===expectedVersion))return record;
             const fresh=connected?createCrossJourneyAssessment(old.crossJourneyEvidence,{ruleScore:old.ruleScore}):createApplicationAssessment(old,{source:record.assessmentSource});
             const preserved={};for(const key of ['customerName','employerName','subject','entity','nationalId','mobile','employerNumber','supervisorName','country','region','city','transactionAmount','amountAtRisk','preventedAmount','confirmedFraudAmount','paymentStatus','financialOutcome','financialProvenance','outcome','outcomeProvenance','decisionDate','decisionOwner','reviewHistory','humanDecision','workflow','workflowStage','demoPortfolio','recordedRoute','demoIntakeBatch','intakeReceivedAt','scenario'])if(old[key]!==undefined)preserved[key]=old[key];
             Object.assign(fresh.caseData,preserved,{assessmentHistory:[...(old.assessmentHistory||[]),{assessmentId:record.assessmentId,modelVersion:record.modelResult?.modelVersion,policy:old.policy,assessedAt:record.assessedAt}].slice(-10)});
@@ -477,17 +477,7 @@ export function createInferenceServer({explain = generateExplanation, answer = g
             fresh.caseData.status=caseStatus(fresh.caseData);fresh.reviewHistory=record.reviewHistory||[];
             return fresh;
           });
-          const records=[...added,...migrated].map(retainRecordedRoute).map(enrichDemoRecord).map(record=>{
-            if(!record.caseData?.businessSimulation)return record;
-            const data=applyBusinessConfig(record.caseData,settings.config||defaultRiskConfig);data.status=caseStatus(data);
-            const fingerprint=JSON.stringify({score:data.score,risk:data.risk,interaction:data.interaction,route:data.recommendedRoute,config:settings.config||defaultRiskConfig});
-            if(record.caseData.scoringFingerprint && record.caseData.scoringFingerprint!==fingerprint){
-              data.assessmentHistory=[...(data.assessmentHistory||[]),{assessmentId:record.assessmentId,score:record.caseData.score,risk:record.caseData.risk}].slice(-10);
-              record={...record,assessmentId:crypto.randomUUID()};data.assessmentId=record.assessmentId;
-            }
-            data.scoringFingerprint=fingerprint;
-            return {...record,caseData:data,risk:data.risk,complete:data.rulesAssessment.complete,applicationAssessment:{route:data.recommendedRoute}};
-          });
+          const records=[...added,...migrated].map(retainRecordedRoute).map(enrichDemoRecord).map(withAppendixAssessment);
           await writeJsonFile(humanReviewsPath,[...reviews,...added.flatMap(r=>r.reviewHistory||[])]);
           await writeSavedAssessments(records);
           return {saved:activeWorkspaceRecords(records).map(withDataQuality),added:added.length,syntheticOnly:true};
@@ -538,12 +528,13 @@ export function createInferenceServer({explain = generateExplanation, answer = g
         let payload = "";
         for await (const chunk of req) { payload += chunk; if (Buffer.byteLength(payload) > 1_100_000) return send(413,{error:"Event upload is too large."}); }
         const body = JSON.parse(payload);
-        if (!body || Array.isArray(body) || Object.keys(body).some(k=>!["csv","case_id","evidence","existingControlScore"].includes(k)) || ["csv","case_id","evidence"].filter(k=>Object.hasOwn(body,k)).length!==1) throw new InputError("Supply csv, a bundled case_id, or saved synthetic evidence.");
+        if (!body || Array.isArray(body) || Object.keys(body).some(k=>!["csv","case_id","evidence","existingControlScore","behavioralInputs"].includes(k)) || ["csv","case_id","evidence"].filter(k=>Object.hasOwn(body,k)).length!==1) throw new InputError("Supply csv, a bundled case_id, or saved synthetic evidence.");
         const inputs = body.csv !== undefined ? parseEventCSV(body.csv) : body.evidence ? [body.evidence] : [demoCases.find(c => c.id === body.case_id)];
         if (body.evidence && (body.evidence.synthetic !== true || typeof body.evidence.id !== 'string' || !/^CJ-SYN-[\w-]+$/.test(body.evidence.id) || !Array.isArray(body.evidence.events) || body.evidence.events.length > 1000 || body.evidence.events.some(e=>!e || typeof e.eventId !== 'string' || !e.eventId.trim() || !Number.isFinite(e.recordedAt) || !Number.isFinite(new Date(e.recordedAt).getTime())) || new Set(body.evidence.events.map(e=>e.eventId)).size !== body.evidence.events.length || !Number.isFinite(body.evidence.asOf) || !Number.isFinite(new Date(body.evidence.asOf).getTime()))) throw new InputError('Supply a valid synthetic event history.');
         if (inputs.some(c=>!c)) throw new InputError("Synthetic cross-journey case not found.",404);
         if(body.existingControlScore!==undefined&&(!Number.isFinite(body.existingControlScore)||body.existingControlScore<0||body.existingControlScore>100))throw new InputError('Existing control score must be between 0 and 100.');
-        const records = inputs.map(input=>createCrossJourneyAssessment(input,{ruleScore:body.existingControlScore}));
+        if(body.behavioralInputs!==undefined&&(!body.behavioralInputs||typeof body.behavioralInputs!=='object'||Array.isArray(body.behavioralInputs)))throw new InputError('Behavioral inputs must be an object.');
+        const records = inputs.map(input=>createCrossJourneyAssessment(input,{ruleScore:body.existingControlScore,behavioralInputs:body.behavioralInputs}));
         const operation = assessmentWrites.catch(()=>{}).then(async()=>{
           const previous = await readSavedAssessments();
           const reviews = await readJsonFile(humanReviewsPath, []);

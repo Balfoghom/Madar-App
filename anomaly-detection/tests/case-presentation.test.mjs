@@ -1,3 +1,4 @@
+import {behavioral} from './fixtures/behavioral.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import '../../dist/case-presentation.js';
@@ -8,9 +9,9 @@ test('case presentation retains distinct control, connected and simulation scori
  const rule=portfolio.find(r=>r.assessmentSource==='rules-demo'&&r.complete).caseData;
  assert.equal(view.score(rule).value,rule.ruleScore);assert.equal(view.score(rule).label,'Control score');
  const saned=portfolio.find(r=>r.caseId==='NEW-ENTERPRISE-SANED-1').caseData;
- assert.equal(view.score(saned).value,saned.score);assert.equal(view.score(saned).kind,'hybrid');assert.equal(view.score(saned).label,'Hybrid review score');
+ assert.equal(view.score(saned).value,saned.score);assert.equal(view.score(saned).kind,'incomplete');assert.equal(view.score(saned).label,'Evidence incomplete');
  const linked=portfolio.find(r=>r.caseId==='CJ-SYN-enterprise-001').caseData;
- assert.equal(view.score(linked).value,linked.score);assert.equal(view.score(linked).kind,'hybrid');
+ assert.equal(view.score(linked).value,linked.score);assert.equal(view.score(linked).kind,'incomplete');
  const incomplete=portfolio.find(r=>!r.complete).caseData;assert.equal(view.score(incomplete).value,null);
  const simulated={score:88,risk:'High',ruleScore:77};assert.equal(view.score(simulated).value,88);assert.equal(view.score(simulated).kind,'simulation');
 });
@@ -75,8 +76,9 @@ test('maternity explanations name the request and linked evidence',()=>{
  assert.match(view.mainReason(item),/maternity request/);assert.doesNotMatch(view.mainReason(item),/SANED/);
 });
 
-test('shared decision breakdown exposes saved contributions without recomputing model outputs',()=>{
- const item=createDemoPortfolio().find(r=>r.caseId==='CJ-SYN-enterprise-001').caseData,before=JSON.stringify(item);
+test('shared decision breakdown exposes saved contributions without recomputing model outputs',async()=>{
+ const {createCrossJourneyAssessment,demoCases}=await import('../lib/cross-journey-adapter.mjs');
+ const item=createCrossJourneyAssessment(demoCases[1],{ruleScore:55,behavioralInputs:behavioral}).caseData,before=JSON.stringify(item);
  const breakdown=view.decisionBreakdown(item);assert.equal(breakdown.complete,true);assert.equal(breakdown.score,item.score);
  assert.deepEqual(breakdown.components.map(c=>c.points),[item.scoringComponents.controlContribution,item.scoringComponents.anomalyContribution,item.scoringComponents.patternAdjustment]);
  assert.equal(breakdown.confidence.label,item.dataQuality.label);assert.equal(JSON.stringify(item),before);

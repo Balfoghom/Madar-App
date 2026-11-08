@@ -1,3 +1,4 @@
+import {appendixScoring} from './appendix-scoring.mjs';
 import {withRouting} from './routing-policy.mjs';
 // Transparent field checks, not a probability that the case or model is correct.
 const supplied = value => typeof value === 'string' && value.trim() && !/^(not supplied|missing employer|—)$/i.test(value.trim());
@@ -8,6 +9,7 @@ export function dataQuality(data) {
   for(const field of ['transactionId','journey','subject','entity','country','region','city']) check(field,supplied(data[field]),['subject','entity'].includes(field));
   check('transactionAmount',number(data.transactionAmount)&&data.transactionAmount>=0);
   if(data.assessmentSource!=='cross-journey'||data.assessmentMode==='hybrid')check('existingControlScore',number(data.ruleScore)&&data.ruleScore>=0&&data.ruleScore<=100,true);
+  if(data.policy===appendixScoring.version)for(const field of appendixScoring.keys)check('behavioral.'+field,!(data.missingBehavioralInputs||[]).includes(field),true);
   // Linked-event conflicts are counted at their source cell, not again in the aggregate flag.
   if(!data.crossJourneyEvidence)check('sourceConsistency',!data.features?.crossSourceConflict);
   if(data.accessEvidence){

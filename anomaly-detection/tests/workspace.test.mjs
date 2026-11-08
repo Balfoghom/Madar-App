@@ -13,7 +13,7 @@ test('unified demo provides named, persisted business rules and ML cases without
  assert.deepEqual(enriched.modelResult,copy.modelResult);assert.deepEqual(enriched.caseData.crossJourneyEvidence,copy.caseData.crossJourneyEvidence);assert.equal(enriched.caseData.ruleScore,55);
  assert.ok(list.some(r=>/login|session/i.test(r.caseData.scenario)));assert.ok(list.some(r=>/IBAN/.test(r.caseData.scenario)));
 });
-test('workspace refresh preserves reviews; applying and resetting weights changes only business simulations',async()=>{
+test('workspace refresh preserves reviews; sandbox weights do not change the fixed Appendix queue specification',async()=>{
  const initial=await post('/workspace-demo');assert.equal(initial.added,77);
  const business=initial.saved.find(r=>r.caseId==='BRI-002'),model=initial.saved.find(r=>r.caseId==='CJ-SYN-enterprise-001');
  const defaults=(await(await fetch(base+'/risk-config')).json()).config;
@@ -22,7 +22,7 @@ test('workspace refresh preserves reviews; applying and resetting weights change
  const repeat=await post('/workspace-demo');assert.equal(repeat.added,0);assert.equal(repeat.saved.length,77);assert.ok(repeat.saved.find(r=>r.caseId===pending.caseId).reviewHistory.length);
  const config={...defaults,controlWeight:0,anomalyWeight:100,interactionMultiplier:0};await post('/risk-config',{config});
  const changed=await post('/workspace-demo');const altered=changed.saved.find(r=>r.caseId===business.caseId);
- assert.notEqual(altered.caseData.score,business.caseData.score);assert.notEqual(altered.assessmentId,business.assessmentId);
+ assert.equal(altered.caseData.score,business.caseData.score);assert.equal(altered.assessmentId,business.assessmentId);
  assert.deepEqual(changed.saved.find(r=>r.caseId===model.caseId).modelResult,model.modelResult);
  assert.equal(changed.saved.find(r=>r.caseId===pending.caseId).caseData.route,'Eligibility Verification');
  await post('/risk-config',{config:defaults});const reset=await post('/workspace-demo');assert.equal(reset.saved.find(r=>r.caseId===business.caseId).caseData.score,business.caseData.score);
@@ -111,11 +111,11 @@ test('resolved business and connected routes survive enrichment and recover a le
  const business=before.find(r=>r.caseId==='BRI-005'),b=structuredClone(business);delete b.caseData.recordedRoute;b.caseData.route='Straight-through processing';
  const recovered=retainRecordedRoute(b);assert.equal(recovered.caseData.route,'Data Verification Review');assert.equal(applyBusinessConfig(recovered.caseData,settings).route,'Data Verification Review');
  for(const [id,expected] of [['001','Eligibility Verification'],['009','Cybersecurity Review'],['010','Cybersecurity Review'],['011','Cybersecurity Review']]){
-  const record=structuredClone(before.find(r=>r.caseId==='CJ-SYN-enterprise-'+id));delete record.caseData.recordedRoute;record.caseData.route='Fraud Prevention & Inspection Review';record.caseData.assessmentHistory=[{modelVersion:record.modelResult.modelVersion}];
+  const record=structuredClone(before.find(r=>r.caseId==='CJ-SYN-enterprise-'+id));delete record.caseData.recordedRoute;record.caseData.policy='hybrid-review-55-45-v2';record.caseData.route='Fraud Prevention & Inspection Review';record.caseData.assessmentHistory=[{modelVersion:record.modelResult.modelVersion}];
   const restored=retainRecordedRoute(record),enriched=enrichDemoRecord(restored);assert.equal(enriched.caseData.route,expected,id);assert.deepEqual(enriched.reviewHistory,record.reviewHistory);assert.equal(enriched.caseData.outcome,record.caseData.outcome);assert.deepEqual(enriched.modelResult,record.modelResult);
  }
  const path=join(dir,'backend-assessments.json'),records=JSON.parse(await readFile(path,'utf8'));
- const damaged=records.find(r=>r.caseId==='CJ-SYN-enterprise-001');delete damaged.caseData.recordedRoute;damaged.caseData.route='Fraud Prevention & Inspection Review';damaged.caseData.assessmentHistory=[{modelVersion:damaged.modelResult.modelVersion}];
+ const damaged=records.find(r=>r.caseId==='CJ-SYN-enterprise-001');delete damaged.caseData.recordedRoute;damaged.caseData.policy='hybrid-review-55-45-v2';damaged.caseData.route='Fraud Prevention & Inspection Review';damaged.caseData.assessmentHistory=[{modelVersion:damaged.modelResult.modelVersion}];
  await writeFile(path,JSON.stringify(records));
  const repaired=(await post('/workspace-demo')).saved.find(r=>r.caseId===damaged.caseId);assert.equal(repaired.caseData.route,'Eligibility Verification');assert.equal(repaired.caseData.recordedRoute,'Eligibility Verification');assert.deepEqual(repaired.reviewHistory,damaged.reviewHistory);
  const repeat=(await post('/workspace-demo')).saved.find(r=>r.caseId===damaged.caseId);assert.equal(repeat.caseData.route,repaired.caseData.route);assert.equal(repeat.assessmentId,repaired.assessmentId);

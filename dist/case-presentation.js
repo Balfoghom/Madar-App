@@ -5,6 +5,7 @@
     const connected=item.assessmentSource==='cross-journey';
     const incomplete=item.decisionComplete===false || item.risk==='Incomplete' || item.modelAssessment?.complete===false || item.rulesAssessment?.complete===false;
     if(incomplete)return {value:null,label:'Evidence incomplete',kind:'incomplete',note:'Complete the required evidence before relying on this assessment.'};
+    if(item.policy==='appendix-scoring-v1')return {value:Number.isFinite(item.score)?item.score:null,label:'Appendix assessment score',kind:'hybrid',note:item.scoreMeaning};
     if(item.assessmentMode==='hybrid')return {value:Number.isFinite(item.score)?item.score:null,label:'Hybrid review score',kind:'hybrid',note:item.scoreMeaning||'Existing controls, AI anomaly score and approved pattern adjustments. Not a fraud probability.'};
     if(connected)return {value:null,label:item.modelAssessment?.modelFlagged?'Model review suggested':'No model review flag',kind:'pattern',note:'The connected model supplies a review recommendation. Existing control score and operational risk band are separate.'};
     if(item.businessSimulation)return {value:Number.isFinite(item.score)?item.score:null,label:'Business-rule score',kind:'simulation',note:'Configured business-rule scoring weights combine operational controls, simulated behavior and pattern adjustments. No trained ML model was used.'};
@@ -12,7 +13,7 @@
     return {value:Number.isFinite(item.score)?item.score:null,label:'Simulation score',kind:'simulation',note:'Weighted scoring simulation: existing controls, simulated behavior and pattern adjustments. Not a fraud probability.'};
   }
   function decisionBreakdown(item){
-    if(item.assessmentMode!=='hybrid')return null;
+    if(item.assessmentMode!=='hybrid'&&item.policy!=='appendix-scoring-v1')return null;
     const display=score(item),c=item.scoringComponents,notes=[];
     const complete=display.value!==null&&!!c;
     if(!complete)notes.push(item.decisionIssue||'Complete the required evidence before calculating the review score.');
@@ -20,9 +21,9 @@
     if(complete&&item.risk==='Medium'&&display.value<=34)notes.push('An assessment finding or source conflict still requires review even though the combined score is below 35.');
     return {score:display.value,complete,notes,components:complete?[
       {label:'Existing controls',value:c.controlScore,weight:c.controlWeight,points:c.controlContribution},
-      {label:'AI assessment',value:c.anomalyScore,weight:c.anomalyWeight,points:c.anomalyContribution},
-      {label:'Approved patterns',points:c.patternAdjustment,matched:c.approvedPatterns?.length||0}
-    ]:[],confidence:item.dataQuality?{label:item.dataQuality.label,passed:item.dataQuality.passed,total:item.dataQuality.total}:null};
+      {label:'Behavioral assessment',value:c.anomalyScore,weight:c.anomalyWeight,points:c.anomalyContribution},
+      {label:'Pattern adjustments',points:c.patternAdjustment,matched:c.approvedPatterns?.length||0}
+    ]:[],featureContributions:c?.featureContributions||[],confidence:item.dataQuality?{label:item.dataQuality.label,passed:item.dataQuality.passed,total:item.dataQuality.total}:null};
   }
   function state(item) {
     const outcome=typeof item.outcome==='string'?item.outcome:'';
@@ -84,7 +85,7 @@
       if(!facts.length && item.signals?.length)facts.push({title:'Review signal',text:item.signals[0][1],target:'assessment'});
     }
     if(item.accessEvidence){const missing=['loginDate','loginTime'].filter(field=>!item.accessEvidence[field]);if(missing.length)return [{title:'Login evidence missing',text:'Missing '+missing.map(field=>field==='loginDate'?'login date':'login time').join(' and ')+'. The event sequence cannot be verified; complete the access log and reassess.',target:'assessment'},{title:'Assessment deferred',text:'Low data quality: a critical event timestamp is unavailable. No model risk score was produced.',target:'assessment'}];}
-    if(item.dataQuality?.criticalMissing)facts.unshift({title:'Required evidence missing',text:'Required source fields are missing or invalid. Complete them before relying on the assessment.',target:'assessment'});
+    if(item.dataQuality?.criticalMissing&&!item.missingBehavioralInputs?.length)facts.unshift({title:'Required evidence missing',text:'Required source fields are missing or invalid. Complete them before relying on the assessment.',target:'assessment'});
     return facts.slice(0,3);
   }
   function journeys(item){
@@ -100,7 +101,7 @@
     }
     if(item.assessmentSource!=='cross-journey')return item.primaryReason||item.signals?.[0]?.[1]||'Review the supplied evidence.';
     const model=item.modelAssessment||{},reasons=model.reasons||[];
-    if(item.assessmentMode==='hybrid'&&item.decisionComplete===false&&item.decisionIssue?.startsWith('Existing control'))return item.decisionIssue;
+    if(item.decisionComplete===false&&item.decisionIssue?.startsWith('Existing control'))return item.decisionIssue;
     const request=item.journey==='SANED'?'SANED request':item.journey==='Maternity Benefit'?'maternity request':'service request';
     if(model.complete===false)return 'The connected source evidence is incomplete: '+(reasons[0]||'required event or employer records are missing.');
     if(!model.modelFlagged&&!model.ruleFlagged)return 'The connected activity remained below the model and comparator review thresholds.';

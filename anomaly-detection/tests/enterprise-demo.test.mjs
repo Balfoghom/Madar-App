@@ -1,3 +1,4 @@
+import {behavioral} from './fixtures/behavioral.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {mkdtemp,rm} from 'node:fs/promises';
@@ -26,7 +27,7 @@ test('enterprise demo covers six journeys with honest detection and outcome prov
 });
 
 test('data quality counts individual missing cells; zero is valid; critical gaps remain visible',()=>{
-  const base=createDemoPortfolio().find(r=>r.caseId==='NEW-ENTERPRISE-SANED-0').caseData;
+  const base={...createDemoPortfolio().find(r=>r.caseId==='NEW-ENTERPRISE-SANED-0').caseData,missingBehavioralInputs:[]};
   const one=structuredClone(base),ten=structuredClone(base);
   delete one.modelInput.sanedCase.events[0].subject;
   for(const event of ten.modelInput.sanedCase.events.slice(0,10))delete event.subject;
