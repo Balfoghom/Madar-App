@@ -2197,6 +2197,14 @@ function projectSaudi(point) {
   return [Math.round(x * 10) / 10, Math.round(y * 10) / 10];
 }
 
+const MAP_VOLUME_BANDS=[
+  {max:4,label:'1–4 cases',color:'#cfe4f4',text:'#163653'},
+  {max:8,label:'5–8 cases',color:'#83b7df',text:'#102e48'},
+  {max:12,label:'9–12 cases',color:'#2b6ea6',text:'#ffffff'},
+  {max:Infinity,label:'13+ cases',color:'#163f70',text:'#ffffff'}
+];
+function mapVolumeBand(count){return MAP_VOLUME_BANDS.find(band=>count<=band.max);}
+
 function renderMap() {
   const stats = regionStats();
   const boundaryPath =
@@ -2211,13 +2219,14 @@ function renderMap() {
     .map(function (name) {
       const value = stats[name];
       const coords = projectSaudi(REGION_GEO[name]);
-      const radius = 7 + Math.min(14, value.count * 3);
+      const radius = 11 + Math.min(12, Math.sqrt(value.count) * 3);
+      const volume=mapVolumeBand(value.count);
       return [
         '<g class="map-marker" data-region-link="' +
           escapeHtml(name) +
           '" tabindex="0" role="button" aria-label="' +
           escapeHtml(
-            name + ": " + value.count + " cases, highest risk " + value.maxRisk,
+            name + ": " + value.count + " cases; " + volume.label + "; " + value.high + " high, " + value.medium + " medium, " + value.low + " low, " + value.incomplete + " incomplete",
           ) +
           '">',
         '<circle class="marker-halo" cx="' +
@@ -2227,7 +2236,7 @@ function renderMap() {
           '" r="' +
           (radius + 7) +
           '" fill="' +
-          riskColor(value.maxRisk) +
+          volume.color +
           '"></circle>',
         '<circle cx="' +
           coords[0] +
@@ -2236,15 +2245,15 @@ function renderMap() {
           '" r="' +
           radius +
           '" fill="' +
-          riskColor(value.maxRisk) +
+          volume.color +
           '"><title>' +
-          escapeHtml(name + " · " + value.count + " cases · " + value.maxRisk) +
+          escapeHtml(name + " · " + value.count + " cases · " + volume.label) +
           "</title></circle>",
         '<text x="' +
           coords[0] +
           '" y="' +
           (coords[1] + 4) +
-          '" text-anchor="middle">' +
+          '" text-anchor="middle" style="fill:' + volume.text + '">' +
           value.count +
           "</text>",
         "</g>",
@@ -2263,6 +2272,7 @@ function renderMap() {
     '<text class="map-attribution" x="582" y="453" text-anchor="end">Boundary: Natural Earth (public domain)</text>',
     "</svg>",
   ].join("");
+  document.querySelector('#map-volume-legend').innerHTML='<span>Case volume</span>'+MAP_VOLUME_BANDS.map(band=>'<span><i aria-hidden="true" style="background:'+band.color+'"></i>'+band.label+'</span>').join('');
   const ordered = Object.keys(stats)
     .sort(function (a, b) {
       return stats[b].count - stats[a].count;
@@ -2276,7 +2286,7 @@ function renderMap() {
         return (
           '<button data-region-link="' +
           escapeHtml(name) +
-          '"><span>' +
+          '"><span style="background:' + mapVolumeBand(value.count).color + ';color:' + mapVolumeBand(value.count).text + '">' +
           value.count +
           "</span><div><strong>" +
           escapeHtml(name) +
