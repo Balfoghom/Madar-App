@@ -247,3 +247,8 @@ main>.workspace-load-status{margin:16px 26px}
 
 .map-marker:hover circle:not(.marker-halo),.map-marker:focus circle:not(.marker-halo){transform:none}
 .map-marker .marker-risk-segment{pointer-events:none;transition:stroke-width .18s ease}.map-marker:hover .marker-risk-segment,.map-marker:focus .marker-risk-segment{stroke-width:7}
+
+/* Keep Appendix contributions readable inside the narrow case review panel. */
+.hybrid-explanation .model-contract-table{table-layout:fixed;width:100%;min-width:0;margin-top:10px}
+.hybrid-explanation .model-contract-table th,.hybrid-explanation .model-contract-table td{padding:8px 3px;white-space:normal;overflow-wrap:anywhere;font-size:10px}
+.hybrid-explanation .model-contract-table th:first-child,.hybrid-explanation .model-contract-table td:first-child{width:43%}
