@@ -8,7 +8,7 @@ export function approvedPatternAdjustments(result,catalog=approvedPatterns,conte
  return catalog.filter(p=>p&&p.status==='Approved'&&p.journey===context.journey&&p.modelVersion===result.modelVersion&&typeof p.approvedBy==='string'&&p.approvedBy.trim()&&Number.isFinite(Date.parse(p.approvedAt))&&typeof p.code==='string'&&/^[A-Z][A-Z0-9_]+$/.test(p.code)&&typeof p.description==='string'&&Number.isFinite(p.points)&&Math.abs(p.points)<=20&&Array.isArray(p.conditions)&&p.conditions.length>0&&p.conditions.every(c=>c&&Object.hasOwn(facts,c.feature)&&Number.isFinite(c.value)&&Number.isFinite(facts[c.feature])&&(['gte','lte'].includes(c.operator))&&(c.operator==='gte'?facts[c.feature]>=c.value:facts[c.feature]<=c.value))).map(p=>({code:p.code,description:p.description,points:p.points,approvedBy:p.approvedBy,approvedAt:p.approvedAt}));
 }
 export function hybridPolicy(context,result){
- return appendixScoring.calculate({...context,requiredEvidenceMissing:context.requiredEvidenceMissing??(!result.complete||!!context.features?.missingData)});
+ return appendixScoring.calculate({...context,requiredEvidenceMissing:!result.complete||!!context.features?.missingData||!!context.requiredEvidenceMissing});
 }
 
 export function hybridReasons(policy){

@@ -11,6 +11,7 @@ test('Appendix score uses supplied feature points independently of raw model sco
  assert.equal(hybridPolicy({ruleScore:20,features:{...behavioral}},{...result,score:.99,percentile:0}).score,base.score);
  const strong=hybridPolicy({ruleScore:90,features:{...behavioral}},result);assert.equal(strong.score,75);assert.equal(strong.risk,'High');
  assert.equal(hybridPolicy({ruleScore:90},{complete:false}).score,null);
+ assert.equal(hybridPolicy({ruleScore:90,features:{...behavioral},requiredEvidenceMissing:false},{complete:false}).score,null);
  assert.equal(hybridPolicy({ruleScore:90,features:{...behavioral,priorRisk:undefined}},result).score,null);
 });
 test('only reviewed approved catalog patterns can contribute an adjustment',()=>{
